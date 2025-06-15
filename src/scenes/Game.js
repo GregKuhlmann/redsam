@@ -10,9 +10,33 @@ import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/Sprit
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
+import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
+import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
+import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
+import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
+import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
 
 const TILESIZE = 16;
+
+class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
+  constructor(game) {
+    super({
+      game,
+      fragShader: `
+        precision mediump float;
+        uniform sampler2D uMainSampler;
+        varying vec2 outTexCoord;
+
+        void main() {
+          vec4 color = texture2D(uMainSampler, outTexCoord);
+          float gray = (color.r + color.g + color.b) / 3.0;
+          gl_FragColor = vec4(vec3(gray), color.a);
+        }
+      `,
+    });
+  }
+}
 
 export class Game extends Phaser.Scene {
   constructor() {
@@ -25,7 +49,16 @@ export class Game extends Phaser.Scene {
     this.load.image("tilesetWater", tilesetWater);
     this.load.image("tilesetItems", tilesetItems);
     this.load.image("tilesetGUI", tilesetGUI);
+    this.load.audio("explosion", audioExplosion);
+    this.load.audio("collect", audioCollect);
+    this.load.audio("chestOpen", audioChestOpen);
+    this.load.audio("celebrate", audioCelebrate);
     this.load.tilemapTiledJSON("level1", level1);
+    this.game.renderer.pipelines.add(
+      "Grayscale",
+      new GrayscalePipeline(this.game)
+    );
+
     this.load.spritesheet("dragon", spriteSheetDragon, {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
@@ -45,6 +78,10 @@ export class Game extends Phaser.Scene {
     this.load.spritesheet("aura", spriteSheetAura, {
       frameWidth: 25,
       frameHeight: 24,
+    });
+    this.load.spritesheet("smoke", spriteSheetSmoke, {
+      frameWidth: 32,
+      frameHeight: 32,
     });
     this.load.spritesheet("chest", spriteSheetChest, {
       frameWidth: TILESIZE,
@@ -69,7 +106,7 @@ export class Game extends Phaser.Scene {
       "tilesetWater"
     );
     const tilesetGUI = this.level.addTilesetImage("TilesetGUI", "tilesetGUI");
-    this.tilesetItems = this.level.addTilesetImage(
+    const tilesetItems = this.level.addTilesetImage(
       "TilesetItems",
       "tilesetItems"
     );
@@ -78,7 +115,7 @@ export class Game extends Phaser.Scene {
       tilesetNature,
       tilesetWater,
       tilesetGUI,
-      this.tilesetItems,
+      tilesetItems,
     ];
 
     this.level.createLayer("LayerBackground", tilesets, 0, 0);
@@ -152,12 +189,28 @@ export class Game extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: "lolo-celebrate",
+      frames: this.anims.generateFrameNumbers("lolo", {
+        frames: [24, 25, 24, 25, 26, 27],
+      }),
+      frameRate: 5,
+      repeat: 0,
+    });
+
+    this.anims.create({
       key: "dragon-idle",
       frames: this.anims.generateFrameNumbers("dragon", {
         frames: [0, 4, 8, 12, 2, 6, 10, 14],
       }),
       frameRate: 5,
       repeat: -1,
+    });
+    this.anims.create({
+      key: "dragon-frozen",
+      frames: this.anims.generateFrameNumbers("dragon", {
+        frames: [0],
+      }),
+      frameRate: 5,
     });
     this.anims.create({
       key: "spark",
@@ -178,6 +231,15 @@ export class Game extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: "smoke",
+      frames: this.anims.generateFrameNumbers("smoke", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    this.anims.create({
       key: "chest-closed",
       frames: this.anims.generateFrameNumbers("chest", {
         start: 0,
@@ -186,10 +248,18 @@ export class Game extends Phaser.Scene {
       frameRate: 10,
     });
     this.anims.create({
-      key: "chest-open",
+      key: "chest-sparkling",
       frames: this.anims.generateFrameNumbers("chest", {
         start: 1,
         end: 1,
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: "chest-collected",
+      frames: this.anims.generateFrameNumbers("chest", {
+        start: 2,
+        end: 2,
       }),
       frameRate: 10,
     });
@@ -209,7 +279,7 @@ export class Game extends Phaser.Scene {
     this.level.getLayer("LayerItems").data.forEach((row) => {
       row.forEach((tile) => {
         if (tile.index !== -1) {
-          const name = this.tilesetItems.getTileProperties(tile.index)?.name;
+          const name = tilesetItems.getTileProperties(tile.index)?.name;
           if (name === "lolo") {
             this.lolo.setPosition(tile.x * TILESIZE, tile.y * TILESIZE);
             this.lolo.aura = this.add
@@ -227,13 +297,13 @@ export class Game extends Phaser.Scene {
           } else if (name === "door") {
             const door = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
-              .setFrame(tile.index - this.tilesetItems.firstgid)
+              .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.door = { x: tile.x, y: tile.y, door, open: false };
           } else if (name === "crystal") {
             const crystal = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
-              .setFrame(tile.index - this.tilesetItems.firstgid)
+              .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             const spark = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "spark")
@@ -256,7 +326,13 @@ export class Game extends Phaser.Scene {
               .setOrigin(0)
               .setVisible(false)
               .play("spark");
-            this.chest = { x: tile.x, y: tile.y, chest, spark, open: false };
+            this.chest = {
+              x: tile.x,
+              y: tile.y,
+              chest,
+              spark,
+              state: "closed",
+            };
           } else {
             console.log(
               `Unknown tile at (${tile.x}, ${tile.y}) with index ${tile.index} and name ${name}`
@@ -318,37 +394,64 @@ export class Game extends Phaser.Scene {
       duration: 200,
       onComplete: () => {
         this.lolo.moving = false;
-        // did lolo collect a crystal?
         const tileX = Math.floor(nextX / TILESIZE);
         const tileY = Math.floor(nextY / TILESIZE);
         if (this.door.x == tileX && this.door.y == tileY) {
-          // freeze all tweens and animations
+          this.lolo.moving = true;
           this.tweens.killAll();
-          this.anims.pauseAll();
-          this.cameras.main.fadeOut(1000, 0, 0, 0); // duration in ms, RGB fade color
-
+          this.sound.play("celebrate");
+          this.lolo.play("lolo-celebrate");
+          this.lolo.aura.setVisible(false);
+          this.lolo.on("animationcomplete", (animation) => {
+            if (animation.key === "lolo-celebrate") {
+              this.cameras.main.fadeOut(500, 0, 0, 0); // duration in ms, RGB fade color
+            }
+          });
           this.cameras.main.once("camerafadeoutcomplete", () => {
             this.anims.resumeAll();
             this.scene.restart(); // or use this.scene.start('SceneName') to go to a different scene
           });
         }
-        if (this.chest.x == tileX && this.chest.y == tileY) {
+        if (
+          this.chest.x == tileX &&
+          this.chest.y == tileY &&
+          this.chest.state === "sparkling"
+        ) {
+          this.dragons.forEach((dragon) => {
+            dragon.dragon.play("dragon-frozen");
+            dragon.dragon.setPipeline("Grayscale");
+          });
+
+          this.chest.state = "collected";
+          this.chest.chest.play("chest-collected");
           this.chest.spark.setVisible(false);
-          this.door.open = true;
-          this.door.door.setVisible(false);
           this.cameras.main.shake(200, 0.01);
+          this.sound.play("explosion");
+          const smoke = this.add
+            .sprite(this.door.x * TILESIZE, this.door.y * TILESIZE, "smoke")
+            .setScale(16 / 32)
+            .setOrigin(0)
+            .play("smoke");
+          smoke.on("animationupdate", (animation, frame) => {
+            if (frame.index === 3) {
+              this.door.open = true;
+              this.door.door.destroy();
+            }
+          });
+          smoke.on("animationcomplete", () => {
+            smoke.destroy();
+          });
         }
         this.crystals.forEach((crystal) => {
           if (crystal.x == tileX && crystal.y == tileY) {
+            this.sound.play("collect");
             crystal.crystal.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
-            console.log(
-              `Collected crystal at (${tileX}, ${tileY}). Crystals remaining: ${this.crystalsRemaining}`
-            );
             if (this.crystalsRemaining == 0) {
-              this.chest.open = true;
-              this.chest.chest.play("chest-open");
+              this.sound.play("chestOpen");
+              this.chest.state = "sparkling";
+              this.chest.chest.play("chest-sparkling");
               this.chest.spark.setVisible(true);
             }
           }
@@ -373,7 +476,7 @@ export class Game extends Phaser.Scene {
     }
 
     if (this.chest.x == tileX && this.chest.y == tileY) {
-      return !this.chest.open;
+      return this.chest.state === "closed";
     }
 
     if (this.dragons.some((dragon) => dragon.x == tileX && dragon.y == tileY)) {
