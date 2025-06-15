@@ -1,0 +1,102 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "level1.json",
+    "expandedProjectPaths": [
+    ],
+    "fileStates": {
+        "": {
+            "scaleInDock": 3.7243,
+            "scaleInEditor": 1
+        },
+        "#TilesetNature": {
+            "scaleInDock": 2.7245
+        },
+        "#TilesetWallSimple": {
+            "scaleInDock": 1.005
+        },
+        "#TilesetWater": {
+            "scaleInDock": 2.2876
+        },
+        "desert1.json": {
+            "scale": 2.48,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 134.2741935483871,
+                "y": 109.67741935483872
+            }
+        },
+        "desert1.json#BigTreasureChest": {
+            "dynamicWrapping": false,
+            "scaleInDock": 4.1602
+        },
+        "desert1.json#Dragon": {
+            "scaleInDock": 2.6582
+        },
+        "desert1.json#RedNinja": {
+            "dynamicWrapping": false,
+            "scaleInDock": 3.7243,
+            "scaleInEditor": 1
+        },
+        "desert1.json#SpriteSheet": {
+            "scaleInEditor": 1
+        },
+        "desert1.json#TilesetElement": {
+            "scaleInDock": 3.1527
+        },
+        "desert1.json#TilesetHouse": {
+            "scaleInDock": 2.215,
+            "scaleInEditor": 1
+        },
+        "desert1.json#TilesetItems": {
+            "dynamicWrapping": true,
+            "scaleInEditor": 1
+        },
+        "desert1.json#TilesetNature": {
+            "dynamicWrapping": false,
+            "scaleInDock": 2.1413,
+            "scaleInEditor": 1.76
+        },
+        "desert1.json#TilesetWater": {
+            "dynamicWrapping": false,
+            "scaleInDock": 2.61,
+            "scaleInEditor": 1
+        },
+        "level1.json": {
+            "scale": 2.21,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 76.0180995475113,
+                "y": 155.65610859728505
+            }
+        },
+        "level1.json#ClassicRPG": {
+            "scaleInDock": 2.4427
+        },
+        "level1.json#GUI": {
+            "scaleInDock": 1.8811
+        }
+    },
+    "frame.defaultDuration": 300,
+    "last.imagePath": "/Users/kuhlmann/phaser/lolo/assets/Ninja",
+    "map.height": 14,
+    "map.lastUsedFormat": "json",
+    "map.tileHeight": 16,
+    "map.tileWidth": 16,
+    "map.width": 20,
+    "openFiles": [
+        "level1.json"
+    ],
+    "project": "lolo.tiled-project",
+    "recentFiles": [
+        "level1.json"
+    ],
+    "tileset.embedInMap": true,
+    "tileset.tileSize": {
+        "height": 16,
+        "width": 16
+    },
+    "tileset.type": 0
+}
