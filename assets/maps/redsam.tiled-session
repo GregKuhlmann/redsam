@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "level1.json",
+    "activeFile": "desert1.json",
     "expandedProjectPaths": [
     ],
     "fileStates": {
@@ -24,7 +24,7 @@
             "scale": 2.48,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 134.2741935483871,
+                "x": 150.2016129032258,
                 "y": 109.67741935483872
             }
         },
@@ -47,14 +47,17 @@
             "scaleInDock": 3.1527
         },
         "desert1.json#TilesetGUI": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 5.7242
         },
         "desert1.json#TilesetHouse": {
+            "dynamicWrapping": false,
             "scaleInDock": 2.215,
             "scaleInEditor": 1
         },
         "desert1.json#TilesetItems": {
             "dynamicWrapping": true,
+            "scaleInDock": 3.0801,
             "scaleInEditor": 1
         },
         "desert1.json#TilesetNature": {
@@ -90,10 +93,11 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "level1.json"
+        "desert1.json"
     ],
-    "project": "lolo.tiled-project",
+    "project": "redsam.tiled-project",
     "recentFiles": [
+        "desert1.json",
         "level1.json"
     ],
     "tileset.embedInMap": true,

@@ -64,7 +64,7 @@ export class Game extends Phaser.Scene {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
     });
-    this.load.spritesheet("lolo", spriteSheetRedNinja3, {
+    this.load.spritesheet("sam", spriteSheetRedNinja3, {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
     });
@@ -133,72 +133,72 @@ export class Game extends Phaser.Scene {
     this.textAmmo = this.add.sprite(296, 114, "font").setOrigin(0);
 
     this.anims.create({
-      key: "lolo-idle-down",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-idle-down",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [0],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-walk-down",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-walk-down",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [0, 4, 8, 12],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-idle-up",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-idle-up",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [1],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-walk-up",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-walk-up",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [1, 5, 9, 13],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-idle-left",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-idle-left",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [2],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-walk-left",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-walk-left",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [2, 6, 10, 14],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-idle-right",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-idle-right",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [3],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-walk-right",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-walk-right",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [3, 7, 11, 15],
       }),
       frameRate: 10,
       repeat: -1,
     });
     this.anims.create({
-      key: "lolo-celebrate",
-      frames: this.anims.generateFrameNumbers("lolo", {
+      key: "sam-celebrate",
+      frames: this.anims.generateFrameNumbers("sam", {
         frames: [24, 25, 24, 25, 26, 27],
       }),
       frameRate: 5,
@@ -285,9 +285,9 @@ export class Game extends Phaser.Scene {
       row.forEach((tile) => {
         if (tile.index !== -1) {
           const name = tilesetItems.getTileProperties(tile.index)?.name;
-          if (name === "lolo") {
+          if (name === "sam") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "lolo")
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "sam")
               .setOrigin(0);
             const aura = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "aura")
@@ -295,7 +295,7 @@ export class Game extends Phaser.Scene {
               .setOrigin(0)
               .setAlpha(0)
               .play("aura");
-            this.lolo = {
+            this.sam = {
               x: tile.x,
               y: tile.y,
               sprite,
@@ -309,7 +309,13 @@ export class Game extends Phaser.Scene {
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "dragon")
               .setOrigin(0)
               .play("dragon-idle");
-            this.dragons.push({ x: tile.x, y: tile.y, sprite, state: "idle" });
+            this.dragons.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              state: "idle",
+              sliding: false,
+            });
           } else if (name === "door") {
             const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
@@ -357,23 +363,23 @@ export class Game extends Phaser.Scene {
         }
       });
     });
-    this.lolo.sprite.setDepth(1000);
-    this.lolo.aura.setDepth(1001);
+    this.sam.sprite.setDepth(1000);
+    this.sam.aura.setDepth(1001);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", () => {
-      if (this.lolo.chargeTween) return;
-      this.lolo.chargeTween = this.tweens.add({
-        targets: this.lolo.aura,
+      if (this.sam.chargeTween) return;
+      this.sam.chargeTween = this.tweens.add({
+        targets: this.sam.aura,
         alpha: 1,
         duration: 500,
         ease: "Power2",
       });
     });
     this.input.keyboard.on("keyup-SPACE", () => {
-      if (this.lolo.chargeTween) {
-        this.lolo.chargeTween.destroy();
-        this.lolo.chargeTween = null;
-        this.lolo.aura.setAlpha(0);
+      if (this.sam.chargeTween) {
+        this.sam.chargeTween.destroy();
+        this.sam.chargeTween = null;
+        this.sam.aura.setAlpha(0);
       }
       this.shoot();
     });
@@ -388,8 +394,8 @@ export class Game extends Phaser.Scene {
       this.move(0, -1, "up");
     } else if (this.cursors.down.isDown) {
       this.move(0, 1, "down");
-    } else if (!this.lolo.moving) {
-      this.lolo.sprite.play(`lolo-idle-${this.lolo.direction}`);
+    } else if (!this.sam.moving) {
+      this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
   }
 
@@ -404,31 +410,63 @@ export class Game extends Phaser.Scene {
     });
   }
 
+  push(x, y, dx, dy) {
+    const targetX = x + dx;
+    const targetY = y + dy;
+    if (
+      this.dragons.some(
+        (dragon) => dragon.x === targetX && dragon.y === targetY
+      )
+    ) {
+      const dragon = this.dragons.find(
+        (dragon) => dragon.x === targetX && dragon.y === targetY
+      );
+      if (dragon.sliding) return false; // already sliding
+      dragon.sliding = true;
+      if (this.collisionAt(dragon.x + dx, dragon.y + dy)) return;
+      this.tweens.add({
+        targets: [dragon.sprite],
+        x: dragon.sprite.x + dx * TILESIZE,
+        y: dragon.sprite.y + dy * TILESIZE,
+        duration: 200,
+        onComplete: () => {
+          dragon.x += dx;
+          dragon.y += dy;
+          dragon.sliding = false;
+        },
+      });
+      return true;
+    }
+    return false;
+  }
+
   move(dx, dy, direction) {
-    if (this.lolo.moving) return;
-    this.lolo.direction = direction;
-    this.lolo.sprite.play(`lolo-walk-${direction}`, true);
+    if (this.sam.moving) return;
+    this.sam.direction = direction;
+    this.sam.sprite.play(`sam-walk-${direction}`, true);
 
-    if (this.collisionAt(this.lolo.x + dx, this.lolo.y + dy)) return;
-    this.lolo.x += dx;
-    this.lolo.y += dy;
+    if (this.collisionAt(this.sam.x + dx, this.sam.y + dy)) return;
+    if (this.push(this.sam.x, this.sam.y, dx, dy)) return;
 
-    this.lolo.moving = true;
+    this.sam.x += dx;
+    this.sam.y += dy;
+
+    this.sam.moving = true;
     this.tweens.add({
-      targets: [this.lolo.sprite, this.lolo.aura],
-      x: this.lolo.sprite.x + dx * TILESIZE,
-      y: this.lolo.sprite.y + dy * TILESIZE,
+      targets: [this.sam.sprite, this.sam.aura],
+      x: this.sam.sprite.x + dx * TILESIZE,
+      y: this.sam.sprite.y + dy * TILESIZE,
       duration: 200,
       onComplete: () => {
-        this.lolo.moving = false;
-        if (this.door.x == this.lolo.x && this.door.y == this.lolo.y) {
-          this.lolo.moving = true;
+        this.sam.moving = false;
+        if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
+          this.sam.moving = true;
           this.tweens.killAll();
           this.sound.play("celebrate");
-          this.lolo.sprite.play("lolo-celebrate");
-          this.lolo.aura.setVisible(false);
-          this.lolo.sprite.on("animationcomplete", (animation) => {
-            if (animation.key === "lolo-celebrate") {
+          this.sam.sprite.play("sam-celebrate");
+          this.sam.aura.setVisible(false);
+          this.sam.sprite.on("animationcomplete", (animation) => {
+            if (animation.key === "sam-celebrate") {
               this.cameras.main.fadeOut(500, 0, 0, 0); // duration in ms, RGB fade color
             }
           });
@@ -438,8 +476,8 @@ export class Game extends Phaser.Scene {
           });
         }
         if (
-          this.chest.x == this.lolo.x &&
-          this.chest.y == this.lolo.y &&
+          this.chest.x == this.sam.x &&
+          this.chest.y == this.sam.y &&
           this.chest.state === "sparkling"
         ) {
           this.chest.state = "collected";
@@ -463,7 +501,7 @@ export class Game extends Phaser.Scene {
           });
         }
         this.crystals.forEach((crystal) => {
-          if (crystal.x == this.lolo.x && crystal.y == this.lolo.y) {
+          if (crystal.x == this.sam.x && crystal.y == this.sam.y) {
             this.sound.play("collect");
             crystal.crystal.destroy();
             crystal.spark.destroy();
@@ -480,12 +518,16 @@ export class Game extends Phaser.Scene {
     });
   }
 
+  outOfBounds(x, y) {
+    return x < 4 || x > 14 || y < 1 || y > 12;
+  }
+
   collisionAt(x, y) {
     if (this.door.x == x && this.door.y == y) {
       return this.door.state === "closed";
     }
 
-    if (x < 4 || x > 14 || y < 1 || y > 12) return true;
+    if (this.outOfBounds(x, y)) return true;
 
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
     if (tile && tile.index !== -1) {
@@ -496,7 +538,11 @@ export class Game extends Phaser.Scene {
       return this.chest.state === "closed";
     }
 
-    if (this.dragons.some((dragon) => dragon.x == x && dragon.y == y)) {
+    if (
+      this.dragons.some(
+        (dragon) => dragon.x == x && dragon.y == y && dragon.state !== "frozen"
+      )
+    ) {
       return true;
     }
 
