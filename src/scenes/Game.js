@@ -315,7 +315,6 @@ export class Game extends Phaser.Scene {
               y: tile.y,
               sprite,
               state: "idle",
-              sliding: false,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -423,54 +422,38 @@ export class Game extends Phaser.Scene {
     });
   }
 
-  push(x, y, dx, dy) {
-    const targetX = x + dx;
-    const targetY = y + dy;
-    if (
-      this.dragons.some(
-        (dragon) => dragon.x === targetX && dragon.y === targetY
-      )
-    ) {
-      const dragon = this.dragons.find(
-        (dragon) => dragon.x === targetX && dragon.y === targetY
-      );
-      if (dragon.sliding) return false; // already sliding
-      dragon.sliding = true;
-      if (this.collisionAt(dragon.x + dx, dragon.y + dy)) return;
-      this.tweens.add({
-        targets: [dragon.sprite],
-        x: dragon.sprite.x + dx * TILESIZE,
-        y: dragon.sprite.y + dy * TILESIZE,
-        duration: 200,
-        onComplete: () => {
-          dragon.x += dx;
-          dragon.y += dy;
-          dragon.sliding = false;
-        },
-      });
-      return true;
-    }
-    return false;
-  }
-
   move(dx, dy, direction) {
     if (this.sam.moving) return;
     this.sam.direction = direction;
     this.sam.sprite.play(`sam-walk-${direction}`, true);
 
-    if (this.collisionAt(this.sam.x + dx, this.sam.y + dy)) return;
-    if (this.push(this.sam.x, this.sam.y, dx, dy)) return;
+    const pushed = this.pushable(dx, dy);
+    if (pushed && this.collides(pushed, dx, dy, true)) return;
+    if (!pushed && this.collides(this.sam, dx, dy)) return;
 
-    this.sam.x += dx;
-    this.sam.y += dy;
+    console.log(`Pushed: ${pushed}, dx: ${dx}, dy: ${dy}`);
 
     this.sam.moving = true;
     this.tweens.add({
-      targets: [this.sam.sprite, this.sam.aura],
+      targets: this.sam.sprite,
       x: this.sam.sprite.x + dx * TILESIZE,
       y: this.sam.sprite.y + dy * TILESIZE,
       duration: 200,
+      onUpdate: () => {
+        this.sam.aura.setPosition(this.sam.sprite.x, this.sam.sprite.y);
+        if (pushed) {
+          pushed.sprite.x = this.sam.sprite.x + dx * TILESIZE;
+          pushed.sprite.y = this.sam.sprite.y + dy * TILESIZE;
+        }
+      },
       onComplete: () => {
+        this.sam.x += dx;
+        this.sam.y += dy;
+        if (pushed) {
+          pushed.x += dx;
+          pushed.y += dy;
+        }
+
         this.sam.moving = false;
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           this.sam.moving = true;
@@ -537,10 +520,33 @@ export class Game extends Phaser.Scene {
   }
 
   outOfBounds(x, y) {
-    return x < 4 || x > 14 || y < 1 || y > 12;
+    return x < 4 || x > 14 || y < 2 || y > 12;
   }
 
-  collisionAt(x, y) {
+  pushable(dx, dy) {
+    const targetX = this.sam.x + dx;
+    const targetY = this.sam.y + dy;
+
+    if (this.outOfBounds(targetX, targetY)) return false;
+
+    const block = this.blocks.find(
+      (block) => block.x === targetX && block.y === targetY
+    );
+    if (block) return block;
+
+    const dragon = this.dragons.find(
+      (dragon) =>
+        dragon.x === targetX &&
+        dragon.y === targetY &&
+        dragon.state === "frozen"
+    );
+    if (dragon) return dragon;
+  }
+
+  collides(obj, dx, dy, isPushed = false) {
+    const x = obj.x + dx;
+    const y = obj.y + dy;
+
     if (this.door.x == x && this.door.y == y) {
       return this.door.state === "closed";
     }
@@ -553,19 +559,21 @@ export class Game extends Phaser.Scene {
     }
 
     if (this.chest.x == x && this.chest.y == y) {
-      return this.chest.state === "closed";
+      return isPushed || this.chest.state === "closed";
     }
 
     if (this.blocks.some((block) => block.x == x && block.y == y)) {
       return true;
     }
 
-    if (
-      this.dragons.some(
-        (dragon) => dragon.x == x && dragon.y == y && dragon.state !== "frozen"
-      )
-    ) {
+    if (this.dragons.some((dragon) => dragon.x == x && dragon.y == y)) {
       return true;
+    }
+
+    if (isPushed) {
+      if (this.crystals.some((crystal) => crystal.x == x && crystal.y == y)) {
+        return true;
+      }
     }
 
     return false;

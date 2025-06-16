@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert1.json",
+    "activeFile": "desert2.json",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -25,7 +25,7 @@
             "scale": 2.48,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 150.2016129032258,
+                "x": 159.8790322580645,
                 "y": 109.67741935483872
             }
         },
@@ -72,21 +72,21 @@
             "scaleInEditor": 1
         },
         "desert2.json": {
-            "scale": 2.60953125,
-            "selectedLayer": 0,
+            "scale": 2.6,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 159.9904197353452,
-                "y": 111.89749116819353
+                "x": 152.49999999999997,
+                "y": 103.07692307692307
             }
         },
         "desert2.json#TilesetGUI": {
             "scaleInDock": 1
         },
         "desert2.json#TilesetHouse": {
-            "scaleInDock": 1
+            "scaleInDock": 3.9512
         },
         "desert2.json#TilesetItems": {
-            "scaleInDock": 1
+            "scaleInDock": 3.1423
         },
         "desert2.json#TilesetNature": {
             "scaleInDock": 1
@@ -122,8 +122,8 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
-        "desert2.json",
         "desert1.json",
+        "desert2.json",
         "level1.json"
     ],
     "tileset.embedInMap": true,
