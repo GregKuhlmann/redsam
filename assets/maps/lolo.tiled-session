@@ -46,6 +46,9 @@
         "desert1.json#TilesetElement": {
             "scaleInDock": 3.1527
         },
+        "desert1.json#TilesetGUI": {
+            "dynamicWrapping": false
+        },
         "desert1.json#TilesetHouse": {
             "scaleInDock": 2.215,
             "scaleInEditor": 1
