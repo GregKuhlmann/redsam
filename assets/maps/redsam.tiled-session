@@ -6,6 +6,7 @@
     "activeFile": "desert1.json",
     "expandedProjectPaths": [
     ],
+    "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
         "": {
             "scaleInDock": 3.7243,
@@ -70,6 +71,29 @@
             "scaleInDock": 2.61,
             "scaleInEditor": 1
         },
+        "desert2.json": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "desert2.json#TilesetGUI": {
+            "scaleInDock": 1
+        },
+        "desert2.json#TilesetHouse": {
+            "scaleInDock": 1
+        },
+        "desert2.json#TilesetItems": {
+            "scaleInDock": 1
+        },
+        "desert2.json#TilesetNature": {
+            "scaleInDock": 1
+        },
+        "desert2.json#TilesetWater": {
+            "scaleInDock": 2.4136
+        },
         "level1.json": {
             "scale": 2.21,
             "selectedLayer": 2,
@@ -93,10 +117,12 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "desert1.json"
+        "desert1.json",
+        "desert2.json"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "desert2.json",
         "desert1.json",
         "level1.json"
     ],

@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-import level1 from "/assets/maps/desert1.json";
+import level1 from "/assets/maps/desert2.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -274,6 +274,7 @@ export class Game extends Phaser.Scene {
 
     this.dragons = [];
     this.crystals = [];
+    this.blocks = [];
     this.crystalsRemaining = 0;
     this.lives = 5;
     this.textLives.setFrame(this.lives);
@@ -322,8 +323,14 @@ export class Game extends Phaser.Scene {
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
+          } else if (name === "block") {
+            const sprite = this.add
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
+              .setFrame(tile.index - tilesetItems.firstgid)
+              .setOrigin(0);
+            this.blocks.push({ x: tile.x, y: tile.y, sprite });
           } else if (name === "crystal") {
-            const crystal = this.add
+            const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
@@ -335,7 +342,13 @@ export class Game extends Phaser.Scene {
                 key: "spark",
                 repeatDelay: Phaser.Math.Between(500, 1500),
               });
-            this.crystals.push({ x: tile.x, y: tile.y, crystal, spark });
+            this.crystals.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              spark,
+              state: "uncollected",
+            });
             this.crystalsRemaining++;
           } else if (name === "chest") {
             const sprite = this.add
@@ -501,9 +514,14 @@ export class Game extends Phaser.Scene {
           });
         }
         this.crystals.forEach((crystal) => {
-          if (crystal.x == this.sam.x && crystal.y == this.sam.y) {
+          if (
+            crystal.x == this.sam.x &&
+            crystal.y == this.sam.y &&
+            crystal.state === "uncollected"
+          ) {
+            crystal.state = "collected";
             this.sound.play("collect");
-            crystal.crystal.destroy();
+            crystal.sprite.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
             if (this.crystalsRemaining == 0) {
@@ -536,6 +554,10 @@ export class Game extends Phaser.Scene {
 
     if (this.chest.x == x && this.chest.y == y) {
       return this.chest.state === "closed";
+    }
+
+    if (this.blocks.some((block) => block.x == x && block.y == y)) {
+      return true;
     }
 
     if (
