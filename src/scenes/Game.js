@@ -571,7 +571,12 @@ export class Game extends Phaser.Scene {
     }
 
     if (isPushed) {
-      if (this.crystals.some((crystal) => crystal.x == x && crystal.y == y)) {
+      if (
+        this.crystals.some(
+          (crystal) =>
+            crystal.x == x && crystal.y == y && crystal.state === "uncollected"
+        )
+      ) {
         return true;
       }
     }
