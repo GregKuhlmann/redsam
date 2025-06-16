@@ -272,16 +272,9 @@ export class Game extends Phaser.Scene {
       frameRate: 10,
     });
 
-    this.lolo = this.add.sprite(-TILESIZE, -TILESIZE, "lolo").setOrigin(0);
-    this.lolo.moving = false;
-    this.lolo.direction = "down";
-    this.lolo.chargeTween = null;
-    this.lolo.aura = null;
+    this.dragons = [];
     this.crystals = [];
     this.crystalsRemaining = 0;
-    this.chest = null;
-    this.door = null;
-    this.dragons = [];
     this.lives = 5;
     this.textLives.setFrame(this.lives);
     this.ammo = 2;
@@ -293,25 +286,36 @@ export class Game extends Phaser.Scene {
         if (tile.index !== -1) {
           const name = tilesetItems.getTileProperties(tile.index)?.name;
           if (name === "lolo") {
-            this.lolo.setPosition(tile.x * TILESIZE, tile.y * TILESIZE);
-            this.lolo.aura = this.add
+            const sprite = this.add
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "lolo")
+              .setOrigin(0);
+            const aura = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "aura")
               .setScale(16 / 25)
               .setOrigin(0)
               .setAlpha(0)
               .play("aura");
+            this.lolo = {
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              aura,
+              moving: false,
+              direction: "down",
+              chargeTween: null,
+            };
           } else if (name === "dragon") {
-            const dragon = this.add
+            const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "dragon")
               .setOrigin(0)
               .play("dragon-idle");
-            this.dragons.push({ x: tile.x, y: tile.y, dragon, state: "idle" });
+            this.dragons.push({ x: tile.x, y: tile.y, sprite, state: "idle" });
           } else if (name === "door") {
-            const door = this.add
+            const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
-            this.door = { x: tile.x, y: tile.y, door, open: false };
+            this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
           } else if (name === "crystal") {
             const crystal = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
@@ -328,7 +332,7 @@ export class Game extends Phaser.Scene {
             this.crystals.push({ x: tile.x, y: tile.y, crystal, spark });
             this.crystalsRemaining++;
           } else if (name === "chest") {
-            const chest = this.add
+            const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "chest")
               .setOrigin(0)
               .play("chest-closed");
@@ -341,19 +345,19 @@ export class Game extends Phaser.Scene {
             this.chest = {
               x: tile.x,
               y: tile.y,
-              chest,
+              sprite,
               spark,
               state: "closed",
             };
           } else {
-            console.log(
+            console.error(
               `Unknown tile at (${tile.x}, ${tile.y}) with index ${tile.index} and name ${name}`
             );
           }
         }
       });
     });
-    this.lolo.setDepth(1000);
+    this.lolo.sprite.setDepth(1000);
     this.lolo.aura.setDepth(1001);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", () => {
@@ -385,7 +389,7 @@ export class Game extends Phaser.Scene {
     } else if (this.cursors.down.isDown) {
       this.move(0, 1, "down");
     } else if (!this.lolo.moving) {
-      this.lolo.play(`lolo-idle-${this.lolo.direction}`);
+      this.lolo.sprite.play(`lolo-idle-${this.lolo.direction}`);
     }
   }
 
@@ -395,38 +399,35 @@ export class Game extends Phaser.Scene {
     this.textAmmo.setFrame(this.ammo);
     this.dragons.forEach((dragon) => {
       dragon.state = "frozen";
-      dragon.dragon.play("dragon-frozen");
-      dragon.dragon.setPipeline("Grayscale");
+      dragon.sprite.play("dragon-frozen");
+      dragon.sprite.setPipeline("Grayscale");
     });
   }
 
   move(dx, dy, direction) {
     if (this.lolo.moving) return;
     this.lolo.direction = direction;
-    this.lolo.play(`lolo-walk-${direction}`, true);
+    this.lolo.sprite.play(`lolo-walk-${direction}`, true);
 
-    const nextX = this.lolo.x + dx * TILESIZE;
-    const nextY = this.lolo.y + dy * TILESIZE;
-
-    if (this.collisionAt(nextX, nextY)) return;
+    if (this.collisionAt(this.lolo.x + dx, this.lolo.y + dy)) return;
+    this.lolo.x += dx;
+    this.lolo.y += dy;
 
     this.lolo.moving = true;
     this.tweens.add({
-      targets: [this.lolo, this.lolo.aura],
-      x: nextX,
-      y: nextY,
+      targets: [this.lolo.sprite, this.lolo.aura],
+      x: this.lolo.sprite.x + dx * TILESIZE,
+      y: this.lolo.sprite.y + dy * TILESIZE,
       duration: 200,
       onComplete: () => {
         this.lolo.moving = false;
-        const tileX = Math.floor(nextX / TILESIZE);
-        const tileY = Math.floor(nextY / TILESIZE);
-        if (this.door.x == tileX && this.door.y == tileY) {
+        if (this.door.x == this.lolo.x && this.door.y == this.lolo.y) {
           this.lolo.moving = true;
           this.tweens.killAll();
           this.sound.play("celebrate");
-          this.lolo.play("lolo-celebrate");
+          this.lolo.sprite.play("lolo-celebrate");
           this.lolo.aura.setVisible(false);
-          this.lolo.on("animationcomplete", (animation) => {
+          this.lolo.sprite.on("animationcomplete", (animation) => {
             if (animation.key === "lolo-celebrate") {
               this.cameras.main.fadeOut(500, 0, 0, 0); // duration in ms, RGB fade color
             }
@@ -437,12 +438,12 @@ export class Game extends Phaser.Scene {
           });
         }
         if (
-          this.chest.x == tileX &&
-          this.chest.y == tileY &&
+          this.chest.x == this.lolo.x &&
+          this.chest.y == this.lolo.y &&
           this.chest.state === "sparkling"
         ) {
           this.chest.state = "collected";
-          this.chest.chest.play("chest-collected");
+          this.chest.sprite.play("chest-collected");
           this.chest.spark.setVisible(false);
           this.cameras.main.shake(200, 0.01);
           this.sound.play("explosion");
@@ -453,8 +454,8 @@ export class Game extends Phaser.Scene {
             .play("smoke");
           smoke.on("animationupdate", (animation, frame) => {
             if (frame.index === 3) {
-              this.door.open = true;
-              this.door.door.destroy();
+              this.door.state = "open";
+              this.door.sprite.destroy();
             }
           });
           smoke.on("animationcomplete", () => {
@@ -462,7 +463,7 @@ export class Game extends Phaser.Scene {
           });
         }
         this.crystals.forEach((crystal) => {
-          if (crystal.x == tileX && crystal.y == tileY) {
+          if (crystal.x == this.lolo.x && crystal.y == this.lolo.y) {
             this.sound.play("collect");
             crystal.crystal.destroy();
             crystal.spark.destroy();
@@ -470,7 +471,7 @@ export class Game extends Phaser.Scene {
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
               this.chest.state = "sparkling";
-              this.chest.chest.play("chest-sparkling");
+              this.chest.sprite.play("chest-sparkling");
               this.chest.spark.setVisible(true);
             }
           }
@@ -480,25 +481,22 @@ export class Game extends Phaser.Scene {
   }
 
   collisionAt(x, y) {
-    const tileX = Math.floor(x / TILESIZE);
-    const tileY = Math.floor(y / TILESIZE);
-
-    if (this.door.x == tileX && this.door.y == tileY) {
-      return !this.door.open;
+    if (this.door.x == x && this.door.y == y) {
+      return this.door.state === "closed";
     }
 
-    if (tileX < 4 || tileX > 14 || tileY < 1 || tileY > 12) return true;
+    if (x < 4 || x > 14 || y < 1 || y > 12) return true;
 
-    let tile = this.level.getTileAt(tileX, tileY, true, "LayerObstacles");
+    let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
     if (tile && tile.index !== -1) {
       return true;
     }
 
-    if (this.chest.x == tileX && this.chest.y == tileY) {
+    if (this.chest.x == x && this.chest.y == y) {
       return this.chest.state === "closed";
     }
 
-    if (this.dragons.some((dragon) => dragon.x == tileX && dragon.y == tileY)) {
+    if (this.dragons.some((dragon) => dragon.x == x && dragon.y == y)) {
       return true;
     }
 
