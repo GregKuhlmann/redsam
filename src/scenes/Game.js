@@ -2,6 +2,7 @@ import * as Phaser from "phaser";
 
 import desert1 from "/assets/maps/desert1.json";
 import desert2 from "/assets/maps/desert2.json";
+import desert3 from "/assets/maps/desert3.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -42,7 +43,7 @@ class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
   }
 }
 
-const MAPS = ["desert1", "desert2"];
+const MAPS = ["desert3", "desert1", "desert2"];
 
 export class Game extends Phaser.Scene {
   constructor() {
@@ -65,6 +66,7 @@ export class Game extends Phaser.Scene {
     this.load.audio("celebrate", audioCelebrate);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
+    this.load.tilemapTiledJSON("desert3", desert3);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -499,9 +501,30 @@ export class Game extends Phaser.Scene {
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
     this.dragons.forEach((dragon) => {
-      dragon.state = "frozen";
-      dragon.sprite.play("dragon-frozen");
-      dragon.sprite.setPipeline("Grayscale");
+      if (dragon.state == "frozen") {
+        this.destroy(dragon);
+      } else {
+        dragon.state = "frozen";
+        dragon.sprite.play("dragon-frozen");
+        dragon.sprite.setPipeline("Grayscale");
+      }
+    });
+  }
+
+  destroy(enemy) {
+    const smoke = this.add
+      .sprite(enemy.x * TILESIZE, enemy.y * TILESIZE, "smoke")
+      .setScale(16 / 32)
+      .setOrigin(0)
+      .play("smoke");
+    smoke.on("animationupdate", (animation, frame) => {
+      if (frame.index === 3) {
+        enemy.state = "destroyed";
+        enemy.sprite.destroy();
+      }
+    });
+    smoke.on("animationcomplete", () => {
+      smoke.destroy();
     });
   }
 
@@ -577,20 +600,9 @@ export class Game extends Phaser.Scene {
             smoke.destroy();
           });
           this.enemies.forEach((enemy) => {
-            const smoke = this.add
-              .sprite(enemy.x * TILESIZE, enemy.y * TILESIZE, "smoke")
-              .setScale(16 / 32)
-              .setOrigin(0)
-              .play("smoke");
-            smoke.on("animationupdate", (animation, frame) => {
-              if (frame.index === 3) {
-                enemy.state = "destroyed";
-                enemy.sprite.destroy();
-              }
-            });
-            smoke.on("animationcomplete", () => {
-              smoke.destroy();
-            });
+            if (enemy.state !== "destroyed") {
+              this.destroy(enemy);
+            }
           });
         }
         this.crystals.forEach((crystal) => {
@@ -669,14 +681,9 @@ export class Game extends Phaser.Scene {
       return true;
     }
 
-    if (this.dragons.some((dragon) => dragon.x == x && dragon.y == y)) {
-      return true;
-    }
-
     if (
-      this.cyclopes.some(
-        (cyclope) =>
-          cyclope.x == x && cyclope.y == y && cyclope.state !== "destroyed"
+      this.enemies.some(
+        (enemy) => enemy.x == x && enemy.y == y && enemy.state !== "destroyed"
       )
     ) {
       return true;
