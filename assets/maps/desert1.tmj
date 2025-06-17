@@ -1,4 +1,12 @@
 { "compressionlevel":-1,
+ "editorsettings":
+    {
+     "export":
+        {
+         "format":"json",
+         "target":"desert1.json"
+        }
+    },
  "height":14,
  "infinite":false,
  "layers":[
@@ -110,187 +118,24 @@
  "tileheight":16,
  "tilesets":[
         {
-         "columns":24,
          "firstgid":1,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetNature.png",
-         "imageheight":336,
-         "imagewidth":384,
-         "margin":0,
-         "name":"TilesetNature",
-         "spacing":0,
-         "tilecount":504,
-         "tileheight":16,
-         "tilewidth":16
+         "source":"tilesets\/TilesetNature.tsx"
         }, 
         {
-         "columns":28,
          "firstgid":505,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetWater.png",
-         "imageheight":272,
-         "imagewidth":448,
-         "margin":0,
-         "name":"TilesetWater",
-         "spacing":0,
-         "tilecount":476,
-         "tileheight":16,
-         "tilewidth":16
+         "source":"tilesets\/TilesetWater.tsx"
         }, 
         {
-         "columns":33,
          "firstgid":981,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetHouse.png",
-         "imageheight":368,
-         "imagewidth":528,
-         "margin":0,
-         "name":"TilesetHouse",
-         "spacing":0,
-         "tilecount":759,
-         "tileheight":16,
-         "tilewidth":16
+         "source":"tilesets\/TilesetHouse.tsx"
         }, 
         {
-         "columns":16,
          "firstgid":1740,
-         "image":"..\/Ninja\/TilesetItems.png",
-         "imageheight":256,
-         "imagewidth":256,
-         "margin":0,
-         "name":"TilesetItems",
-         "spacing":0,
-         "tilecount":256,
-         "tileheight":16,
-         "tiles":[
-                {
-                 "id":0,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"chest"
-                        }]
-                }, 
-                {
-                 "id":1,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"sam"
-                        }]
-                }, 
-                {
-                 "id":2,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"dragon"
-                        }]
-                }, 
-                {
-                 "id":3,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"door"
-                        }]
-                }, 
-                {
-                 "id":4,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"crystal-0"
-                        }]
-                }, 
-                {
-                 "id":5,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"shuriken"
-                        }]
-                }, 
-                {
-                 "id":6,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"block"
-                        }]
-                }, 
-                {
-                 "id":7,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"cyclope-down"
-                        }]
-                }, 
-                {
-                 "id":8,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"cyclope-up"
-                        }]
-                }, 
-                {
-                 "id":9,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"cyclope-left"
-                        }]
-                }, 
-                {
-                 "id":10,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"cyclope-right"
-                        }]
-                }, 
-                {
-                 "id":20,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"crystal-1"
-                        }]
-                }, 
-                {
-                 "id":36,
-                 "properties":[
-                        {
-                         "name":"name",
-                         "type":"string",
-                         "value":"crystal-2"
-                        }]
-                }],
-         "tilewidth":16
+         "source":"tilesets\/TilesetItems.tsx"
         }, 
         {
-         "columns":8,
          "firstgid":1996,
-         "image":"..\/Ninja\/TilesetGUI.png",
-         "imageheight":64,
-         "imagewidth":128,
-         "margin":0,
-         "name":"TilesetGUI",
-         "spacing":0,
-         "tilecount":32,
-         "tileheight":16,
-         "tilewidth":16
+         "source":"tilesets\/TilesetGUI.tsx"
         }],
  "tilewidth":16,
  "type":"map",

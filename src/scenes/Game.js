@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 
-import level1 from "/assets/maps/desert2.json";
+import desert1 from "/assets/maps/desert1.json";
+import desert2 from "/assets/maps/desert2.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -8,10 +9,12 @@ import tilesetItems from "/assets/Ninja/TilesetItems.png";
 import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
 import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
+import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
+import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
 import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
 import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
@@ -39,9 +42,15 @@ class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
   }
 }
 
+const MAPS = ["desert1", "desert2"];
+
 export class Game extends Phaser.Scene {
   constructor() {
     super("Game");
+  }
+
+  init(data) {
+    this.map = data.map || MAPS[0];
   }
 
   preload() {
@@ -54,13 +63,18 @@ export class Game extends Phaser.Scene {
     this.load.audio("collect", audioCollect);
     this.load.audio("chestOpen", audioChestOpen);
     this.load.audio("celebrate", audioCelebrate);
-    this.load.tilemapTiledJSON("level1", level1);
+    this.load.tilemapTiledJSON("desert1", desert1);
+    this.load.tilemapTiledJSON("desert2", desert2);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
     );
 
     this.load.spritesheet("dragon", spriteSheetDragon, {
+      frameWidth: TILESIZE,
+      frameHeight: TILESIZE,
+    });
+    this.load.spritesheet("cyclope", spriteSheetCyclope, {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
     });
@@ -88,6 +102,10 @@ export class Game extends Phaser.Scene {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
     });
+    this.load.spritesheet("crystal", spriteSheetCrystal, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     this.load.spritesheet("font", spriteSheetFont, {
       frameWidth: 8,
       frameHeight: 8,
@@ -97,7 +115,7 @@ export class Game extends Phaser.Scene {
   create() {
     //const { width, height } = this.scale;
 
-    this.level = this.make.tilemap({ key: "level1" });
+    this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(
       "TilesetHouse",
       "tilesetHouse"
@@ -218,7 +236,54 @@ export class Game extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers("dragon", {
         frames: [0],
       }),
-      frameRate: 5,
+    });
+    this.anims.create({
+      key: "cyclope-down-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-up-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [1],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-left-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [2],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-right-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [3],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-down-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [4],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-up-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [5],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-left-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [6],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-right-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [7],
+      }),
     });
     this.anims.create({
       key: "spark",
@@ -273,12 +338,13 @@ export class Game extends Phaser.Scene {
     });
 
     this.dragons = [];
+    this.cyclopes = [];
     this.crystals = [];
     this.blocks = [];
     this.crystalsRemaining = 0;
     this.lives = 5;
     this.textLives.setFrame(this.lives);
-    this.ammo = 2;
+    this.ammo = 0;
     this.textAmmo.setFrame(this.ammo);
 
     // iterate over the key, value pairs in the tilesetItems.tileProperties
@@ -316,6 +382,19 @@ export class Game extends Phaser.Scene {
               sprite,
               state: "idle",
             });
+          } else if (name.startsWith("cyclope")) {
+            const direction = name.split("-")[1];
+            const sprite = this.add
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "cyclope")
+              .setOrigin(0)
+              .play(`cyclope-${direction}-closed`);
+            this.cyclopes.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              state: "closed",
+              direction,
+            });
           } else if (name === "door") {
             const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
@@ -328,10 +407,10 @@ export class Game extends Phaser.Scene {
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
-          } else if (name === "crystal") {
+          } else if (name.startsWith("crystal")) {
+            const ammo = parseInt(name.split("-")[1], 10);
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
-              .setFrame(tile.index - tilesetItems.firstgid)
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "crystal")
               .setOrigin(0);
             const spark = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "spark")
@@ -346,6 +425,7 @@ export class Game extends Phaser.Scene {
               y: tile.y,
               sprite,
               spark,
+              ammo,
               state: "uncollected",
             });
             this.crystalsRemaining++;
@@ -375,6 +455,9 @@ export class Game extends Phaser.Scene {
         }
       });
     });
+
+    this.enemies = [...this.dragons, ...this.cyclopes];
+
     this.sam.sprite.setDepth(1000);
     this.sam.aura.setDepth(1001);
     this.cursors = this.input.keyboard.createCursorKeys();
@@ -431,8 +514,6 @@ export class Game extends Phaser.Scene {
     if (pushed && this.collides(pushed, dx, dy, true)) return;
     if (!pushed && this.collides(this.sam, dx, dy)) return;
 
-    console.log(`Pushed: ${pushed}, dx: ${dx}, dy: ${dy}`);
-
     this.sam.moving = true;
     this.tweens.add({
       targets: this.sam.sprite,
@@ -468,7 +549,7 @@ export class Game extends Phaser.Scene {
           });
           this.cameras.main.once("camerafadeoutcomplete", () => {
             this.anims.resumeAll();
-            this.scene.restart(); // or use this.scene.start('SceneName') to go to a different scene
+            this.scene.restart({ map: MAPS[MAPS.indexOf(this.map) + 1] });
           });
         }
         if (
@@ -495,6 +576,22 @@ export class Game extends Phaser.Scene {
           smoke.on("animationcomplete", () => {
             smoke.destroy();
           });
+          this.enemies.forEach((enemy) => {
+            const smoke = this.add
+              .sprite(enemy.x * TILESIZE, enemy.y * TILESIZE, "smoke")
+              .setScale(16 / 32)
+              .setOrigin(0)
+              .play("smoke");
+            smoke.on("animationupdate", (animation, frame) => {
+              if (frame.index === 3) {
+                enemy.state = "destroyed";
+                enemy.sprite.destroy();
+              }
+            });
+            smoke.on("animationcomplete", () => {
+              smoke.destroy();
+            });
+          });
         }
         this.crystals.forEach((crystal) => {
           if (
@@ -507,11 +604,17 @@ export class Game extends Phaser.Scene {
             crystal.sprite.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
+            this.ammo = Math.min(2, this.ammo + crystal.ammo);
+            this.textAmmo.setFrame(this.ammo);
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
               this.chest.state = "sparkling";
               this.chest.sprite.play("chest-sparkling");
               this.chest.spark.setVisible(true);
+              this.cyclopes.forEach((cyclope) => {
+                cyclope.state = "open";
+                cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
+              });
             }
           }
         });
@@ -567,6 +670,15 @@ export class Game extends Phaser.Scene {
     }
 
     if (this.dragons.some((dragon) => dragon.x == x && dragon.y == y)) {
+      return true;
+    }
+
+    if (
+      this.cyclopes.some(
+        (cyclope) =>
+          cyclope.x == x && cyclope.y == y && cyclope.state !== "destroyed"
+      )
+    ) {
       return true;
     }
 
