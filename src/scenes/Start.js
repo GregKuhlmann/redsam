@@ -30,6 +30,7 @@ import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
 import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
 import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
+import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
 
 import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
@@ -53,6 +54,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("step", audioStep);
     this.load.audio("slash", audioSlash);
     this.load.audio("slash-reverse", audioSlashReverse);
+    this.load.audio("freeze", audioFreeze);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -308,7 +310,7 @@ export default class Start extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers("slime", {
         frames: [1, 5, 9, 13],
       }),
-      frameRate: 8,
+      frameRate: 10,
       repeat: -1,
     });
     this.anims.create({

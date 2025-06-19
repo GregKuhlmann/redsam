@@ -1,7 +1,5 @@
 import * as Phaser from "phaser";
 
-import easystarjs from "easystarjs";
-
 const MAPS = ["desert3", "desert1", "desert2"];
 
 export default class Game extends Phaser.Scene {
@@ -97,6 +95,7 @@ export default class Game extends Phaser.Scene {
               y: tile.y,
               sprite,
               state: "idle",
+              respawns: true,
             });
           } else if (name.startsWith("cyclope")) {
             const direction = name.split("-")[1];
@@ -112,9 +111,6 @@ export default class Game extends Phaser.Scene {
               direction,
             });
           } else if (name.startsWith("slime")) {
-            const finder = new easystarjs.js();
-            finder.setAcceptableTiles([0]);
-            this.setGrid(finder);
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
@@ -131,8 +127,9 @@ export default class Game extends Phaser.Scene {
               sprite,
               ice,
               state: "bouncing",
+              dx: 0,
+              dy: -1,
               moving: false,
-              finder,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -195,20 +192,12 @@ export default class Game extends Phaser.Scene {
       });
     });
 
-    this.slimes.forEach((slime) => {
-      slime.finder.findPath(
-        slime.x,
-        slime.y,
-        this.sam.x,
-        this.sam.y,
-        (path) => {
-          this.setPath(slime, path);
-        }
-      );
-      slime.finder.calculate();
-    });
-
     this.enemies = [...this.dragons, ...this.cyclopes, ...this.slimes];
+
+    this.makeGrid();
+    this.slimes.forEach((slime) => {
+      this.setPath(slime, this.sam.x, this.sam.y);
+    });
 
     this.sam.sprite.setDepth(1000);
     this.sam.aura.setDepth(1001);
@@ -245,68 +234,104 @@ export default class Game extends Phaser.Scene {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
 
+    this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
-      if (!slime.moving) {
-        slime.finder.findPath(
-          slime.x,
-          slime.y,
-          this.sam.x,
-          this.sam.y,
-          (path) => {
-            this.setPath(slime, path);
-          }
-        );
-        slime.finder.calculate();
-      }
+      this.setPath(slime, this.sam.x, this.sam.y);
     });
   }
 
-  setGrid(finder) {
-    var grid = [];
+  makeGrid() {
+    this.grid = [];
     for (var y = 0; y < this.level.height; y++) {
       var col = [];
       for (var x = 0; x < this.level.width; x++) {
         const tile = this.level.getTileAt(x, y, true, "LayerObstacles");
         if (tile.index !== -1 || this.outOfBounds(x, y)) {
           col.push(1);
+        } else if (this.chest.x == x && this.chest.y == y) {
+          col.push(1);
+        } else if (this.blocks.some((block) => block.x == x && block.y == y)) {
+          col.push(1);
+        } else if (
+          this.enemies.some(
+            (enemy) =>
+              enemy.x == x && enemy.y == y && enemy.state !== "destroyed"
+          )
+        ) {
+          col.push(1);
+        } else if (
+          this.crystals.some(
+            (crystal) =>
+              crystal.x == x && crystal.y == y && crystal.state !== "collected"
+          )
+        ) {
+          col.push(1);
         } else {
           col.push(0);
         }
       }
-      grid.push(col);
+      this.grid.push(col);
     }
-    finder.setGrid(grid);
   }
 
-  setPath(enemy, path) {
-    if (!path || path.length < 2) {
-      enemy.moving = false;
-      return;
-    }
-    path.shift(); // remove the first point (the enemy's current position)
-    enemy.moving = true;
-    const next = path.shift();
-    console.log(
-      `Moving ${enemy.sprite.texture.key} from (${enemy.x}, ${enemy.y}) to (${next.x}, ${next.y})`
-    );
-    if (enemy.x === 14 && enemy.y === 7) {
-      enemy.state = "frozen";
-      enemy.ice.setPosition(enemy.sprite.x, enemy.sprite.y);
-      enemy.ice.setVisible(true);
-      enemy.sprite.play("slime-frozen");
-      return;
-    }
+  distance(x1, y1, x2, y2) {
+    return Math.abs(x1 - x2) + Math.abs(y1 - y2);
+  }
+
+  moveSlime(slime, targetX, targetY) {
+    slime.moving = true;
+    slime.dx = targetX - slime.x;
+    slime.dy = targetY - slime.y;
     this.tweens.add({
-      targets: enemy.sprite,
-      x: next.x * 16,
-      y: next.y * 16,
-      duration: 500,
+      targets: slime.sprite,
+      x: targetX * 16,
+      y: targetY * 16,
+      duration: 350,
       onComplete: () => {
-        enemy.x = next.x;
-        enemy.y = next.y;
-        enemy.moving = false;
+        slime.x = targetX;
+        slime.y = targetY;
+        slime.moving = false;
       },
     });
+  }
+
+  setPath(slime, targetX, targetY) {
+    if (slime.moving) return;
+    if (slime.state !== "bouncing") return;
+    const options = [];
+    for (const option of [
+      { dx: slime.dx, dy: slime.dy, dir: "forward" },
+      { dx: -slime.dy, dy: slime.dx, dir: "left" },
+      { dx: slime.dy, dy: -slime.dx, dir: "right" },
+      { dx: -slime.dx, dy: -slime.dy, dir: "backward" },
+    ]) {
+      const { dx, dy, dir } = option;
+      const newX = slime.x + dx;
+      const newY = slime.y + dy;
+      if (this.grid[newY][newX] === 0) {
+        options.push({
+          x: newX,
+          y: newY,
+          dir,
+          dist: this.distance(newX, newY, targetX, targetY),
+        });
+      }
+    }
+    options.sort((a, b) => a.dist - b.dist);
+    if (options.length === 0) return;
+    if (options[0].dir === "backward" && options.length > 1) {
+      options.shift(); // remove backward option if there are other options
+    }
+    if (options[0].dist <= 1) {
+      this.sound.play("freeze");
+      slime.state = "frozen";
+      slime.ice.setPosition(slime.sprite.x, slime.sprite.y);
+      slime.ice.setVisible(true);
+      slime.sprite.play("slime-frozen");
+      return;
+    } else {
+      this.moveSlime(slime, options[0].x, options[0].y);
+    }
   }
 
   shoot() {
@@ -341,18 +366,20 @@ export default class Game extends Phaser.Scene {
     });
     smoke.on("animationcomplete", () => {
       smoke.destroy();
-      // wait 9 seconds then respawn the enemy
-      this.time.delayedCall(9000, () => {
-        if (this.chest.state !== "collected") {
-          enemy.sprite.setPipeline("Shadow");
-          enemy.sprite.setVisible(true);
-          this.time.delayedCall(1000, () => {
-            enemy.sprite.resetPipeline();
-            enemy.sprite.play("dragon-idle");
-            enemy.state = "idle";
-          });
-        }
-      });
+      if (enemy.respawns) {
+        // wait 9 seconds then respawn the enemy
+        this.time.delayedCall(9000, () => {
+          if (this.chest.state !== "collected") {
+            enemy.sprite.setPipeline("Shadow");
+            enemy.sprite.setVisible(true);
+            this.time.delayedCall(1000, () => {
+              enemy.sprite.resetPipeline();
+              enemy.sprite.play("dragon-idle");
+              enemy.state = "idle";
+            });
+          }
+        });
+      }
     });
   }
 
