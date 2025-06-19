@@ -9,6 +9,7 @@ const config = {
   width: 320,
   height: 224,
   pixelArt: true,
+  antialias: false,
   parent: "game-container",
   scene: [Start, Game],
   scale: {

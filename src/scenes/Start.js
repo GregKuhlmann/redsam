@@ -28,8 +28,12 @@ import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
 import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
 import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
 import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
+import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
+import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
 
-import startScreen from "/assets/images/start.png";
+import startBackground from "/assets/images/start-bg.png";
+import redSam from "/assets/images/red-sam.png";
+import clickToStart from "/assets/images/click-to-start.png";
 
 export default class Start extends Phaser.Scene {
   constructor() {
@@ -47,6 +51,8 @@ export default class Start extends Phaser.Scene {
     this.load.audio("chestOpen", audioChestOpen);
     this.load.audio("celebrate", audioCelebrate);
     this.load.audio("step", audioStep);
+    this.load.audio("slash", audioSlash);
+    this.load.audio("slash-reverse", audioSlashReverse);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -107,20 +113,16 @@ export default class Start extends Phaser.Scene {
       frameWidth: 8,
       frameHeight: 8,
     });
-    this.load.image("start-screen", startScreen);
+    this.load.image("start-bg", startBackground);
+    this.load.image("red-sam", redSam);
+    this.load.image("click-to-start", clickToStart);
   }
 
   create() {
     const { width, height } = this.scale;
-    this.add.image(width / 2, height / 2, "start-screen");
-    const start = this.add
-      .text((width * 2) / 3, height - 30, "Click to Start", {
-        fontFamily: "SamuraiWarrior",
-        fontSize: 30,
-        color: "#ffffff",
-      })
-      .setOrigin(0.5, 0.5);
-    start.setShadow(1, 1, "#000000", 0.3, true, true);
+    this.add.image(width / 2, height / 2, "start-bg");
+    const redSam = this.add.image(width / 2, height / 2, "red-sam");
+    const start = this.add.image(width / 2, height / 2, "click-to-start");
     this.tweens.add({
       targets: start,
       alpha: 0.5,
@@ -131,6 +133,39 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       this.scene.start("Game");
+      start.destroy();
+      this.sound.play("slash");
+      var faded = false;
+      this.tweens.add({
+        targets: redSam,
+        y: 450,
+        scale: 5,
+        alpha: 0,
+        duration: 1500,
+        ease: "Sine.easeOut",
+        onUpdate: (tween) => {
+          if (tween.progress > 0.5) {
+            if (!faded) {
+              faded = true;
+              this.sound.play("slash-reverse");
+              this.tweens.add({
+                targets: this.cameras.main,
+                zoom: 50,
+                scrollY: -50,
+                alpha: 0,
+                duration: 1000,
+                ease: "Sine.easeInOut",
+                onComplete: () => {
+                  redSam.destroy();
+                  this.time.delayedCall(500, () => {
+                    this.scene.start("Game");
+                  });
+                },
+              });
+            }
+          }
+        },
+      });
     });
 
     this.anims.create({
