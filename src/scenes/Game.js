@@ -18,6 +18,7 @@ import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
 import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
+import spriteSheetShadow from "/assets/Ninja/shadow.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
 import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
@@ -42,6 +43,24 @@ class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
           vec4 color = texture2D(uMainSampler, outTexCoord);
           float gray = (color.r + color.g + color.b) / 2.0;
           gl_FragColor = vec4(vec3(gray), color.a);
+        }
+      `,
+    });
+  }
+}
+
+class ShadowPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
+  constructor(game) {
+    super({
+      game,
+      fragShader: `
+        precision mediump float;
+        uniform sampler2D uMainSampler;
+        varying vec2 outTexCoord;
+
+        void main() {
+          vec4 color = texture2D(uMainSampler, outTexCoord);
+          gl_FragColor = vec4(0, 0, 0, min(color.a, 0.2));
         }
       `,
     });
@@ -77,7 +96,7 @@ export class Game extends Phaser.Scene {
       "Grayscale",
       new GrayscalePipeline(this.game)
     );
-
+    this.game.renderer.pipelines.add("Shadow", new ShadowPipeline(this.game));
     this.load.spritesheet("dragon", spriteSheetDragon, {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
@@ -113,6 +132,10 @@ export class Game extends Phaser.Scene {
     this.load.spritesheet("ice", spriteSheetIce, {
       frameWidth: 32,
       frameHeight: 32,
+    });
+    this.load.spritesheet("shadow", spriteSheetShadow, {
+      frameWidth: 16,
+      frameHeight: 16,
     });
     this.load.spritesheet("chest", spriteSheetChest, {
       frameWidth: TILESIZE,
@@ -332,6 +355,14 @@ export class Game extends Phaser.Scene {
       }),
       frameRate: 10,
       repeat: 0,
+    });
+    this.anims.create({
+      key: "shadow",
+      frames: this.anims.generateFrameNumbers("shadow", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
     });
     this.anims.create({
       key: "aura",
@@ -668,8 +699,13 @@ export class Game extends Phaser.Scene {
       // wait 9 seconds then respawn the enemy
       this.time.delayedCall(9000, () => {
         if (this.chest.state !== "collected") {
-          enemy.state = "idle";
+          enemy.sprite.setPipeline("Shadow");
           enemy.sprite.setVisible(true);
+          this.time.delayedCall(1000, () => {
+            enemy.sprite.resetPipeline();
+            enemy.sprite.play("dragon-idle");
+            enemy.state = "idle";
+          });
         }
       });
     });
@@ -679,13 +715,21 @@ export class Game extends Phaser.Scene {
     if (this.sam.moving) return;
     this.sam.direction = direction;
     this.sam.sprite.play(`sam-walk-${direction}`, true);
-    this.sound.play("step");
 
     const pushed = this.pushable(dx, dy);
     if (pushed && this.collides(pushed, dx, dy, true)) return;
     if (!pushed && this.collides(this.sam, dx, dy)) return;
 
     this.sam.moving = true;
+    this.sound.play("step");
+    const shadow = this.add
+      .sprite(this.sam.x * TILESIZE, this.sam.y * TILESIZE, "shadow")
+      .setOrigin(0)
+      .setAlpha(0.2)
+      .play("shadow");
+    shadow.on("animationcomplete", () => {
+      shadow.destroy();
+    });
     this.tweens.add({
       targets: this.sam.sprite,
       x: this.sam.sprite.x + dx * TILESIZE,
