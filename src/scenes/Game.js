@@ -1,5 +1,7 @@
 import * as Phaser from "phaser";
 
+import easystarjs from "easystarjs";
+
 import desert1 from "/assets/maps/desert1.json";
 import desert2 from "/assets/maps/desert2.json";
 import desert3 from "/assets/maps/desert3.json";
@@ -11,6 +13,7 @@ import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
 import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
 import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
+import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
@@ -77,6 +80,10 @@ export class Game extends Phaser.Scene {
       frameHeight: TILESIZE,
     });
     this.load.spritesheet("cyclope", spriteSheetCyclope, {
+      frameWidth: TILESIZE,
+      frameHeight: TILESIZE,
+    });
+    this.load.spritesheet("slime", spriteSheetSlime, {
       frameWidth: TILESIZE,
       frameHeight: TILESIZE,
     });
@@ -288,6 +295,38 @@ export class Game extends Phaser.Scene {
       }),
     });
     this.anims.create({
+      key: "slime-bounce-down",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "slime-bounce-up",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "slime-bounce-left",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [2, 6, 10, 14],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "slime-bounce-right",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [3, 7, 11, 15],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
       key: "spark",
       frames: this.anims.generateFrameNumbers("spark", {
         start: 0,
@@ -341,6 +380,7 @@ export class Game extends Phaser.Scene {
 
     this.dragons = [];
     this.cyclopes = [];
+    this.slimes = [];
     this.crystals = [];
     this.blocks = [];
     this.crystalsRemaining = 0;
@@ -395,6 +435,24 @@ export class Game extends Phaser.Scene {
               y: tile.y,
               sprite,
               state: "closed",
+              direction,
+            });
+          } else if (name.startsWith("slime")) {
+            const direction = name.split("-")[1];
+            const finder = new easystarjs.js();
+            finder.setAcceptableTiles([0]);
+            this.setGrid(finder);
+            const sprite = this.add
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "slime")
+              .setOrigin(0)
+              .play(`slime-bounce-${direction}`);
+            this.slimes.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              state: "bouncing",
+              moving: false,
+              finder,
               direction,
             });
           } else if (name === "door") {
@@ -458,7 +516,20 @@ export class Game extends Phaser.Scene {
       });
     });
 
-    this.enemies = [...this.dragons, ...this.cyclopes];
+    this.slimes.forEach((slime) => {
+      slime.finder.findPath(
+        slime.x,
+        slime.y,
+        this.sam.x,
+        this.sam.y,
+        (path) => {
+          this.setPath(slime, path);
+        }
+      );
+      slime.finder.calculate();
+    });
+
+    this.enemies = [...this.dragons, ...this.cyclopes, ...this.slimes];
 
     this.sam.sprite.setDepth(1000);
     this.sam.aura.setDepth(1001);
@@ -494,6 +565,62 @@ export class Game extends Phaser.Scene {
     } else if (!this.sam.moving) {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
+
+    this.slimes.forEach((slime) => {
+      if (!slime.moving) {
+        slime.finder.findPath(
+          slime.x,
+          slime.y,
+          this.sam.x,
+          this.sam.y,
+          (path) => {
+            this.setPath(slime, path);
+          }
+        );
+        slime.finder.calculate();
+      }
+    });
+  }
+
+  setGrid(finder) {
+    var grid = [];
+    for (var y = 0; y < this.level.height; y++) {
+      var col = [];
+      for (var x = 0; x < this.level.width; x++) {
+        const tile = this.level.getTileAt(x, y, true, "LayerObstacles");
+        if (tile.index !== -1 || this.outOfBounds(x, y)) {
+          col.push(1);
+        } else {
+          col.push(0);
+        }
+      }
+      grid.push(col);
+    }
+    finder.setGrid(grid);
+  }
+
+  setPath(enemy, path) {
+    if (!path || path.length < 2) {
+      enemy.moving = false;
+      return;
+    }
+    path.shift(); // remove the first point (the enemy's current position)
+    enemy.moving = true;
+    const next = path.shift();
+    console.log(
+      `Moving ${enemy.sprite.texture.key} from (${enemy.x}, ${enemy.y}) to (${next.x}, ${next.y})`
+    );
+    this.tweens.add({
+      targets: enemy.sprite,
+      x: next.x * TILESIZE,
+      y: next.y * TILESIZE,
+      duration: 500,
+      onComplete: () => {
+        enemy.x = next.x;
+        enemy.y = next.y;
+        enemy.moving = false;
+      },
+    });
   }
 
   shoot() {
@@ -520,11 +647,18 @@ export class Game extends Phaser.Scene {
     smoke.on("animationupdate", (animation, frame) => {
       if (frame.index === 3) {
         enemy.state = "destroyed";
-        enemy.sprite.destroy();
+        enemy.sprite.setVisible(false);
       }
     });
     smoke.on("animationcomplete", () => {
       smoke.destroy();
+      // wait 9 seconds then respawn the enemy
+      this.time.delayedCall(9000, () => {
+        if (this.chest.state !== "collected") {
+          enemy.state = "idle";
+          enemy.sprite.setVisible(true);
+        }
+      });
     });
   }
 
@@ -557,8 +691,8 @@ export class Game extends Phaser.Scene {
           pushed.x += dx;
           pushed.y += dy;
         }
-
         this.sam.moving = false;
+
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           this.sam.moving = true;
           this.tweens.killAll();

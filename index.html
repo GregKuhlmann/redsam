@@ -19,5 +19,10 @@
   <body>
     <div id="game-container" class="container"></div>
     <script type="module" src="/src/main.js"></script>
+    <script>
+      document.addEventListener("contextmenu", (event) => {
+        event.preventDefault();
+      });
+    </script>
   </body>
 </html>
