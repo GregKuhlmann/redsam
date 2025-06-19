@@ -17,6 +17,7 @@ import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
+import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
 import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
@@ -24,6 +25,7 @@ import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
 import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
 import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
 import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
+import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 
 const TILESIZE = 16;
 
@@ -67,6 +69,7 @@ export class Game extends Phaser.Scene {
     this.load.audio("collect", audioCollect);
     this.load.audio("chestOpen", audioChestOpen);
     this.load.audio("celebrate", audioCelebrate);
+    this.load.audio("step", audioStep);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -104,6 +107,10 @@ export class Game extends Phaser.Scene {
       frameHeight: 24,
     });
     this.load.spritesheet("smoke", spriteSheetSmoke, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("ice", spriteSheetIce, {
       frameWidth: 32,
       frameHeight: 32,
     });
@@ -295,15 +302,7 @@ export class Game extends Phaser.Scene {
       }),
     });
     this.anims.create({
-      key: "slime-bounce-down",
-      frames: this.anims.generateFrameNumbers("slime", {
-        frames: [0, 4, 8, 12],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "slime-bounce-up",
+      key: "slime-bounce",
       frames: this.anims.generateFrameNumbers("slime", {
         frames: [1, 5, 9, 13],
       }),
@@ -311,20 +310,10 @@ export class Game extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
-      key: "slime-bounce-left",
+      key: "slime-frozen",
       frames: this.anims.generateFrameNumbers("slime", {
-        frames: [2, 6, 10, 14],
+        frames: [9],
       }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "slime-bounce-right",
-      frames: this.anims.generateFrameNumbers("slime", {
-        frames: [3, 7, 11, 15],
-      }),
-      frameRate: 8,
-      repeat: -1,
     });
     this.anims.create({
       key: "spark",
@@ -334,6 +323,15 @@ export class Game extends Phaser.Scene {
       }),
       frameRate: 10,
       repeat: -1,
+    });
+    this.anims.create({
+      key: "ice",
+      frames: this.anims.generateFrameNumbers("ice", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 10,
+      repeat: 0,
     });
     this.anims.create({
       key: "aura",
@@ -438,22 +436,27 @@ export class Game extends Phaser.Scene {
               direction,
             });
           } else if (name.startsWith("slime")) {
-            const direction = name.split("-")[1];
             const finder = new easystarjs.js();
             finder.setAcceptableTiles([0]);
             this.setGrid(finder);
             const sprite = this.add
               .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "slime")
               .setOrigin(0)
-              .play(`slime-bounce-${direction}`);
+              .play("slime-bounce");
+            const ice = this.add
+              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "ice")
+              .setScale(16 / 32)
+              .setOrigin(0)
+              .setVisible(false)
+              .play("ice");
             this.slimes.push({
               x: tile.x,
               y: tile.y,
               sprite,
+              ice,
               state: "bouncing",
               moving: false,
               finder,
-              direction,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -610,6 +613,13 @@ export class Game extends Phaser.Scene {
     console.log(
       `Moving ${enemy.sprite.texture.key} from (${enemy.x}, ${enemy.y}) to (${next.x}, ${next.y})`
     );
+    if (enemy.x === 14 && enemy.y === 7) {
+      enemy.state = "frozen";
+      enemy.ice.setPosition(enemy.sprite.x, enemy.sprite.y);
+      enemy.ice.setVisible(true);
+      enemy.sprite.play("slime-frozen");
+      return;
+    }
     this.tweens.add({
       targets: enemy.sprite,
       x: next.x * TILESIZE,
@@ -640,7 +650,7 @@ export class Game extends Phaser.Scene {
 
   destroy(enemy) {
     const smoke = this.add
-      .sprite(enemy.x * TILESIZE, enemy.y * TILESIZE, "smoke")
+      .sprite(enemy.sprite.x, enemy.sprite.y, "smoke")
       .setScale(16 / 32)
       .setOrigin(0)
       .play("smoke");
@@ -648,6 +658,9 @@ export class Game extends Phaser.Scene {
       if (frame.index === 3) {
         enemy.state = "destroyed";
         enemy.sprite.setVisible(false);
+        if (enemy.ice) {
+          enemy.ice.setVisible(false);
+        }
       }
     });
     smoke.on("animationcomplete", () => {
@@ -666,6 +679,7 @@ export class Game extends Phaser.Scene {
     if (this.sam.moving) return;
     this.sam.direction = direction;
     this.sam.sprite.play(`sam-walk-${direction}`, true);
+    this.sound.play("step");
 
     const pushed = this.pushable(dx, dy);
     if (pushed && this.collides(pushed, dx, dy, true)) return;
