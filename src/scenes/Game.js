@@ -1,5 +1,8 @@
 import * as Phaser from "phaser";
 
+import GrayscalePipeline from "/src/shaders/grayscale.js";
+import ShadowPipeline from "/src/shaders/shadow.js";
+
 import easystarjs from "easystarjs";
 
 import desert1 from "/assets/maps/desert1.json";
@@ -29,43 +32,6 @@ import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
 import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 
 const TILESIZE = 16;
-
-class GrayscalePipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
-  constructor(game) {
-    super({
-      game,
-      fragShader: `
-        precision mediump float;
-        uniform sampler2D uMainSampler;
-        varying vec2 outTexCoord;
-
-        void main() {
-          vec4 color = texture2D(uMainSampler, outTexCoord);
-          float gray = (color.r + color.g + color.b) / 2.0;
-          gl_FragColor = vec4(vec3(gray), color.a);
-        }
-      `,
-    });
-  }
-}
-
-class ShadowPipeline extends Phaser.Renderer.WebGL.Pipelines.SinglePipeline {
-  constructor(game) {
-    super({
-      game,
-      fragShader: `
-        precision mediump float;
-        uniform sampler2D uMainSampler;
-        varying vec2 outTexCoord;
-
-        void main() {
-          vec4 color = texture2D(uMainSampler, outTexCoord);
-          gl_FragColor = vec4(0, 0, 0, min(color.a, 0.2));
-        }
-      `,
-    });
-  }
-}
 
 const MAPS = ["desert3", "desert1", "desert2"];
 
