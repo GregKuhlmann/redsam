@@ -1,5 +1,8 @@
 import * as Phaser from "phaser";
-import { Game } from "./scenes/Game.js";
+import Start from "/src/scenes/Start.js";
+import Game from "/src/scenes/Game.js";
+
+import samuraiWarrior from "/assets/fonts/Samurai Warrior.ttf";
 
 const config = {
   type: Phaser.WEBGL,
@@ -7,12 +10,16 @@ const config = {
   height: 224,
   pixelArt: true,
   parent: "game-container",
-  backgroundColor: "#71ddee",
-  scene: [Game],
+  scene: [Start, Game],
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
 };
 
-new Phaser.Game(config);
+const font = new FontFace("SamuraiWarrior", `url(${samuraiWarrior})`);
+
+font.load().then(function (loadedFace) {
+  document.fonts.add(loadedFace);
+  new Phaser.Game(config);
+});

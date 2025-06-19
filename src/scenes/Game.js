@@ -1,41 +1,10 @@
 import * as Phaser from "phaser";
 
-import GrayscalePipeline from "/src/shaders/grayscale.js";
-import ShadowPipeline from "/src/shaders/shadow.js";
-
 import easystarjs from "easystarjs";
-
-import desert1 from "/assets/maps/desert1.json";
-import desert2 from "/assets/maps/desert2.json";
-import desert3 from "/assets/maps/desert3.json";
-import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
-import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
-import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
-import tilesetItems from "/assets/Ninja/TilesetItems.png";
-import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
-import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
-import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
-import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
-import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
-import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
-import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
-import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
-import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
-import spriteSheetShadow from "/assets/Ninja/shadow.png";
-import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
-import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
-import spriteSheetFont from "/assets/Ninja/font.png";
-import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
-import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
-import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
-import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
-import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
-
-const TILESIZE = 16;
 
 const MAPS = ["desert3", "desert1", "desert2"];
 
-export class Game extends Phaser.Scene {
+export default class Game extends Phaser.Scene {
   constructor() {
     super("Game");
   }
@@ -44,82 +13,10 @@ export class Game extends Phaser.Scene {
     this.map = data.map || MAPS[0];
   }
 
-  preload() {
-    this.load.image("tilesetHouse", tilesetHouse);
-    this.load.image("tilesetNature", tilesetNature);
-    this.load.image("tilesetWater", tilesetWater);
-    this.load.image("tilesetItems", tilesetItems);
-    this.load.image("tilesetGUI", tilesetGUI);
-    this.load.audio("explosion", audioExplosion);
-    this.load.audio("collect", audioCollect);
-    this.load.audio("chestOpen", audioChestOpen);
-    this.load.audio("celebrate", audioCelebrate);
-    this.load.audio("step", audioStep);
-    this.load.tilemapTiledJSON("desert1", desert1);
-    this.load.tilemapTiledJSON("desert2", desert2);
-    this.load.tilemapTiledJSON("desert3", desert3);
-    this.game.renderer.pipelines.add(
-      "Grayscale",
-      new GrayscalePipeline(this.game)
-    );
-    this.game.renderer.pipelines.add("Shadow", new ShadowPipeline(this.game));
-    this.load.spritesheet("dragon", spriteSheetDragon, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("cyclope", spriteSheetCyclope, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("slime", spriteSheetSlime, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("sam", spriteSheetRedNinja3, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("items", tilesetItems, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("spark", spriteSheetSpark, {
-      frameWidth: 30,
-      frameHeight: 35,
-    });
-    this.load.spritesheet("aura", spriteSheetAura, {
-      frameWidth: 25,
-      frameHeight: 24,
-    });
-    this.load.spritesheet("smoke", spriteSheetSmoke, {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet("ice", spriteSheetIce, {
-      frameWidth: 32,
-      frameHeight: 32,
-    });
-    this.load.spritesheet("shadow", spriteSheetShadow, {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet("chest", spriteSheetChest, {
-      frameWidth: TILESIZE,
-      frameHeight: TILESIZE,
-    });
-    this.load.spritesheet("crystal", spriteSheetCrystal, {
-      frameWidth: 16,
-      frameHeight: 16,
-    });
-    this.load.spritesheet("font", spriteSheetFont, {
-      frameWidth: 8,
-      frameHeight: 8,
-    });
-  }
+  preload() {}
 
   create() {
-    //const { width, height } = this.scale;
-
+    this.cameras.main.setBackgroundColor("#71ddee");
     this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(
       "TilesetHouse",
@@ -155,224 +52,6 @@ export class Game extends Phaser.Scene {
     this.textLives = this.add.sprite(296, 82, "font").setOrigin(0);
     this.textAmmo = this.add.sprite(296, 114, "font").setOrigin(0);
 
-    this.anims.create({
-      key: "sam-idle-down",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [0],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-walk-down",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [0, 4, 8, 12],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-idle-up",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [1],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-walk-up",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [1, 5, 9, 13],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-idle-left",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [2],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-walk-left",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [2, 6, 10, 14],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-idle-right",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [3],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-walk-right",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [3, 7, 11, 15],
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "sam-celebrate",
-      frames: this.anims.generateFrameNumbers("sam", {
-        frames: [24, 25, 24, 25, 26, 27],
-      }),
-      frameRate: 5,
-      repeat: 0,
-    });
-
-    this.anims.create({
-      key: "dragon-idle",
-      frames: this.anims.generateFrameNumbers("dragon", {
-        frames: [0, 4, 8, 12, 2, 6, 10, 14],
-      }),
-      frameRate: 5,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "dragon-frozen",
-      frames: this.anims.generateFrameNumbers("dragon", {
-        frames: [0],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-down-closed",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [0],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-up-closed",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [1],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-left-closed",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [2],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-right-closed",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [3],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-down-open",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [4],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-up-open",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [5],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-left-open",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [6],
-      }),
-    });
-    this.anims.create({
-      key: "cyclope-right-open",
-      frames: this.anims.generateFrameNumbers("cyclope", {
-        frames: [7],
-      }),
-    });
-    this.anims.create({
-      key: "slime-bounce",
-      frames: this.anims.generateFrameNumbers("slime", {
-        frames: [1, 5, 9, 13],
-      }),
-      frameRate: 8,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "slime-frozen",
-      frames: this.anims.generateFrameNumbers("slime", {
-        frames: [9],
-      }),
-    });
-    this.anims.create({
-      key: "spark",
-      frames: this.anims.generateFrameNumbers("spark", {
-        start: 0,
-        end: 8,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "ice",
-      frames: this.anims.generateFrameNumbers("ice", {
-        start: 0,
-        end: 2,
-      }),
-      frameRate: 10,
-      repeat: 0,
-    });
-    this.anims.create({
-      key: "shadow",
-      frames: this.anims.generateFrameNumbers("shadow", {
-        start: 0,
-        end: 4,
-      }),
-      frameRate: 10,
-    });
-    this.anims.create({
-      key: "aura",
-      frames: this.anims.generateFrameNumbers("aura", {
-        start: 0,
-        end: 4,
-      }),
-      frameRate: 10,
-      repeat: -1,
-    });
-    this.anims.create({
-      key: "smoke",
-      frames: this.anims.generateFrameNumbers("smoke", {
-        start: 0,
-        end: 5,
-      }),
-      frameRate: 10,
-      repeat: 0,
-    });
-    this.anims.create({
-      key: "chest-closed",
-      frames: this.anims.generateFrameNumbers("chest", {
-        start: 0,
-        end: 0,
-      }),
-      frameRate: 10,
-    });
-    this.anims.create({
-      key: "chest-sparkling",
-      frames: this.anims.generateFrameNumbers("chest", {
-        start: 1,
-        end: 1,
-      }),
-      frameRate: 10,
-    });
-    this.anims.create({
-      key: "chest-collected",
-      frames: this.anims.generateFrameNumbers("chest", {
-        start: 2,
-        end: 2,
-      }),
-      frameRate: 10,
-    });
-
     this.dragons = [];
     this.cyclopes = [];
     this.slimes = [];
@@ -391,10 +70,10 @@ export class Game extends Phaser.Scene {
           const name = tilesetItems.getTileProperties(tile.index)?.name;
           if (name === "sam") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "sam")
+              .sprite(tile.x * 16, tile.y * 16, "sam")
               .setOrigin(0);
             const aura = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "aura")
+              .sprite(tile.x * 16, tile.y * 16, "aura")
               .setScale(16 / 25)
               .setOrigin(0)
               .setAlpha(0)
@@ -410,7 +89,7 @@ export class Game extends Phaser.Scene {
             };
           } else if (name === "dragon") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "dragon")
+              .sprite(tile.x * 16, tile.y * 16, "dragon")
               .setOrigin(0)
               .play("dragon-idle");
             this.dragons.push({
@@ -422,7 +101,7 @@ export class Game extends Phaser.Scene {
           } else if (name.startsWith("cyclope")) {
             const direction = name.split("-")[1];
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "cyclope")
+              .sprite(tile.x * 16, tile.y * 16, "cyclope")
               .setOrigin(0)
               .play(`cyclope-${direction}-closed`);
             this.cyclopes.push({
@@ -437,11 +116,11 @@ export class Game extends Phaser.Scene {
             finder.setAcceptableTiles([0]);
             this.setGrid(finder);
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "slime")
+              .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
               .play("slime-bounce");
             const ice = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "ice")
+              .sprite(tile.x * 16, tile.y * 16, "ice")
               .setScale(16 / 32)
               .setOrigin(0)
               .setVisible(false)
@@ -457,23 +136,23 @@ export class Game extends Phaser.Scene {
             });
           } else if (name === "door") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
+              .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
           } else if (name === "block") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "items")
+              .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
           } else if (name.startsWith("crystal")) {
             const ammo = parseInt(name.split("-")[1], 10);
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "crystal")
+              .sprite(tile.x * 16, tile.y * 16, "crystal")
               .setOrigin(0);
             const spark = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "spark")
+              .sprite(tile.x * 16, tile.y * 16, "spark")
               .setScale(16 / 35)
               .setOrigin(0)
               .play({
@@ -491,11 +170,11 @@ export class Game extends Phaser.Scene {
             this.crystalsRemaining++;
           } else if (name === "chest") {
             const sprite = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "chest")
+              .sprite(tile.x * 16, tile.y * 16, "chest")
               .setOrigin(0)
               .play("chest-closed");
             const spark = this.add
-              .sprite(tile.x * TILESIZE, tile.y * TILESIZE, "spark")
+              .sprite(tile.x * 16, tile.y * 16, "spark")
               .setScale(16 / 35)
               .setOrigin(0)
               .setVisible(false)
@@ -619,8 +298,8 @@ export class Game extends Phaser.Scene {
     }
     this.tweens.add({
       targets: enemy.sprite,
-      x: next.x * TILESIZE,
-      y: next.y * TILESIZE,
+      x: next.x * 16,
+      y: next.y * 16,
       duration: 500,
       onComplete: () => {
         enemy.x = next.x;
@@ -689,7 +368,7 @@ export class Game extends Phaser.Scene {
     this.sam.moving = true;
     this.sound.play("step");
     const shadow = this.add
-      .sprite(this.sam.x * TILESIZE, this.sam.y * TILESIZE, "shadow")
+      .sprite(this.sam.x * 16, this.sam.y * 16, "shadow")
       .setOrigin(0)
       .setAlpha(0.2)
       .play("shadow");
@@ -698,14 +377,14 @@ export class Game extends Phaser.Scene {
     });
     this.tweens.add({
       targets: this.sam.sprite,
-      x: this.sam.sprite.x + dx * TILESIZE,
-      y: this.sam.sprite.y + dy * TILESIZE,
+      x: this.sam.sprite.x + dx * 16,
+      y: this.sam.sprite.y + dy * 16,
       duration: 200,
       onUpdate: () => {
         this.sam.aura.setPosition(this.sam.sprite.x, this.sam.sprite.y);
         if (pushed) {
-          pushed.sprite.x = this.sam.sprite.x + dx * TILESIZE;
-          pushed.sprite.y = this.sam.sprite.y + dy * TILESIZE;
+          pushed.sprite.x = this.sam.sprite.x + dx * 16;
+          pushed.sprite.y = this.sam.sprite.y + dy * 16;
         }
       },
       onComplete: () => {
@@ -744,7 +423,7 @@ export class Game extends Phaser.Scene {
           this.cameras.main.shake(200, 0.01);
           this.sound.play("explosion");
           const smoke = this.add
-            .sprite(this.door.x * TILESIZE, this.door.y * TILESIZE, "smoke")
+            .sprite(this.door.x * 16, this.door.y * 16, "smoke")
             .setScale(16 / 32)
             .setOrigin(0)
             .play("smoke");

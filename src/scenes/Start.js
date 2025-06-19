@@ -1,0 +1,354 @@
+import * as Phaser from "phaser";
+
+import GrayscalePipeline from "/src/shaders/grayscale.js";
+import ShadowPipeline from "/src/shaders/shadow.js";
+
+import desert1 from "/assets/maps/desert1.json";
+import desert2 from "/assets/maps/desert2.json";
+import desert3 from "/assets/maps/desert3.json";
+import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
+import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
+import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
+import tilesetItems from "/assets/Ninja/TilesetItems.png";
+import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
+import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
+import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
+import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
+import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
+import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
+import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
+import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
+import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
+import spriteSheetShadow from "/assets/Ninja/shadow.png";
+import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
+import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
+import spriteSheetFont from "/assets/Ninja/font.png";
+import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
+import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
+import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
+import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
+import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
+
+import startScreen from "/assets/images/start.png";
+
+export default class Start extends Phaser.Scene {
+  constructor() {
+    super("Start");
+  }
+
+  preload() {
+    this.load.image("tilesetHouse", tilesetHouse);
+    this.load.image("tilesetNature", tilesetNature);
+    this.load.image("tilesetWater", tilesetWater);
+    this.load.image("tilesetItems", tilesetItems);
+    this.load.image("tilesetGUI", tilesetGUI);
+    this.load.audio("explosion", audioExplosion);
+    this.load.audio("collect", audioCollect);
+    this.load.audio("chestOpen", audioChestOpen);
+    this.load.audio("celebrate", audioCelebrate);
+    this.load.audio("step", audioStep);
+    this.load.tilemapTiledJSON("desert1", desert1);
+    this.load.tilemapTiledJSON("desert2", desert2);
+    this.load.tilemapTiledJSON("desert3", desert3);
+    this.game.renderer.pipelines.add(
+      "Grayscale",
+      new GrayscalePipeline(this.game)
+    );
+    this.game.renderer.pipelines.add("Shadow", new ShadowPipeline(this.game));
+    this.load.spritesheet("dragon", spriteSheetDragon, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("cyclope", spriteSheetCyclope, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("slime", spriteSheetSlime, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("sam", spriteSheetRedNinja3, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("items", tilesetItems, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("spark", spriteSheetSpark, {
+      frameWidth: 30,
+      frameHeight: 35,
+    });
+    this.load.spritesheet("aura", spriteSheetAura, {
+      frameWidth: 25,
+      frameHeight: 24,
+    });
+    this.load.spritesheet("smoke", spriteSheetSmoke, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("ice", spriteSheetIce, {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet("shadow", spriteSheetShadow, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("chest", spriteSheetChest, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("crystal", spriteSheetCrystal, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("font", spriteSheetFont, {
+      frameWidth: 8,
+      frameHeight: 8,
+    });
+    this.load.image("start-screen", startScreen);
+  }
+
+  create() {
+    const { width, height } = this.scale;
+    this.add.image(width / 2, height / 2, "start-screen");
+    const start = this.add
+      .text((width * 2) / 3, height - 30, "Click to Start", {
+        fontFamily: "SamuraiWarrior",
+        fontSize: 30,
+        color: "#ffffff",
+      })
+      .setOrigin(0.5, 0.5);
+    start.setShadow(1, 1, "#000000", 0.3, true, true);
+    this.tweens.add({
+      targets: start,
+      alpha: 0.5,
+      duration: 100,
+      ease: "Sine.easeInOut",
+      yoyo: true,
+      repeat: -1,
+    });
+    this.input.once("pointerdown", () => {
+      this.scene.start("Game");
+    });
+
+    this.anims.create({
+      key: "sam-idle-down",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [0],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-walk-down",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-idle-up",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [1],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-walk-up",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-idle-left",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [2],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-walk-left",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [2, 6, 10, 14],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-idle-right",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [3],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-walk-right",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [3, 7, 11, 15],
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "sam-celebrate",
+      frames: this.anims.generateFrameNumbers("sam", {
+        frames: [24, 25, 24, 25, 26, 27],
+      }),
+      frameRate: 5,
+      repeat: 0,
+    });
+
+    this.anims.create({
+      key: "dragon-idle",
+      frames: this.anims.generateFrameNumbers("dragon", {
+        frames: [0, 4, 8, 12, 2, 6, 10, 14],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "dragon-frozen",
+      frames: this.anims.generateFrameNumbers("dragon", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-down-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-up-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [1],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-left-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [2],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-right-closed",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [3],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-down-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [4],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-up-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [5],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-left-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [6],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-right-open",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [7],
+      }),
+    });
+    this.anims.create({
+      key: "slime-bounce",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 8,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "slime-frozen",
+      frames: this.anims.generateFrameNumbers("slime", {
+        frames: [9],
+      }),
+    });
+    this.anims.create({
+      key: "spark",
+      frames: this.anims.generateFrameNumbers("spark", {
+        start: 0,
+        end: 8,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "ice",
+      frames: this.anims.generateFrameNumbers("ice", {
+        start: 0,
+        end: 2,
+      }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    this.anims.create({
+      key: "shadow",
+      frames: this.anims.generateFrameNumbers("shadow", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: "aura",
+      frames: this.anims.generateFrameNumbers("aura", {
+        start: 0,
+        end: 4,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "smoke",
+      frames: this.anims.generateFrameNumbers("smoke", {
+        start: 0,
+        end: 5,
+      }),
+      frameRate: 10,
+      repeat: 0,
+    });
+    this.anims.create({
+      key: "chest-closed",
+      frames: this.anims.generateFrameNumbers("chest", {
+        start: 0,
+        end: 0,
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: "chest-sparkling",
+      frames: this.anims.generateFrameNumbers("chest", {
+        start: 1,
+        end: 1,
+      }),
+      frameRate: 10,
+    });
+    this.anims.create({
+      key: "chest-collected",
+      frames: this.anims.generateFrameNumbers("chest", {
+        start: 2,
+        end: 2,
+      }),
+      frameRate: 10,
+    });
+  }
+}
