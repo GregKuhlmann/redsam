@@ -7,6 +7,7 @@ import desert1 from "/assets/maps/desert1.json";
 import desert2 from "/assets/maps/desert2.json";
 import desert3 from "/assets/maps/desert3.json";
 import desert4 from "/assets/maps/desert4.json";
+import desert5 from "/assets/maps/desert5.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -65,6 +66,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
     this.load.tilemapTiledJSON("desert4", desert4);
+    this.load.tilemapTiledJSON("desert5", desert5);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)

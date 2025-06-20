@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import easystarjs from "easystarjs";
 
-const MAPS = ["desert4", "desert3", "desert1", "desert2"];
+const MAPS = ["desert5", "desert4", "desert3", "desert1", "desert2"];
 
 export default class Game extends Phaser.Scene {
   constructor() {

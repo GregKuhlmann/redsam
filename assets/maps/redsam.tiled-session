@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert2.json",
+    "activeFile": "desert5.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -25,7 +25,7 @@
             "scale": 2.48,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 150.2016129032258,
+                "x": 159.8790322580645,
                 "y": 109.67741935483872
             }
         },
@@ -128,6 +128,14 @@
                 "y": 111.92307692307693
             }
         },
+        "desert5.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
         "level1.json": {
             "scale": 2.21,
             "selectedLayer": 2,
@@ -155,7 +163,7 @@
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 1.8442
         },
         "tilesets/TilesetWater.tsx": {
             "scaleInDock": 1
@@ -173,15 +181,21 @@
     "map.width": 20,
     "openFiles": [
         "desert1.json",
-        "desert2.json"
+        "desert2.json",
+        "desert3.tmj",
+        "desert4.tmj",
+        "desert5.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
-        "tilesets/TilesetItems.tsx",
+        "desert1.json",
         "desert2.json",
+        "desert3.tmj",
+        "desert4.tmj",
+        "desert5.tmj",
+        "tilesets/TilesetItems.tsx",
         "desert1.tmj",
         "tilesets/TilesetHouse.tsx",
-        "desert1.json",
         "level1.json"
     ],
     "tileset.embedInMap": true,
