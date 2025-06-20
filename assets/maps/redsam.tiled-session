@@ -113,6 +113,14 @@
             }
         },
         "desert3.tmj": {
+            "scale": 2.06,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 135.19417475728153,
+                "y": 92.71844660194175
+            }
+        },
+        "desert4.tmj": {
             "scale": 2.6,
             "selectedLayer": 3,
             "viewCenter": {

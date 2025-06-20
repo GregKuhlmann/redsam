@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert3", "desert1", "desert2"];
+const MAPS = ["desert4", "desert3", "desert1", "desert2"];
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -53,6 +53,7 @@ export default class Game extends Phaser.Scene {
     this.dragons = [];
     this.cyclopes = [];
     this.slimes = [];
+    this.flams = [];
     this.crystals = [];
     this.blocks = [];
     this.crystalsRemaining = 0;
@@ -66,6 +67,12 @@ export default class Game extends Phaser.Scene {
       row.forEach((tile) => {
         if (tile.index !== -1) {
           const name = tilesetItems.getTileProperties(tile.index)?.name;
+          if (!name) {
+            console.error(
+              `Tile at (${tile.x}, ${tile.y}) with index ${tile.index} has no name`
+            );
+            return;
+          }
           if (name === "sam") {
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "sam")
@@ -131,6 +138,17 @@ export default class Game extends Phaser.Scene {
               dy: -1,
               moving: false,
             });
+          } else if (name === "flam") {
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "flam")
+              .setOrigin(0)
+              .play("flam-idle");
+            this.flams.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              state: "idle",
+            });
           } else if (name === "door") {
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "items")
@@ -192,7 +210,12 @@ export default class Game extends Phaser.Scene {
       });
     });
 
-    this.enemies = [...this.dragons, ...this.cyclopes, ...this.slimes];
+    this.enemies = [
+      ...this.dragons,
+      ...this.cyclopes,
+      ...this.slimes,
+      ...this.flams,
+    ];
 
     this.makeGrid();
     this.slimes.forEach((slime) => {
@@ -490,6 +513,10 @@ export default class Game extends Phaser.Scene {
               this.cyclopes.forEach((cyclope) => {
                 cyclope.state = "open";
                 cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
+              });
+              this.flams.forEach((flam) => {
+                flam.state = "pursuing";
+                flam.sprite.play("flam-pursue");
               });
             }
           }

@@ -6,6 +6,7 @@ import ShadowPipeline from "/src/shaders/shadow.js";
 import desert1 from "/assets/maps/desert1.json";
 import desert2 from "/assets/maps/desert2.json";
 import desert3 from "/assets/maps/desert3.json";
+import desert4 from "/assets/maps/desert4.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -15,6 +16,7 @@ import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/Sprit
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
 import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
 import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
+import spriteSheetFlam from "/assets/Ninja/flam.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
@@ -58,6 +60,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
+    this.load.tilemapTiledJSON("desert4", desert4);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -72,6 +75,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("slime", spriteSheetSlime, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("flam", spriteSheetFlam, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -134,6 +141,7 @@ export default class Start extends Phaser.Scene {
       repeat: -1,
     });
     this.input.once("pointerdown", () => {
+      // Uncomment for intro
       this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
@@ -318,6 +326,24 @@ export default class Start extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers("slime", {
         frames: [9],
       }),
+    });
+    this.anims.create({
+      key: "flam-idle",
+      frames: this.anims.generateFrameNumbers("flam", {
+        start: 0,
+        end: 3,
+      }),
+      frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "flam-pursue",
+      frames: this.anims.generateFrameNumbers("flam", {
+        start: 4,
+        end: 7,
+      }),
+      frameRate: 20,
+      repeat: -1,
     });
     this.anims.create({
       key: "spark",
