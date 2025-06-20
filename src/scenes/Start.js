@@ -33,6 +33,8 @@ import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
 import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
 import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
+import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
+import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
 
 import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
@@ -57,6 +59,8 @@ export default class Start extends Phaser.Scene {
     this.load.audio("slash", audioSlash);
     this.load.audio("slash-reverse", audioSlashReverse);
     this.load.audio("freeze", audioFreeze);
+    this.load.audio("killed", audioKilled);
+    this.load.audio("game-over", audioGameOver);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);

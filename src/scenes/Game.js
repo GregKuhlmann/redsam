@@ -1,5 +1,7 @@
 import * as Phaser from "phaser";
 
+import easystarjs from "easystarjs";
+
 const MAPS = ["desert4", "desert3", "desert1", "desert2"];
 
 export default class Game extends Phaser.Scene {
@@ -9,6 +11,7 @@ export default class Game extends Phaser.Scene {
 
   init(data) {
     this.map = data.map || MAPS[0];
+    this.lives = data.lives || 5;
   }
 
   preload() {}
@@ -57,7 +60,6 @@ export default class Game extends Phaser.Scene {
     this.crystals = [];
     this.blocks = [];
     this.crystalsRemaining = 0;
-    this.lives = 5;
     this.textLives.setFrame(this.lives);
     this.ammo = 0;
     this.textAmmo.setFrame(this.ammo);
@@ -91,6 +93,7 @@ export default class Game extends Phaser.Scene {
               moving: false,
               direction: "down",
               chargeTween: null,
+              state: "alive",
             };
           } else if (name === "dragon") {
             const sprite = this.add
@@ -133,7 +136,7 @@ export default class Game extends Phaser.Scene {
               y: tile.y,
               sprite,
               ice,
-              state: "bouncing",
+              state: "pursuing",
               dx: 0,
               dy: -1,
               moving: false,
@@ -143,11 +146,14 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "flam")
               .setOrigin(0)
               .play("flam-idle");
+            const finder = new easystarjs.js();
             this.flams.push({
               x: tile.x,
               y: tile.y,
               sprite,
+              finder,
               state: "idle",
+              moving: false,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -221,6 +227,14 @@ export default class Game extends Phaser.Scene {
     this.slimes.forEach((slime) => {
       this.setPath(slime, this.sam.x, this.sam.y);
     });
+    this.flams.forEach((flam) => {
+      flam.finder.setAcceptableTiles([0]);
+      flam.finder.setGrid(this.grid);
+      flam.finder.findPath(flam.x, flam.y, this.sam.x, this.sam.y, (path) => {
+        this.setPath(flam, path);
+      });
+      flam.finder.calculate();
+    });
 
     this.sam.sprite.setDepth(1000);
     this.sam.aura.setDepth(1001);
@@ -245,6 +259,7 @@ export default class Game extends Phaser.Scene {
   }
 
   update() {
+    if (this.sam.state === "dead") return;
     if (this.cursors.left.isDown) {
       this.move(-1, 0, "left");
     } else if (this.cursors.right.isDown) {
@@ -260,6 +275,48 @@ export default class Game extends Phaser.Scene {
     this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
       this.setPath(slime, this.sam.x, this.sam.y);
+    });
+    this.flams.forEach((flam) => {
+      if (flam.state !== "pursuing") return;
+      if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
+        this.sam.state = "dead";
+        this.sam.sprite.anims.pause();
+        this.sound.play("killed");
+
+        let heroCam = this.cameras.add(
+          0,
+          0,
+          this.scale.width,
+          this.scale.height
+        );
+
+        this.children.list.forEach((obj) => {
+          if (obj !== this.sam.sprite) heroCam.ignore(obj);
+        });
+
+        this.cameras.main.setVisible(false);
+
+        // Optional: Fade out the heroCam after a delay
+        this.time.delayedCall(
+          1000,
+          () => {
+            this.sound.play("game-over");
+            heroCam.fadeOut(1000, 255, 0, 0);
+            this.time.delayedCall(2000, () => {
+              this.scene.restart({ map: this.map, lives: this.lives - 1 });
+            });
+          },
+          [],
+          this
+        );
+
+        return;
+      }
+      flam.finder.setGrid(this.grid);
+      flam.finder.findPath(flam.x, flam.y, this.sam.x, this.sam.y, (path) => {
+        this.setFlamPath(flam, path);
+      });
+      flam.finder.calculate();
     });
   }
 
@@ -278,7 +335,10 @@ export default class Game extends Phaser.Scene {
         } else if (
           this.enemies.some(
             (enemy) =>
-              enemy.x == x && enemy.y == y && enemy.state !== "destroyed"
+              enemy.x == x &&
+              enemy.y == y &&
+              enemy.state !== "destroyed" &&
+              enemy.state !== "pursuing"
           )
         ) {
           col.push(1);
@@ -287,6 +347,10 @@ export default class Game extends Phaser.Scene {
             (crystal) =>
               crystal.x == x && crystal.y == y && crystal.state !== "collected"
           )
+        ) {
+          col.push(1);
+        } else if (
+          this.blocks.some((block) => block.x === x && block.y === y)
         ) {
           col.push(1);
         } else {
@@ -318,9 +382,36 @@ export default class Game extends Phaser.Scene {
     });
   }
 
+  moveFlam(flam, targetX, targetY) {
+    flam.moving = true;
+    flam.dx = targetX - flam.x;
+    flam.dy = targetY - flam.y;
+    this.tweens.add({
+      targets: flam.sprite,
+      x: targetX * 16,
+      y: targetY * 16,
+      duration: 150,
+      onComplete: () => {
+        flam.x = targetX;
+        flam.y = targetY;
+        flam.moving = false;
+      },
+    });
+  }
+
+  setFlamPath(flam, path) {
+    if (!path || path.length < 2) {
+      flam.moving = false;
+      return;
+    }
+    path.shift();
+    const next = path.shift();
+    this.moveFlam(flam, next.x, next.y);
+  }
+
   setPath(slime, targetX, targetY) {
     if (slime.moving) return;
-    if (slime.state !== "bouncing") return;
+    if (slime.state !== "pursuing") return;
     const options = [];
     for (const option of [
       { dx: slime.dx, dy: slime.dy, dir: "forward" },
@@ -458,8 +549,11 @@ export default class Game extends Phaser.Scene {
             }
           });
           this.cameras.main.once("camerafadeoutcomplete", () => {
-            this.anims.resumeAll();
-            this.scene.restart({ map: MAPS[MAPS.indexOf(this.map) + 1] });
+            this.anims.resumeAll(); // TODO: is this necessary?
+            this.scene.restart({
+              map: MAPS[MAPS.indexOf(this.map) + 1],
+              lives: this.lives,
+            });
           });
         }
         if (
