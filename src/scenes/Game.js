@@ -1,8 +1,13 @@
 import * as Phaser from "phaser";
 
-import easystarjs from "easystarjs";
+const MAPS = ["desert1", "desert2", "desert3", "desert4", "desert5"];
 
-const MAPS = ["desert5", "desert5", "desert3", "desert4", "desert5"];
+const DIRECTIONS = {
+  up: { dx: 0, dy: -1 },
+  down: { dx: 0, dy: 1 },
+  left: { dx: -1, dy: 0 },
+  right: { dx: 1, dy: 0 },
+};
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -17,6 +22,10 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
+    // this.sound.play("main-theme", {
+    //   loop: true,
+    //   volume: 0.2,
+    // });
     this.cameras.main.setBackgroundColor("#71ddee");
     this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(
@@ -57,6 +66,8 @@ export default class Game extends Phaser.Scene {
     this.cyclopes = [];
     this.slimes = [];
     this.flams = [];
+    this.flamBoxes = this.physics.add.group();
+    this.pandas = [];
     this.crystals = [];
     this.blocks = [];
     this.crystalsRemaining = 0;
@@ -97,7 +108,7 @@ export default class Game extends Phaser.Scene {
               state: "alive",
             };
           } else if (name === "dragon") {
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "dragon")
               .setOrigin(0)
               .play("dragon-idle");
@@ -129,12 +140,25 @@ export default class Game extends Phaser.Scene {
               firing: false,
               direction,
             });
+          } else if (name.startsWith("panda")) {
+            const direction = name.split("-")[1];
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "panda")
+              .setOrigin(0)
+              .play(`panda-walk-${direction}`);
+            this.pandas.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              state: "idle",
+              direction,
+            });
           } else if (name.startsWith("slime")) {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
               .play("slime-bounce");
-            const ice = this.add
+            const ice = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "ice")
               .setScale(16 / 32)
               .setOrigin(0)
@@ -146,22 +170,25 @@ export default class Game extends Phaser.Scene {
               sprite,
               ice,
               state: "pursuing",
+              moveDuration: 350,
               dx: 0,
               dy: -1,
               moving: false,
             });
           } else if (name === "flam") {
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "flam")
               .setOrigin(0)
               .play("flam-idle");
-            const finder = new easystarjs.js();
+            this.flamBoxes.add(sprite);
             this.flams.push({
               x: tile.x,
               y: tile.y,
               sprite,
-              finder,
               state: "idle",
+              moveDuration: 150,
+              dx: 1,
+              dy: 0,
               moving: false,
             });
           } else if (name === "door") {
@@ -230,24 +257,11 @@ export default class Game extends Phaser.Scene {
       ...this.cyclopes,
       ...this.slimes,
       ...this.flams,
+      ...this.pandas,
     ];
 
     this.physics.add.overlap(this.sam.sprite, this.projectiles, () => {
-      if (this.sam.state === "dead") return;
       this.die();
-    });
-
-    this.makeGrid();
-    this.slimes.forEach((slime) => {
-      this.setPath(slime, this.sam.x, this.sam.y);
-    });
-    this.flams.forEach((flam) => {
-      flam.finder.setAcceptableTiles([0]);
-      flam.finder.setGrid(this.grid);
-      flam.finder.findPath(flam.x, flam.y, this.sam.x, this.sam.y, (path) => {
-        this.setPath(flam, path);
-      });
-      flam.finder.calculate();
     });
 
     this.sam.sprite.setDepth(1000);
@@ -270,22 +284,13 @@ export default class Game extends Phaser.Scene {
       }
       this.shoot();
     });
+    this.input.keyboard.on("keydown-R", () => {
+      this.die();
+    });
   }
 
   update() {
     if (this.sam.state === "dead") return;
-    if (this.cursors.left.isDown) {
-      this.move(-1, 0, "left");
-    } else if (this.cursors.right.isDown) {
-      this.move(1, 0, "right");
-    } else if (this.cursors.up.isDown) {
-      this.move(0, -1, "up");
-    } else if (this.cursors.down.isDown) {
-      this.move(0, 1, "down");
-    } else if (!this.sam.moving) {
-      this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
-    }
-
     this.cyclopes.forEach((cyclope) => {
       if (cyclope.firing) {
         if (
@@ -303,29 +308,54 @@ export default class Game extends Phaser.Scene {
 
     this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
-      this.setPath(slime, this.sam.x, this.sam.y);
+      if (slime.state === "pursuing" && !slime.moving) {
+        if (
+          slime.state === "pursuing" &&
+          Math.abs(slime.x - this.sam.x) <= 1 &&
+          Math.abs(slime.y - this.sam.y) <= 1 // include diagonal movement
+        ) {
+          this.sound.play("freeze");
+          slime.state = "frozen";
+          slime.ice.setPosition(slime.sprite.x, slime.sprite.y);
+          slime.ice.setVisible(true);
+          slime.sprite.play("slime-frozen");
+          return;
+        }
+        const path = this.getPath(slime, this.sam.x, this.sam.y);
+        if (path.x !== this.sam.x || path.y !== this.sam.y) {
+          this.moveEnemy(slime, path.x, path.y);
+        }
+      }
     });
     this.flams.forEach((flam) => {
       if (flam.state !== "frozen" && flam.state !== "destroyed") {
-        flam.sprite.setFlipX(flam.sprite.x > this.sam.sprite.x);
+        flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
       }
-      if (flam.state !== "pursuing") return;
-      if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
-        this.die();
-        return;
+      if (flam.state === "pursuing" && !flam.moving) {
+        const path = this.setPath(flam, this.sam.x, this.sam.y);
+        this.moveEnemy(flam, path.x, path.y);
       }
-      flam.finder.setGrid(this.grid);
-      flam.finder.findPath(flam.x, flam.y, this.sam.x, this.sam.y, (path) => {
-        this.setFlamPath(flam, path);
-      });
-      flam.finder.calculate();
     });
+
+    if (this.cursors.left.isDown) {
+      this.move(-1, 0, "left");
+    } else if (this.cursors.right.isDown) {
+      this.move(1, 0, "right");
+    } else if (this.cursors.up.isDown) {
+      this.move(0, -1, "up");
+    } else if (this.cursors.down.isDown) {
+      this.move(0, 1, "down");
+    } else if (!this.sam.moving) {
+      this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
+    }
   }
 
   die() {
+    if (this.sam.state === "dead") return;
     this.sam.state = "dead";
     this.sam.sprite.anims.pause();
     this.tweens.killAll();
+    this.sound.stopAll();
     this.sound.play("killed");
 
     let heroCam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
@@ -369,6 +399,7 @@ export default class Game extends Phaser.Scene {
               enemy.x == x &&
               enemy.y == y &&
               enemy.state !== "destroyed" &&
+              enemy.state !== "jettisoned" &&
               enemy.state !== "pursuing"
           )
         ) {
@@ -396,53 +427,24 @@ export default class Game extends Phaser.Scene {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
   }
 
-  moveSlime(slime, targetX, targetY) {
-    slime.moving = true;
-    slime.dx = targetX - slime.x;
-    slime.dy = targetY - slime.y;
+  moveEnemy(enemy, targetX, targetY) {
+    enemy.moving = true;
+    enemy.dx = targetX - enemy.x;
+    enemy.dy = targetY - enemy.y;
+    enemy.x = targetX;
+    enemy.y = targetY;
     this.tweens.add({
-      targets: slime.sprite,
+      targets: enemy.sprite,
       x: targetX * 16,
       y: targetY * 16,
-      duration: 350,
+      duration: enemy.moveDuration,
       onComplete: () => {
-        slime.x = targetX;
-        slime.y = targetY;
-        slime.moving = false;
+        enemy.moving = false;
       },
     });
   }
 
-  moveFlam(flam, targetX, targetY) {
-    flam.moving = true;
-    flam.dx = targetX - flam.x;
-    flam.dy = targetY - flam.y;
-    this.tweens.add({
-      targets: flam.sprite,
-      x: targetX * 16,
-      y: targetY * 16,
-      duration: 150,
-      onComplete: () => {
-        flam.x = targetX;
-        flam.y = targetY;
-        flam.moving = false;
-      },
-    });
-  }
-
-  setFlamPath(flam, path) {
-    if (!path || path.length < 2) {
-      flam.moving = false;
-      return;
-    }
-    path.shift();
-    const next = path.shift();
-    this.moveFlam(flam, next.x, next.y);
-  }
-
-  setPath(slime, targetX, targetY) {
-    if (slime.moving) return;
-    if (slime.state !== "pursuing") return;
+  getPath(slime, targetX, targetY) {
     const options = [];
     for (const option of [
       { dx: slime.dx, dy: slime.dy, dir: "forward" },
@@ -463,31 +465,26 @@ export default class Game extends Phaser.Scene {
       }
     }
     options.sort((a, b) => a.dist - b.dist);
-    if (options.length === 0) return;
+    if (options.length === 0) return { x: slime.x, y: slime.y };
     if (options[0].dir === "backward" && options.length > 1) {
       options.shift(); // remove backward option if there are other options
     }
-    if (options[0].dist <= 1) {
-      this.sound.play("freeze");
-      slime.state = "frozen";
-      slime.ice.setPosition(slime.sprite.x, slime.sprite.y);
-      slime.ice.setVisible(true);
-      slime.sprite.play("slime-frozen");
-      return;
-    } else {
-      this.moveSlime(slime, options[0].x, options[0].y);
-    }
+    return options[0];
   }
 
   shoot() {
     if (this.ammo <= 0) return;
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
+    this.sound.play("freeze");
+    const dir = DIRECTIONS[this.sam.direction];
     this.dragons.forEach((dragon) => {
-      if (this.distance(dragon.x, dragon.y, this.sam.x, this.sam.y) <= 1) {
-        this.sound.play("freeze");
+      if (
+        this.sam.x + dir.dx === dragon.x &&
+        this.sam.y + dir.dy === dragon.y
+      ) {
         if (dragon.state == "frozen") {
-          this.destroy(dragon);
+          this.jettison(dragon, dir);
         } else {
           dragon.state = "frozen";
           dragon.sprite.play("dragon-frozen");
@@ -497,7 +494,6 @@ export default class Game extends Phaser.Scene {
     });
     this.flams.forEach((flam) => {
       if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
-        this.sound.play("freeze");
         if (flam.state === "frozen") {
           this.destroy(flam);
         } else {
@@ -507,6 +503,43 @@ export default class Game extends Phaser.Scene {
         }
       }
     });
+  }
+
+  jettison(enemy, direction) {
+    enemy.state = "jettisoned";
+    enemy.sprite
+      .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
+      .setOrigin(0.5)
+      .setVelocity(400 * direction.dx, 400 * direction.dy);
+    this.tweens.add({
+      targets: enemy.sprite,
+      angle: 360,
+      scale: 4,
+      duration: 500,
+      repeat: 0,
+    });
+    if (enemy.respawns) {
+      // wait 9 seconds then respawn the enemy
+      this.time.delayedCall(9000, () => {
+        if (this.chest.state === "collected") return;
+        this.tweens.killTweensOf(enemy.sprite);
+        enemy.sprite
+          .setPosition(enemy.x * 16, enemy.y * 16)
+          .setOrigin(0)
+          .setAngle(0)
+          .setScale(1)
+          .setVelocity(0, 0);
+        if (this.chest.state !== "collected") {
+          enemy.sprite.setPipeline("Shadow");
+          enemy.sprite.setVisible(true);
+          this.time.delayedCall(1000, () => {
+            enemy.sprite.resetPipeline();
+            enemy.sprite.play("dragon-idle");
+            enemy.state = "idle";
+          });
+        }
+      });
+    }
   }
 
   destroy(enemy) {
@@ -522,7 +555,11 @@ export default class Game extends Phaser.Scene {
     smoke.on("animationupdate", (animation, frame) => {
       if (frame.index === 3) {
         enemy.state = "destroyed";
-        enemy.sprite.setVisible(false);
+        if (enemy.respawns) {
+          enemy.sprite.setVisible(false);
+        } else {
+          enemy.sprite.destroy();
+        }
         if (enemy.ice) {
           enemy.ice.setVisible(false);
         }
@@ -558,8 +595,14 @@ export default class Game extends Phaser.Scene {
 
     this.sam.moving = true;
     this.sound.play("step");
+    this.sam.x += dx;
+    this.sam.y += dy;
+    if (pushed) {
+      pushed.x += dx;
+      pushed.y += dy;
+    }
     const shadow = this.add
-      .sprite(this.sam.x * 16, this.sam.y * 16, "shadow")
+      .sprite(this.sam.sprite.x, this.sam.sprite.y, "shadow")
       .setOrigin(0)
       .setAlpha(0.2)
       .play("shadow");
@@ -579,17 +622,11 @@ export default class Game extends Phaser.Scene {
         }
       },
       onComplete: () => {
-        this.sam.x += dx;
-        this.sam.y += dy;
-        if (pushed) {
-          pushed.x += dx;
-          pushed.y += dy;
-        }
         this.sam.moving = false;
-
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           this.sam.moving = true;
           this.tweens.killAll();
+          this.sound.stopAll();
           this.sound.play("celebrate");
           this.sam.sprite.play("sam-celebrate");
           this.sam.aura.setVisible(false);
@@ -713,6 +750,9 @@ export default class Game extends Phaser.Scene {
                   flam.sprite.play("flam-pursue");
                 }
               });
+              this.physics.add.overlap(this.sam.sprite, this.flamBoxes, () => {
+                this.die();
+              });
             }
           }
         });
@@ -769,7 +809,11 @@ export default class Game extends Phaser.Scene {
 
     if (
       this.enemies.some(
-        (enemy) => enemy.x == x && enemy.y == y && enemy.state !== "destroyed"
+        (enemy) =>
+          enemy.x == x &&
+          enemy.y == y &&
+          enemy.state !== "destroyed" &&
+          enemy.state !== "jettisoned"
       )
     ) {
       return true;

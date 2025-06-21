@@ -14,6 +14,7 @@ import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
 import tilesetItems from "/assets/Ninja/TilesetItems.png";
 import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
 import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
+import spriteSheetPanda from "/assets/Ninja/Actor/Monsters/Panda/SpriteSheet.png";
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
 import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
 import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
@@ -36,6 +37,7 @@ import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
 import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
 import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
 import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
+import audioMainTheme from "/assets/audio/lolo-main-theme.mp3";
 import audioLaser from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash5.wav";
 import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
@@ -64,6 +66,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("killed", audioKilled);
     this.load.audio("game-over", audioGameOver);
     this.load.audio("laser", audioLaser);
+    this.load.audio("main-theme", audioMainTheme);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -91,6 +94,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("sam", spriteSheetRedNinja3, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("panda", spriteSheetPanda, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -259,7 +266,62 @@ export default class Start extends Phaser.Scene {
       frameRate: 5,
       repeat: 0,
     });
-
+    this.anims.create({
+      key: "panda-idle-down",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "panda-walk-down",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "panda-idle-up",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [1],
+      }),
+    });
+    this.anims.create({
+      key: "panda-walk-up",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "panda-idle-left",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [2],
+      }),
+    });
+    this.anims.create({
+      key: "panda-walk-left",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [2, 6, 10, 14],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "panda-idle-right",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [3],
+      }),
+    });
+    this.anims.create({
+      key: "panda-walk-right",
+      frames: this.anims.generateFrameNumbers("panda", {
+        frames: [3, 7, 11, 15],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
     this.anims.create({
       key: "dragon-idle",
       frames: this.anims.generateFrameNumbers("dragon", {

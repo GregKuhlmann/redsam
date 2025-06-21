@@ -71,6 +71,26 @@
    <property name="name" value="crystal-1"/>
   </properties>
  </tile>
+ <tile id="23">
+  <properties>
+   <property name="name" value="panda-down"/>
+  </properties>
+ </tile>
+ <tile id="24">
+  <properties>
+   <property name="name" value="panda-up"/>
+  </properties>
+ </tile>
+ <tile id="25">
+  <properties>
+   <property name="name" value="panda-left"/>
+  </properties>
+ </tile>
+ <tile id="26">
+  <properties>
+   <property name="name" value="panda-right"/>
+  </properties>
+ </tile>
  <tile id="36">
   <properties>
    <property name="name" value="crystal-2"/>
