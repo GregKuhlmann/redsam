@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import easystarjs from "easystarjs";
 
-const MAPS = ["desert2", "desert5", "desert3", "desert4", "desert5"];
+const MAPS = ["desert1", "desert5", "desert3", "desert4", "desert5"];
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -645,6 +645,18 @@ export default class Game extends Phaser.Scene {
                 duration: 200,
                 onComplete: () => {
                   cyclope.laser.setVelocityX(400);
+                },
+              });
+            } else if (cyclope.direction === "left") {
+              cyclope.laser
+                .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
+                .setOrigin(1, 0);
+              this.tweens.add({
+                targets: cyclope.laser,
+                displayWidth: 50,
+                duration: 200,
+                onComplete: () => {
+                  cyclope.laser.setVelocityX(-400);
                 },
               });
             }

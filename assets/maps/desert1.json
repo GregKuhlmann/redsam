@@ -260,6 +260,24 @@
                         }]
                 }, 
                 {
+                 "id":11,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"slime"
+                        }]
+                }, 
+                {
+                 "id":12,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"flam"
+                        }]
+                }, 
+                {
                  "id":20,
                  "properties":[
                         {

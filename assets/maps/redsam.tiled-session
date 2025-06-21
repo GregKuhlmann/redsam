@@ -114,7 +114,7 @@
         },
         "desert3.tmj": {
             "scale": 2.06,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 135.19417475728153,
                 "y": 92.71844660194175
@@ -188,12 +188,12 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
-        "desert1.json",
+        "tilesets/TilesetItems.tsx",
         "desert2.json",
+        "desert1.json",
         "desert3.tmj",
         "desert4.tmj",
         "desert5.tmj",
-        "tilesets/TilesetItems.tsx",
         "desert1.tmj",
         "tilesets/TilesetHouse.tsx",
         "level1.json"
