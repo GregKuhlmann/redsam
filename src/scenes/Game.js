@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import easystarjs from "easystarjs";
 
-const MAPS = ["desert5", "desert4", "desert3", "desert1", "desert2"];
+const MAPS = ["desert2", "desert5", "desert3", "desert4", "desert5"];
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -63,6 +63,7 @@ export default class Game extends Phaser.Scene {
     this.textLives.setFrame(this.lives);
     this.ammo = 0;
     this.textAmmo.setFrame(this.ammo);
+    this.projectiles = this.physics.add.group();
 
     // iterate over the key, value pairs in the tilesetItems.tileProperties
     this.level.getLayer("LayerItems").data.forEach((row) => {
@@ -76,7 +77,7 @@ export default class Game extends Phaser.Scene {
             return;
           }
           if (name === "sam") {
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "sam")
               .setOrigin(0);
             const aura = this.add
@@ -113,15 +114,23 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "cyclope")
               .setOrigin(0)
               .play(`cyclope-${direction}-closed`);
+            const laser = this.physics.add
+              .image(0, 0, "laser")
+              .setDisplaySize(2, 2)
+              .setDepth(1000)
+              .setVisible(false);
+            this.projectiles.add(laser);
             this.cyclopes.push({
               x: tile.x,
               y: tile.y,
               sprite,
+              laser,
               state: "closed",
+              firing: false,
               direction,
             });
           } else if (name.startsWith("slime")) {
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
               .play("slime-bounce");
@@ -223,6 +232,11 @@ export default class Game extends Phaser.Scene {
       ...this.flams,
     ];
 
+    this.physics.add.overlap(this.sam.sprite, this.projectiles, () => {
+      if (this.sam.state === "dead") return;
+      this.die();
+    });
+
     this.makeGrid();
     this.slimes.forEach((slime) => {
       this.setPath(slime, this.sam.x, this.sam.y);
@@ -272,6 +286,21 @@ export default class Game extends Phaser.Scene {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
 
+    this.cyclopes.forEach((cyclope) => {
+      if (cyclope.firing) {
+        if (
+          !Phaser.Geom.Intersects.RectangleToRectangle(
+            this.scale.getViewPort(),
+            cyclope.laser.getBounds()
+          )
+        ) {
+          cyclope.laser.setVisible(false);
+          cyclope.firing = false;
+          cyclope.laser.setVelocity(0, 0);
+        }
+      }
+    });
+
     this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
       this.setPath(slime, this.sam.x, this.sam.y);
@@ -279,37 +308,7 @@ export default class Game extends Phaser.Scene {
     this.flams.forEach((flam) => {
       if (flam.state !== "pursuing") return;
       if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
-        this.sam.state = "dead";
-        this.sam.sprite.anims.pause();
-        this.sound.play("killed");
-
-        let heroCam = this.cameras.add(
-          0,
-          0,
-          this.scale.width,
-          this.scale.height
-        );
-
-        this.children.list.forEach((obj) => {
-          if (obj !== this.sam.sprite) heroCam.ignore(obj);
-        });
-
-        this.cameras.main.setVisible(false);
-
-        // Optional: Fade out the heroCam after a delay
-        this.time.delayedCall(
-          1000,
-          () => {
-            this.sound.play("game-over");
-            heroCam.fadeOut(1000, 255, 0, 0);
-            this.time.delayedCall(2000, () => {
-              this.scene.restart({ map: this.map, lives: this.lives - 1 });
-            });
-          },
-          [],
-          this
-        );
-
+        this.die();
         return;
       }
       flam.finder.setGrid(this.grid);
@@ -318,6 +317,34 @@ export default class Game extends Phaser.Scene {
       });
       flam.finder.calculate();
     });
+  }
+
+  die() {
+    this.sam.state = "dead";
+    this.sam.sprite.anims.pause();
+    this.sound.play("killed");
+
+    let heroCam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
+
+    this.children.list.forEach((obj) => {
+      if (obj !== this.sam.sprite) heroCam.ignore(obj);
+    });
+
+    this.cameras.main.setVisible(false);
+
+    // Optional: Fade out the heroCam after a delay
+    this.time.delayedCall(
+      1000,
+      () => {
+        this.sound.play("game-over");
+        heroCam.fadeOut(1000, 255, 0, 0);
+        this.time.delayedCall(2000, () => {
+          this.scene.restart({ map: this.map, lives: this.lives - 1 });
+        });
+      },
+      [],
+      this
+    );
   }
 
   makeGrid() {
@@ -586,6 +613,43 @@ export default class Game extends Phaser.Scene {
             }
           });
         }
+        this.cyclopes.forEach((cyclope) => {
+          if (
+            (cyclope.x == this.sam.x || cyclope.y == this.sam.y) &&
+            cyclope.state === "open" &&
+            !cyclope.firing
+          ) {
+            cyclope.firing = true;
+            this.sound.play("laser");
+            cyclope.laser.setDisplaySize(2, 2);
+            cyclope.laser.setVisible(true);
+            if (cyclope.direction === "down") {
+              cyclope.laser
+                .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
+                .setOrigin(0);
+              this.tweens.add({
+                targets: cyclope.laser,
+                displayHeight: 50,
+                duration: 200,
+                onComplete: () => {
+                  cyclope.laser.setVelocityY(400);
+                },
+              });
+            } else if (cyclope.direction === "right") {
+              cyclope.laser
+                .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
+                .setOrigin(0);
+              this.tweens.add({
+                targets: cyclope.laser,
+                displayWidth: 50,
+                duration: 200,
+                onComplete: () => {
+                  cyclope.laser.setVelocityX(400);
+                },
+              });
+            }
+          }
+        });
         this.crystals.forEach((crystal) => {
           if (
             crystal.x == this.sam.x &&

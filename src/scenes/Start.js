@@ -36,10 +36,11 @@ import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
 import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
 import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
 import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
-
+import audioLaser from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash5.wav";
 import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
 import clickToStart from "/assets/images/click-to-start.png";
+import laser from "/assets/Ninja/laser.png";
 
 export default class Start extends Phaser.Scene {
   constructor() {
@@ -62,6 +63,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("freeze", audioFreeze);
     this.load.audio("killed", audioKilled);
     this.load.audio("game-over", audioGameOver);
+    this.load.audio("laser", audioLaser);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -131,6 +133,7 @@ export default class Start extends Phaser.Scene {
     this.load.image("start-bg", startBackground);
     this.load.image("red-sam", redSam);
     this.load.image("click-to-start", clickToStart);
+    this.load.image("laser", laser);
   }
 
   create() {
@@ -148,7 +151,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      this.scene.start("Game");
+      //this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
