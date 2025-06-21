@@ -2,7 +2,7 @@ import * as Phaser from "phaser";
 
 import easystarjs from "easystarjs";
 
-const MAPS = ["desert1", "desert5", "desert3", "desert4", "desert5"];
+const MAPS = ["desert5", "desert5", "desert3", "desert4", "desert5"];
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -306,6 +306,9 @@ export default class Game extends Phaser.Scene {
       this.setPath(slime, this.sam.x, this.sam.y);
     });
     this.flams.forEach((flam) => {
+      if (flam.state !== "frozen" && flam.state !== "destroyed") {
+        flam.sprite.setFlipX(flam.sprite.x > this.sam.sprite.x);
+      }
       if (flam.state !== "pursuing") return;
       if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
         this.die();
@@ -322,6 +325,7 @@ export default class Game extends Phaser.Scene {
   die() {
     this.sam.state = "dead";
     this.sam.sprite.anims.pause();
+    this.tweens.killAll();
     this.sound.play("killed");
 
     let heroCam = this.cameras.add(0, 0, this.scale.width, this.scale.height);
@@ -480,17 +484,36 @@ export default class Game extends Phaser.Scene {
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
     this.dragons.forEach((dragon) => {
-      if (dragon.state == "frozen") {
-        this.destroy(dragon);
-      } else {
-        dragon.state = "frozen";
-        dragon.sprite.play("dragon-frozen");
-        dragon.sprite.setPipeline("Grayscale");
+      if (this.distance(dragon.x, dragon.y, this.sam.x, this.sam.y) <= 1) {
+        this.sound.play("freeze");
+        if (dragon.state == "frozen") {
+          this.destroy(dragon);
+        } else {
+          dragon.state = "frozen";
+          dragon.sprite.play("dragon-frozen");
+          dragon.sprite.setPipeline("Grayscale");
+        }
+      }
+    });
+    this.flams.forEach((flam) => {
+      if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
+        this.sound.play("freeze");
+        if (flam.state === "frozen") {
+          this.destroy(flam);
+        } else {
+          flam.state = "frozen";
+          flam.sprite.play("flam-frozen");
+          flam.sprite.setPipeline("Grayscale");
+        }
       }
     });
   }
 
   destroy(enemy) {
+    if (enemy.state === "pursuing") {
+      enemy.state = "idle";
+    }
+    this.tweens.killTweensOf(enemy.sprite);
     const smoke = this.add
       .sprite(enemy.sprite.x, enemy.sprite.y, "smoke")
       .setScale(16 / 32)
@@ -685,8 +708,10 @@ export default class Game extends Phaser.Scene {
                 cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
               });
               this.flams.forEach((flam) => {
-                flam.state = "pursuing";
-                flam.sprite.play("flam-pursue");
+                if (flam.state === "idle") {
+                  flam.state = "pursuing";
+                  flam.sprite.play("flam-pursue");
+                }
               });
             }
           }

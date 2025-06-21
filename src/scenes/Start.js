@@ -355,6 +355,13 @@ export default class Start extends Phaser.Scene {
       repeat: -1,
     });
     this.anims.create({
+      key: "flam-frozen",
+      frames: this.anims.generateFrameNumbers("flam", {
+        start: 0,
+        end: 0,
+      }),
+    });
+    this.anims.create({
       key: "spark",
       frames: this.anims.generateFrameNumbers("spark", {
         start: 0,
