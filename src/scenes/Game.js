@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert1", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert5", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -674,54 +674,70 @@ export default class Game extends Phaser.Scene {
           });
         }
         this.cyclopes.forEach((cyclope) => {
+          if (cyclope.state !== "open" || cyclope.firing) return;
           if (
-            (cyclope.x == this.sam.x || cyclope.y == this.sam.y) &&
-            cyclope.state === "open" &&
-            !cyclope.firing
+            cyclope.direction === "down" &&
+            cyclope.x == this.sam.x &&
+            cyclope.y < this.sam.y
           ) {
             cyclope.firing = true;
             this.sound.play("laser");
             cyclope.laser.setDisplaySize(2, 2);
             cyclope.laser.setVisible(true);
-            if (cyclope.direction === "down") {
-              cyclope.laser
-                .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
-                .setOrigin(0);
-              this.tweens.add({
-                targets: cyclope.laser,
-                displayHeight: 50,
-                duration: 200,
-                onComplete: () => {
-                  cyclope.laser.setVelocityY(400);
-                },
-              });
-            } else if (cyclope.direction === "right") {
-              cyclope.laser
-                .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
-                .setOrigin(0);
-              this.tweens.add({
-                targets: cyclope.laser,
-                displayWidth: 50,
-                duration: 200,
-                onComplete: () => {
-                  cyclope.laser.setVelocityX(400);
-                },
-              });
-            } else if (cyclope.direction === "left") {
-              cyclope.laser
-                .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
-                .setOrigin(1, 0);
-              this.tweens.add({
-                targets: cyclope.laser,
-                displayWidth: 50,
-                duration: 200,
-                onComplete: () => {
-                  cyclope.laser.setVelocityX(-400);
-                },
-              });
-            }
+            cyclope.laser
+              .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
+              .setOrigin(0);
+            this.tweens.add({
+              targets: cyclope.laser,
+              displayHeight: 50,
+              duration: 200,
+              onComplete: () => {
+                cyclope.laser.setVelocityY(400);
+              },
+            });
+          } else if (
+            cyclope.direction === "right" &&
+            cyclope.y == this.sam.y &&
+            cyclope.x < this.sam.x
+          ) {
+            cyclope.firing = true;
+            this.sound.play("laser");
+            cyclope.laser.setDisplaySize(2, 2);
+            cyclope.laser.setVisible(true);
+            cyclope.laser
+              .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
+              .setOrigin(0);
+            this.tweens.add({
+              targets: cyclope.laser,
+              displayWidth: 50,
+              duration: 200,
+              onComplete: () => {
+                cyclope.laser.setVelocityX(400);
+              },
+            });
+          } else if (
+            cyclope.direction === "left" &&
+            cyclope.y == this.sam.y &&
+            cyclope.x > this.sam.x
+          ) {
+            cyclope.firing = true;
+            this.sound.play("laser");
+            cyclope.laser.setDisplaySize(2, 2);
+            cyclope.laser.setVisible(true);
+            cyclope.laser
+              .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
+              .setOrigin(1, 0);
+            this.tweens.add({
+              targets: cyclope.laser,
+              displayWidth: 50,
+              duration: 200,
+              onComplete: () => {
+                cyclope.laser.setVelocityX(-400);
+              },
+            });
           }
         });
+
         this.crystals.forEach((crystal) => {
           if (
             crystal.x == this.sam.x &&
