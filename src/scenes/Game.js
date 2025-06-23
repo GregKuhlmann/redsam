@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert2", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert5", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -115,43 +115,57 @@ export default class Game extends Phaser.Scene {
             this.dragons.push({
               x: tile.x,
               y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
               sprite,
-              state: "idle",
-              respawns: true,
+              statued: false,
+              destroyed: false,
+              jettisoned: false,
             });
           } else if (name.startsWith("cyclope")) {
             const direction = name.split("-")[1];
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "cyclope")
               .setOrigin(0)
               .play(`cyclope-${direction}-closed`);
             const laser = this.physics.add
               .image(0, 0, "laser")
               .setDisplaySize(2, 2)
-              .setDepth(1000)
+              .setDepth(1100)
               .setVisible(false);
             this.projectiles.add(laser);
             this.cyclopes.push({
               x: tile.x,
               y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
               sprite,
               laser,
               state: "closed",
               firing: false,
               direction,
+              statued: false,
+              destroyed: false,
+              jettisoned: false,
             });
           } else if (name.startsWith("panda")) {
             const direction = name.split("-")[1];
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "panda")
               .setOrigin(0)
               .play(`panda-walk-${direction}`);
             this.pandas.push({
               x: tile.x,
               y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
               sprite,
               state: "idle",
               direction,
+              moving: false,
+              statued: false,
+              destroyed: false,
+              jettisoned: false,
             });
           } else if (name.startsWith("slime")) {
             const sprite = this.physics.add
@@ -167,6 +181,8 @@ export default class Game extends Phaser.Scene {
             this.slimes.push({
               x: tile.x,
               y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
               sprite,
               ice,
               state: "pursuing",
@@ -174,6 +190,9 @@ export default class Game extends Phaser.Scene {
               dx: 0,
               dy: -1,
               moving: false,
+              statued: false,
+              destroyed: false,
+              jettisoned: false,
             });
           } else if (name === "flam") {
             const sprite = this.physics.add
@@ -184,12 +203,16 @@ export default class Game extends Phaser.Scene {
             this.flams.push({
               x: tile.x,
               y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
               sprite,
               state: "idle",
               moveDuration: 150,
               dx: 1,
               dy: 0,
               moving: false,
+              destroyed: false,
+              jettisoned: false,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -304,10 +327,80 @@ export default class Game extends Phaser.Scene {
           cyclope.laser.setVelocity(0, 0);
         }
       }
+      if (
+        cyclope.state !== "open" ||
+        cyclope.statued ||
+        cyclope.destroyed ||
+        cyclope.jettisoned ||
+        cyclope.firing
+      )
+        return;
+      if (
+        cyclope.direction === "down" &&
+        cyclope.x == this.sam.x &&
+        cyclope.y < this.sam.y
+      ) {
+        cyclope.firing = true;
+        this.sound.play("laser");
+        cyclope.laser.setDisplaySize(2, 2);
+        cyclope.laser.setVisible(true);
+        cyclope.laser
+          .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
+          .setOrigin(0);
+        this.tweens.add({
+          targets: cyclope.laser,
+          displayHeight: 50,
+          duration: 300,
+          onComplete: () => {
+            cyclope.laser.setVelocityY(300);
+          },
+        });
+      } else if (
+        cyclope.direction === "right" &&
+        cyclope.y == this.sam.y &&
+        cyclope.x < this.sam.x
+      ) {
+        cyclope.firing = true;
+        this.sound.play("laser");
+        cyclope.laser.setDisplaySize(2, 2);
+        cyclope.laser.setVisible(true);
+        cyclope.laser
+          .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
+          .setOrigin(0);
+        this.tweens.add({
+          targets: cyclope.laser,
+          displayWidth: 50,
+          duration: 300,
+          onComplete: () => {
+            cyclope.laser.setVelocityX(300);
+          },
+        });
+      } else if (
+        cyclope.direction === "left" &&
+        cyclope.y == this.sam.y &&
+        cyclope.x > this.sam.x
+      ) {
+        cyclope.firing = true;
+        this.sound.play("laser");
+        cyclope.laser.setDisplaySize(2, 2);
+        cyclope.laser.setVisible(true);
+        cyclope.laser
+          .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
+          .setOrigin(1, 0);
+        this.tweens.add({
+          targets: cyclope.laser,
+          displayWidth: 50,
+          duration: 300,
+          onComplete: () => {
+            cyclope.laser.setVelocityX(-300);
+          },
+        });
+      }
     });
 
     this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
+      if (slime.statued || slime.destroyed || slime.jettisoned) return;
       if (slime.state === "pursuing" && !slime.moving) {
         if (
           slime.state === "pursuing" &&
@@ -328,12 +421,13 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.flams.forEach((flam) => {
-      if (flam.state !== "frozen" && flam.state !== "destroyed") {
-        flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
-      }
+      if (flam.destroyed || flam.jettisoned || flam.statued) return;
+      flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
       if (flam.state === "pursuing" && !flam.moving) {
-        const path = this.setPath(flam, this.sam.x, this.sam.y);
-        this.moveEnemy(flam, path.x, path.y);
+        const path = this.getPath(flam, this.sam.x, this.sam.y);
+        if (path.x !== this.sam.x || path.y !== this.sam.y) {
+          this.moveEnemy(flam, path.x, path.y);
+        }
       }
     });
 
@@ -366,7 +460,6 @@ export default class Game extends Phaser.Scene {
 
     this.cameras.main.setVisible(false);
 
-    // Optional: Fade out the heroCam after a delay
     this.time.delayedCall(
       1000,
       () => {
@@ -398,9 +491,8 @@ export default class Game extends Phaser.Scene {
             (enemy) =>
               enemy.x == x &&
               enemy.y == y &&
-              enemy.state !== "destroyed" &&
-              enemy.state !== "jettisoned" &&
-              enemy.state !== "pursuing"
+              !enemy.destroyed &&
+              !enemy.jettisoned
           )
         ) {
           col.push(1);
@@ -478,35 +570,21 @@ export default class Game extends Phaser.Scene {
     this.textAmmo.setFrame(this.ammo);
     this.sound.play("freeze");
     const dir = DIRECTIONS[this.sam.direction];
-    this.dragons.forEach((dragon) => {
-      if (
-        this.sam.x + dir.dx === dragon.x &&
-        this.sam.y + dir.dy === dragon.y
-      ) {
-        if (dragon.state == "frozen") {
-          this.jettison(dragon, dir);
+    this.enemies.forEach((enemy) => {
+      if (this.sam.x + dir.dx === enemy.x && this.sam.y + dir.dy === enemy.y) {
+        if (enemy.statued) {
+          this.jettison(enemy, dir);
         } else {
-          dragon.state = "frozen";
-          dragon.sprite.play("dragon-frozen");
-          dragon.sprite.setPipeline("Grayscale");
-        }
-      }
-    });
-    this.flams.forEach((flam) => {
-      if (this.distance(flam.x, flam.y, this.sam.x, this.sam.y) <= 1) {
-        if (flam.state === "frozen") {
-          this.destroy(flam);
-        } else {
-          flam.state = "frozen";
-          flam.sprite.play("flam-frozen");
-          flam.sprite.setPipeline("Grayscale");
+          enemy.statued = true;
+          enemy.sprite.anims.pause();
+          enemy.sprite.setPipeline("Grayscale");
         }
       }
     });
   }
 
   jettison(enemy, direction) {
-    enemy.state = "jettisoned";
+    enemy.jettisoned = true;
     enemy.sprite
       .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
       .setOrigin(0.5)
@@ -518,35 +596,35 @@ export default class Game extends Phaser.Scene {
       duration: 500,
       repeat: 0,
     });
-    if (enemy.respawns) {
-      // wait 9 seconds then respawn the enemy
-      this.time.delayedCall(9000, () => {
-        if (this.chest.state === "collected") return;
-        this.tweens.killTweensOf(enemy.sprite);
-        enemy.sprite
-          .setPosition(enemy.x * 16, enemy.y * 16)
-          .setOrigin(0)
-          .setAngle(0)
-          .setScale(1)
-          .setVelocity(0, 0);
-        if (this.chest.state !== "collected") {
-          enemy.sprite.setPipeline("Shadow");
-          enemy.sprite.setVisible(true);
-          this.time.delayedCall(1000, () => {
-            enemy.sprite.resetPipeline();
-            enemy.sprite.play("dragon-idle");
-            enemy.state = "idle";
-          });
+    // wait 9 seconds then respawn the enemy
+    this.time.delayedCall(9000, () => {
+      if (this.chest.state === "collected") return;
+      this.tweens.killTweensOf(enemy.sprite);
+      enemy.sprite
+        .setPosition(enemy.origX * 16, enemy.origY * 16)
+        .setOrigin(0)
+        .setAngle(0)
+        .setScale(1)
+        .setVelocity(0, 0)
+        .setPipeline("Shadow")
+        .setVisible(true);
+      this.time.delayedCall(1000, () => {
+        if (!enemy.destroyed) {
+          enemy.sprite.resetPipeline();
+          enemy.sprite.anims.resume();
+          enemy.jettisoned = false;
+          enemy.statued = false;
+          enemy.x = enemy.origX;
+          enemy.y = enemy.origY;
+          enemy.sprite.setPosition(enemy.x * 16, enemy.y * 16);
         }
       });
-    }
+    });
   }
 
   destroy(enemy) {
-    if (enemy.state === "pursuing") {
-      enemy.state = "idle";
-    }
     this.tweens.killTweensOf(enemy.sprite);
+    enemy.sprite.anims.pause();
     const smoke = this.add
       .sprite(enemy.sprite.x, enemy.sprite.y, "smoke")
       .setScale(16 / 32)
@@ -554,33 +632,15 @@ export default class Game extends Phaser.Scene {
       .play("smoke");
     smoke.on("animationupdate", (animation, frame) => {
       if (frame.index === 3) {
-        enemy.state = "destroyed";
-        if (enemy.respawns) {
-          enemy.sprite.setVisible(false);
-        } else {
-          enemy.sprite.destroy();
-        }
+        enemy.destroyed = true;
+        enemy.sprite.destroy();
         if (enemy.ice) {
-          enemy.ice.setVisible(false);
+          enemy.ice.destroy();
         }
       }
     });
     smoke.on("animationcomplete", () => {
       smoke.destroy();
-      if (enemy.respawns) {
-        // wait 9 seconds then respawn the enemy
-        this.time.delayedCall(9000, () => {
-          if (this.chest.state !== "collected") {
-            enemy.sprite.setPipeline("Shadow");
-            enemy.sprite.setVisible(true);
-            this.time.delayedCall(1000, () => {
-              enemy.sprite.resetPipeline();
-              enemy.sprite.play("dragon-idle");
-              enemy.state = "idle";
-            });
-          }
-        });
-      }
     });
   }
 
@@ -668,76 +728,9 @@ export default class Game extends Phaser.Scene {
             smoke.destroy();
           });
           this.enemies.forEach((enemy) => {
-            if (enemy.state !== "destroyed") {
-              this.destroy(enemy);
-            }
+            this.destroy(enemy);
           });
         }
-        this.cyclopes.forEach((cyclope) => {
-          if (cyclope.state !== "open" || cyclope.firing) return;
-          if (
-            cyclope.direction === "down" &&
-            cyclope.x == this.sam.x &&
-            cyclope.y < this.sam.y
-          ) {
-            cyclope.firing = true;
-            this.sound.play("laser");
-            cyclope.laser.setDisplaySize(2, 2);
-            cyclope.laser.setVisible(true);
-            cyclope.laser
-              .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
-              .setOrigin(0);
-            this.tweens.add({
-              targets: cyclope.laser,
-              displayHeight: 50,
-              duration: 200,
-              onComplete: () => {
-                cyclope.laser.setVelocityY(400);
-              },
-            });
-          } else if (
-            cyclope.direction === "right" &&
-            cyclope.y == this.sam.y &&
-            cyclope.x < this.sam.x
-          ) {
-            cyclope.firing = true;
-            this.sound.play("laser");
-            cyclope.laser.setDisplaySize(2, 2);
-            cyclope.laser.setVisible(true);
-            cyclope.laser
-              .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
-              .setOrigin(0);
-            this.tweens.add({
-              targets: cyclope.laser,
-              displayWidth: 50,
-              duration: 200,
-              onComplete: () => {
-                cyclope.laser.setVelocityX(400);
-              },
-            });
-          } else if (
-            cyclope.direction === "left" &&
-            cyclope.y == this.sam.y &&
-            cyclope.x > this.sam.x
-          ) {
-            cyclope.firing = true;
-            this.sound.play("laser");
-            cyclope.laser.setDisplaySize(2, 2);
-            cyclope.laser.setVisible(true);
-            cyclope.laser
-              .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
-              .setOrigin(1, 0);
-            this.tweens.add({
-              targets: cyclope.laser,
-              displayWidth: 50,
-              duration: 200,
-              onComplete: () => {
-                cyclope.laser.setVelocityX(-400);
-              },
-            });
-          }
-        });
-
         this.crystals.forEach((crystal) => {
           if (
             crystal.x == this.sam.x &&
@@ -791,13 +784,15 @@ export default class Game extends Phaser.Scene {
     );
     if (block) return block;
 
-    const dragon = this.dragons.find(
-      (dragon) =>
-        dragon.x === targetX &&
-        dragon.y === targetY &&
-        dragon.state === "frozen"
+    const enemy = this.enemies.find(
+      (enemy) =>
+        enemy.x === targetX &&
+        enemy.y === targetY &&
+        enemy.statued &&
+        !enemy.destroyed &&
+        !enemy.jettisoned
     );
-    if (dragon) return dragon;
+    if (enemy) return enemy;
   }
 
   collides(obj, dx, dy, isPushed = false) {
@@ -826,10 +821,7 @@ export default class Game extends Phaser.Scene {
     if (
       this.enemies.some(
         (enemy) =>
-          enemy.x == x &&
-          enemy.y == y &&
-          enemy.state !== "destroyed" &&
-          enemy.state !== "jettisoned"
+          enemy.x == x && enemy.y == y && !enemy.destroyed && !enemy.jettisoned
       )
     ) {
       return true;

@@ -3,11 +3,7 @@
 - Panda behavior
 - Laser absorbed by rocks
 - Add sam shooting from a distance
-- Restart with right amount of ammo
 - Make egg time expire
-- Respawn in _original_ location, not moved
-- Optimize makeGrid
-- Flams, Cyclopes can be pushed, jettisoned and they respawn
-- If the Dragon or Cyclope respawns under you, you don't die, but if the Flam does you do
+- Can we get rid of jettisoned flag using x,y=-1,-1
+- Optimize makeGrid - or get rid of grid entirely
 - Don't start level until first move is made?
-- Dragon, cyclope respawn while chest is open
