@@ -1,6 +1,5 @@
 # Red Sam
 
-- Make egg time expire
 - Panda behavior
 - Laser absorbed by rocks
 - Add sam shooting from a distance

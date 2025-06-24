@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert4", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert1", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -72,7 +72,7 @@ export default class Game extends Phaser.Scene {
     this.blocks = [];
     this.crystalsRemaining = 0;
     this.textLives.setFrame(this.lives);
-    this.ammo = 4;
+    this.ammo = 0;
     this.textAmmo.setFrame(this.ammo);
     this.projectiles = this.physics.add.group();
 
@@ -315,6 +315,25 @@ export default class Game extends Phaser.Scene {
 
   update() {
     if (this.sam.state === "dead") return;
+    this.enemies.forEach((enemy) => {
+      const timeDiff = this.time.now - enemy.statued;
+      if (enemy.statued && timeDiff > 6500) {
+        enemy.statued = null;
+        enemy.sprite.body.enable = true;
+        enemy.sprite.resetPipeline();
+        enemy.sprite.anims.resume();
+      } else if (enemy.statued && timeDiff > 4500) {
+        const frame = Math.floor((timeDiff / 75) % 2);
+        console.log(
+          `Enemy statu: ${enemy.sprite.texture.key} - frame: ${frame}`
+        );
+        if (frame === 0) {
+          enemy.sprite.resetPipeline();
+        } else {
+          enemy.sprite.setPipeline("Grayscale");
+        }
+      }
+    });
     this.cyclopes.forEach((cyclope) => {
       if (this.chest.state === "sparkling") {
         cyclope.state = "open";
@@ -407,7 +426,6 @@ export default class Game extends Phaser.Scene {
       if (slime.statued || slime.destroyed || slime.jettisoned) return;
       if (slime.state === "pursuing" && !slime.moving) {
         if (
-          slime.state === "pursuing" &&
           Math.abs(slime.x - this.sam.x) <= 1 &&
           Math.abs(slime.y - this.sam.y) <= 1 // include diagonal movement
         ) {
@@ -553,7 +571,7 @@ export default class Game extends Phaser.Scene {
         if (enemy.statued) {
           this.jettison(enemy, dir);
         } else {
-          enemy.statued = true;
+          enemy.statued = this.time.now;
           enemy.sprite.body.enable = false;
           enemy.sprite.anims.pause();
           enemy.sprite.setPipeline("Grayscale");
@@ -564,6 +582,7 @@ export default class Game extends Phaser.Scene {
 
   jettison(enemy, direction) {
     enemy.jettisoned = true;
+    enemy.statued = null;
     enemy.sprite
       .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
       .setOrigin(0.5);
@@ -593,7 +612,7 @@ export default class Game extends Phaser.Scene {
           enemy.sprite.resetPipeline();
           enemy.sprite.anims.resume();
           enemy.jettisoned = false;
-          enemy.statued = false;
+          enemy.statued = null;
           enemy.x = enemy.origX;
           enemy.y = enemy.origY;
           enemy.sprite.setPosition(enemy.x * 16, enemy.y * 16);
@@ -723,7 +742,7 @@ export default class Game extends Phaser.Scene {
             crystal.sprite.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
-            this.ammo = Math.min(4, this.ammo + crystal.ammo);
+            this.ammo = Math.min(2, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
