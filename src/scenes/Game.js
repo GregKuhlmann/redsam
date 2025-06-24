@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert5", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert1", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -120,7 +120,6 @@ export default class Game extends Phaser.Scene {
               sprite,
               statued: false,
               destroyed: false,
-              jettisoned: false,
             });
           } else if (name.startsWith("cyclope")) {
             const direction = name.split("-")[1];
@@ -146,7 +145,6 @@ export default class Game extends Phaser.Scene {
               direction,
               statued: false,
               destroyed: false,
-              jettisoned: false,
             });
           } else if (name.startsWith("panda")) {
             const direction = name.split("-")[1];
@@ -168,7 +166,6 @@ export default class Game extends Phaser.Scene {
               moving: false,
               statued: false,
               destroyed: false,
-              jettisoned: false,
             });
           } else if (name.startsWith("slime")) {
             const sprite = this.physics.add
@@ -195,7 +192,6 @@ export default class Game extends Phaser.Scene {
               moving: false,
               statued: false,
               destroyed: false,
-              jettisoned: false,
             });
           } else if (name === "flam") {
             const sprite = this.physics.add
@@ -215,7 +211,6 @@ export default class Game extends Phaser.Scene {
               dy: 0,
               moving: false,
               destroyed: false,
-              jettisoned: false,
             });
           } else if (name === "door") {
             const sprite = this.add
@@ -357,7 +352,6 @@ export default class Game extends Phaser.Scene {
         cyclope.state !== "open" ||
         cyclope.statued ||
         cyclope.destroyed ||
-        cyclope.jettisoned ||
         cyclope.firing
       )
         return;
@@ -426,7 +420,7 @@ export default class Game extends Phaser.Scene {
     });
 
     this.slimes.forEach((slime) => {
-      if (slime.statued || slime.destroyed || slime.jettisoned) return;
+      if (slime.statued || slime.destroyed) return;
       if (slime.state === "pursuing" && !slime.moving) {
         if (
           Math.abs(slime.x - this.sam.x) <= 1 &&
@@ -449,7 +443,7 @@ export default class Game extends Phaser.Scene {
       if (this.chest.state === "sparkling") {
         flam.state = "pursuing";
       }
-      if (flam.destroyed || flam.jettisoned || flam.statued) return;
+      if (flam.destroyed || flam.statued) return;
       flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
       if (flam.state === "pursuing" && !flam.moving) {
         flam.sprite.play("flam-pursue", true);
@@ -458,7 +452,7 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.pandas.forEach((panda) => {
-      if (panda.destroyed || panda.jettisoned || panda.statued) return;
+      if (panda.destroyed || panda.statued) return;
       if (panda.state === "pursuing" && !panda.moving) {
         const path = this.getPath(panda, this.sam.x, this.sam.y);
         if (path.x !== this.sam.x || path.y !== this.sam.y) {
@@ -591,7 +585,6 @@ export default class Game extends Phaser.Scene {
   }
 
   jettison(enemy, direction) {
-    enemy.jettisoned = true;
     enemy.statued = null;
     enemy.sprite
       .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
@@ -606,6 +599,8 @@ export default class Game extends Phaser.Scene {
       duration: 1000,
       repeat: 0,
     });
+    enemy.x = -1;
+    enemy.y = -1;
     // wait 9 seconds then respawn the enemy
     this.time.delayedCall(9000, () => {
       if (this.chest.state === "collected") return;
@@ -621,7 +616,6 @@ export default class Game extends Phaser.Scene {
         if (!enemy.destroyed) {
           enemy.sprite.resetPipeline();
           enemy.sprite.anims.resume();
-          enemy.jettisoned = false;
           enemy.statued = null;
           enemy.x = enemy.origX;
           enemy.y = enemy.origY;
@@ -790,8 +784,7 @@ export default class Game extends Phaser.Scene {
         enemy.x === targetX &&
         enemy.y === targetY &&
         enemy.statued &&
-        !enemy.destroyed &&
-        !enemy.jettisoned
+        !enemy.destroyed
     );
     if (enemy) return enemy;
   }
@@ -821,8 +814,7 @@ export default class Game extends Phaser.Scene {
 
     if (
       this.enemies.some(
-        (enemy) =>
-          enemy.x == x && enemy.y == y && !enemy.destroyed && !enemy.jettisoned
+        (enemy) => enemy.x == x && enemy.y == y && !enemy.destroyed
       )
     ) {
       return true;
