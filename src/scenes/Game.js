@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert1", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert5", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -159,10 +159,12 @@ export default class Game extends Phaser.Scene {
               y: tile.y,
               origX: tile.x,
               origY: tile.y,
+              dx: DIRECTIONS[direction].dx,
+              dy: DIRECTIONS[direction].dy,
               sprite,
               state: "pursuing",
               direction,
-              moveDuration: 200,
+              moveDuration: 400,
               moving: false,
               statued: false,
               destroyed: false,
@@ -311,9 +313,13 @@ export default class Game extends Phaser.Scene {
     this.input.keyboard.on("keydown-R", () => {
       this.die();
     });
+    this.input.keyboard.on("keydown-P", () => {
+      this.pause = !this.pause;
+    });
   }
 
   update() {
+    if (this.pause) return;
     if (this.sam.state === "dead") return;
     this.enemies.forEach((enemy) => {
       const timeDiff = this.time.now - enemy.statued;
@@ -324,9 +330,6 @@ export default class Game extends Phaser.Scene {
         enemy.sprite.anims.resume();
       } else if (enemy.statued && timeDiff > 4500) {
         const frame = Math.floor((timeDiff / 75) % 2);
-        console.log(
-          `Enemy statu: ${enemy.sprite.texture.key} - frame: ${frame}`
-        );
         if (frame === 0) {
           enemy.sprite.resetPipeline();
         } else {
@@ -529,10 +532,6 @@ export default class Game extends Phaser.Scene {
   }
 
   getPath(enemy, targetX, targetY) {
-    if (enemy.direction) {
-      enemy.dx = DIRECTIONS[enemy.direction].dx;
-      enemy.dy = DIRECTIONS[enemy.direction].dy;
-    }
     const options = [];
     for (const option of [
       { dx: enemy.dx, dy: enemy.dy, dir: "forward" },
@@ -552,6 +551,7 @@ export default class Game extends Phaser.Scene {
         });
       }
     }
+    Phaser.Utils.Array.Shuffle(options);
     options.sort((a, b) => a.dist - b.dist);
     if (options.length === 0) return { x: enemy.x, y: enemy.y };
     if (options[0].dir === "backward" && options.length > 1) {
