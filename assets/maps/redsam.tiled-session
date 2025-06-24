@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert5.tmj",
+    "activeFile": "desert2.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -180,21 +180,22 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "desert1.json",
-        "desert2.json",
-        "desert3.tmj",
-        "desert4.tmj",
-        "desert5.tmj"
-    ],
-    "project": "redsam.tiled-project",
-    "recentFiles": [
-        "tilesets/TilesetItems.tsx",
-        "desert2.json",
-        "desert1.json",
         "desert3.tmj",
         "desert4.tmj",
         "desert5.tmj",
         "desert1.tmj",
+        "desert2.tmj"
+    ],
+    "project": "redsam.tiled-project",
+    "recentFiles": [
+        "desert3.tmj",
+        "desert4.tmj",
+        "desert5.tmj",
+        "desert1.tmj",
+        "desert2.tmj",
+        "tilesets/TilesetItems.tsx",
+        "desert2.json",
+        "desert1.json",
         "tilesets/TilesetHouse.tsx",
         "level1.json"
     ],

@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert5", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert3", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -160,8 +160,9 @@ export default class Game extends Phaser.Scene {
               origX: tile.x,
               origY: tile.y,
               sprite,
-              state: "idle",
+              state: "pursuing",
               direction,
+              moveDuration: 200,
               moving: false,
               statued: false,
               destroyed: false,
@@ -398,7 +399,6 @@ export default class Game extends Phaser.Scene {
       }
     });
 
-    this.makeGrid(); // Inefficient, optimize later by updating only changed tiles
     this.slimes.forEach((slime) => {
       if (slime.statued || slime.destroyed || slime.jettisoned) return;
       if (slime.state === "pursuing" && !slime.moving) {
@@ -427,6 +427,15 @@ export default class Game extends Phaser.Scene {
         const path = this.getPath(flam, this.sam.x, this.sam.y);
         if (path.x !== this.sam.x || path.y !== this.sam.y) {
           this.moveEnemy(flam, path.x, path.y);
+        }
+      }
+    });
+    this.pandas.forEach((panda) => {
+      if (panda.destroyed || panda.jettisoned || panda.statued) return;
+      if (panda.state === "pursuing" && !panda.moving) {
+        const path = this.getPath(panda, this.sam.x, this.sam.y);
+        if (path.x !== this.sam.x || path.y !== this.sam.y) {
+          this.moveEnemy(panda, path.x, path.y);
         }
       }
     });
@@ -474,47 +483,6 @@ export default class Game extends Phaser.Scene {
     );
   }
 
-  makeGrid() {
-    this.grid = [];
-    for (var y = 0; y < this.level.height; y++) {
-      var col = [];
-      for (var x = 0; x < this.level.width; x++) {
-        const tile = this.level.getTileAt(x, y, true, "LayerObstacles");
-        if (tile.index !== -1 || this.outOfBounds(x, y)) {
-          col.push(1);
-        } else if (this.chest.x == x && this.chest.y == y) {
-          col.push(1);
-        } else if (this.blocks.some((block) => block.x == x && block.y == y)) {
-          col.push(1);
-        } else if (
-          this.enemies.some(
-            (enemy) =>
-              enemy.x == x &&
-              enemy.y == y &&
-              !enemy.destroyed &&
-              !enemy.jettisoned
-          )
-        ) {
-          col.push(1);
-        } else if (
-          this.crystals.some(
-            (crystal) =>
-              crystal.x == x && crystal.y == y && crystal.state !== "collected"
-          )
-        ) {
-          col.push(1);
-        } else if (
-          this.blocks.some((block) => block.x === x && block.y === y)
-        ) {
-          col.push(1);
-        } else {
-          col.push(0);
-        }
-      }
-      this.grid.push(col);
-    }
-  }
-
   distance(x1, y1, x2, y2) {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
   }
@@ -536,18 +504,22 @@ export default class Game extends Phaser.Scene {
     });
   }
 
-  getPath(slime, targetX, targetY) {
+  getPath(enemy, targetX, targetY) {
+    if (enemy.direction) {
+      enemy.dx = DIRECTIONS[enemy.direction].dx;
+      enemy.dy = DIRECTIONS[enemy.direction].dy;
+    }
     const options = [];
     for (const option of [
-      { dx: slime.dx, dy: slime.dy, dir: "forward" },
-      { dx: -slime.dy, dy: slime.dx, dir: "left" },
-      { dx: slime.dy, dy: -slime.dx, dir: "right" },
-      { dx: -slime.dx, dy: -slime.dy, dir: "backward" },
+      { dx: enemy.dx, dy: enemy.dy, dir: "forward" },
+      { dx: -enemy.dy, dy: enemy.dx, dir: "left" },
+      { dx: enemy.dy, dy: -enemy.dx, dir: "right" },
+      { dx: -enemy.dx, dy: -enemy.dy, dir: "backward" },
     ]) {
       const { dx, dy, dir } = option;
-      const newX = slime.x + dx;
-      const newY = slime.y + dy;
-      if (this.grid[newY][newX] === 0) {
+      const newX = enemy.x + dx;
+      const newY = enemy.y + dy;
+      if (!this.collides(enemy, dx, dy, true)) {
         options.push({
           x: newX,
           y: newY,
@@ -557,7 +529,7 @@ export default class Game extends Phaser.Scene {
       }
     }
     options.sort((a, b) => a.dist - b.dist);
-    if (options.length === 0) return { x: slime.x, y: slime.y };
+    if (options.length === 0) return { x: enemy.x, y: enemy.y };
     if (options[0].dir === "backward" && options.length > 1) {
       options.shift(); // remove backward option if there are other options
     }

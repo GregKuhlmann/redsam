@@ -5,5 +5,4 @@
 - Add sam shooting from a distance
 - Make egg time expire
 - Can we get rid of jettisoned flag using x,y=-1,-1
-- Optimize makeGrid - or get rid of grid entirely
 - Don't start level until first move is made?
