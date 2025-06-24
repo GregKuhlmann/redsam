@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert3", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert4", "desert2", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -72,7 +72,7 @@ export default class Game extends Phaser.Scene {
     this.blocks = [];
     this.crystalsRemaining = 0;
     this.textLives.setFrame(this.lives);
-    this.ammo = 0;
+    this.ammo = 4;
     this.textAmmo.setFrame(this.ammo);
     this.projectiles = this.physics.add.group();
 
@@ -316,6 +316,9 @@ export default class Game extends Phaser.Scene {
   update() {
     if (this.sam.state === "dead") return;
     this.cyclopes.forEach((cyclope) => {
+      if (this.chest.state === "sparkling") {
+        cyclope.state = "open";
+      }
       if (cyclope.firing) {
         if (
           !Phaser.Geom.Intersects.RectangleToRectangle(
@@ -336,6 +339,7 @@ export default class Game extends Phaser.Scene {
         cyclope.firing
       )
         return;
+      cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
       if (
         cyclope.direction === "down" &&
         cyclope.x == this.sam.x &&
@@ -421,13 +425,15 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.flams.forEach((flam) => {
+      if (this.chest.state === "sparkling") {
+        flam.state = "pursuing";
+      }
       if (flam.destroyed || flam.jettisoned || flam.statued) return;
       flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
       if (flam.state === "pursuing" && !flam.moving) {
+        flam.sprite.play("flam-pursue", true);
         const path = this.getPath(flam, this.sam.x, this.sam.y);
-        if (path.x !== this.sam.x || path.y !== this.sam.y) {
-          this.moveEnemy(flam, path.x, path.y);
-        }
+        this.moveEnemy(flam, path.x, path.y);
       }
     });
     this.pandas.forEach((panda) => {
@@ -548,6 +554,7 @@ export default class Game extends Phaser.Scene {
           this.jettison(enemy, dir);
         } else {
           enemy.statued = true;
+          enemy.sprite.body.enable = false;
           enemy.sprite.anims.pause();
           enemy.sprite.setPipeline("Grayscale");
         }
@@ -559,13 +566,15 @@ export default class Game extends Phaser.Scene {
     enemy.jettisoned = true;
     enemy.sprite
       .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
-      .setOrigin(0.5)
-      .setVelocity(400 * direction.dx, 400 * direction.dy);
+      .setOrigin(0.5);
     this.tweens.add({
       targets: enemy.sprite,
-      angle: 360,
+      angle: 720,
       scale: 4,
-      duration: 500,
+      x: enemy.sprite.x + this.scale.width * direction.dx,
+      y: enemy.sprite.y + this.scale.width * direction.dy,
+      ease: "Power2",
+      duration: 1000,
       repeat: 0,
     });
     // wait 9 seconds then respawn the enemy
@@ -577,7 +586,6 @@ export default class Game extends Phaser.Scene {
         .setOrigin(0)
         .setAngle(0)
         .setScale(1)
-        .setVelocity(0, 0)
         .setPipeline("Shadow")
         .setVisible(true);
       this.time.delayedCall(1000, () => {
@@ -589,6 +597,7 @@ export default class Game extends Phaser.Scene {
           enemy.x = enemy.origX;
           enemy.y = enemy.origY;
           enemy.sprite.setPosition(enemy.x * 16, enemy.y * 16);
+          enemy.sprite.body.enable = true;
         }
       });
     });
@@ -714,23 +723,13 @@ export default class Game extends Phaser.Scene {
             crystal.sprite.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
-            this.ammo = Math.min(2, this.ammo + crystal.ammo);
+            this.ammo = Math.min(4, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
               this.chest.state = "sparkling";
               this.chest.sprite.play("chest-sparkling");
               this.chest.spark.setVisible(true);
-              this.cyclopes.forEach((cyclope) => {
-                cyclope.state = "open";
-                cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
-              });
-              this.flams.forEach((flam) => {
-                if (flam.state === "idle") {
-                  flam.state = "pursuing";
-                  flam.sprite.play("flam-pursue");
-                }
-              });
               this.physics.add.overlap(this.sam.sprite, this.flamBoxes, () => {
                 this.die();
               });
