@@ -463,18 +463,20 @@ export default class Game extends Phaser.Scene {
         const path = this.getPath(panda, this.sam.x, this.sam.y);
         if (path.x !== this.sam.x || path.y !== this.sam.y) {
           this.moveEnemy(panda, path.x, path.y);
+          const dir = this.getDir(panda.dx, panda.dy);
+          panda.sprite.play(`panda-walk-${dir}`, true);
         }
       }
     });
 
     if (this.cursors.left.isDown) {
-      this.move(-1, 0, "left");
+      this.move("left");
     } else if (this.cursors.right.isDown) {
-      this.move(1, 0, "right");
+      this.move("right");
     } else if (this.cursors.up.isDown) {
-      this.move(0, -1, "up");
+      this.move("up");
     } else if (this.cursors.down.isDown) {
-      this.move(0, 1, "down");
+      this.move("down");
     } else if (!this.sam.moving) {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
@@ -529,6 +531,14 @@ export default class Game extends Phaser.Scene {
         enemy.moving = false;
       },
     });
+  }
+
+  getDir(dx, dy) {
+    if (dx === 0 && dy === -1) return "up";
+    if (dx === 0 && dy === 1) return "down";
+    if (dx === -1 && dy === 0) return "left";
+    if (dx === 1 && dy === 0) return "right";
+    return null;
   }
 
   getPath(enemy, targetX, targetY) {
@@ -644,7 +654,8 @@ export default class Game extends Phaser.Scene {
     });
   }
 
-  move(dx, dy, direction) {
+  move(direction) {
+    const { dx, dy } = DIRECTIONS[direction];
     if (this.sam.moving) return;
     this.sam.direction = direction;
     this.sam.sprite.play(`sam-walk-${direction}`, true);
