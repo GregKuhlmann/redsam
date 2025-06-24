@@ -1,1 +1,5 @@
-# lolo
+# Red Sam
+
+```
+npm run dev
+```
