@@ -96,4 +96,24 @@
    <property name="name" value="crystal-2"/>
   </properties>
  </tile>
+ <tile id="39">
+  <properties>
+   <property name="name" value="trex-down"/>
+  </properties>
+ </tile>
+ <tile id="40">
+  <properties>
+   <property name="name" value="trex-up"/>
+  </properties>
+ </tile>
+ <tile id="41">
+  <properties>
+   <property name="name" value="trex-left"/>
+  </properties>
+ </tile>
+ <tile id="42">
+  <properties>
+   <property name="name" value="trex-right"/>
+  </properties>
+ </tile>
 </tileset>

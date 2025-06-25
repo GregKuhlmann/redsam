@@ -8,6 +8,8 @@ import desert2 from "/assets/maps/desert2.json";
 import desert3 from "/assets/maps/desert3.json";
 import desert4 from "/assets/maps/desert4.json";
 import desert5 from "/assets/maps/desert5.json";
+import desert6 from "/assets/maps/desert6.json";
+import desert7 from "/assets/maps/desert7.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -15,6 +17,7 @@ import tilesetItems from "/assets/Ninja/TilesetItems.png";
 import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
 import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
 import spriteSheetPanda from "/assets/Ninja/Actor/Monsters/Panda/SpriteSheet.png";
+import spriteSheetTrex from "/assets/Ninja/Actor/Monsters/Grey Trex/SpriteSheet.png";
 import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.png";
 import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
 import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
@@ -72,6 +75,8 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("desert3", desert3);
     this.load.tilemapTiledJSON("desert4", desert4);
     this.load.tilemapTiledJSON("desert5", desert5);
+    this.load.tilemapTiledJSON("desert6", desert6);
+    this.load.tilemapTiledJSON("desert7", desert7);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -98,6 +103,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("panda", spriteSheetPanda, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("trex", spriteSheetTrex, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -317,6 +326,62 @@ export default class Start extends Phaser.Scene {
     this.anims.create({
       key: "panda-walk-right",
       frames: this.anims.generateFrameNumbers("panda", {
+        frames: [3, 7, 11, 15],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "trex-idle-down",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "trex-walk-down",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "trex-idle-up",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [1],
+      }),
+    });
+    this.anims.create({
+      key: "trex-walk-up",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [1, 5, 9, 13],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "trex-idle-left",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [2],
+      }),
+    });
+    this.anims.create({
+      key: "trex-walk-left",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [2, 6, 10, 14],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "trex-idle-right",
+      frames: this.anims.generateFrameNumbers("trex", {
+        frames: [3],
+      }),
+    });
+    this.anims.create({
+      key: "trex-walk-right",
+      frames: this.anims.generateFrameNumbers("trex", {
         frames: [3, 7, 11, 15],
       }),
       frameRate: 5,
