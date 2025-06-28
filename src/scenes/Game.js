@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert3", "desert2", "desert3", "desert4", "desert5"];
+const MAPS = ["desert7", "desert7", "desert3", "desert4", "desert5"];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -67,6 +67,7 @@ export default class Game extends Phaser.Scene {
     this.slimes = [];
     this.flams = [];
     this.flamBoxes = this.physics.add.group();
+    this.octopuses = [];
     this.pandas = [];
     this.trexs = [];
     this.trexBoxes = this.physics.add.group();
@@ -238,6 +239,32 @@ export default class Game extends Phaser.Scene {
               statued: null,
               destroyed: false,
             });
+          } else if (name === "octopus") {
+            const sprite = this.physics.add
+              .sprite(tile.x * 16, tile.y * 16, "octopus")
+              .setOrigin(0)
+              .play("octopus-happy");
+            const lightning = this.physics.add
+              .sprite(tile.x * 16 + 8, tile.y * 16 + 8, "lightning")
+              .setOrigin(0.5, 0)
+              .setBodySize(16, 16)
+              .setDepth(1100)
+              .play("lightning")
+              .setVisible(false);
+            this.projectiles.add(lightning);
+            lightning.body.enable = false;
+
+            this.octopuses.push({
+              x: tile.x,
+              y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
+              sprite,
+              lightning,
+              state: "happy",
+              statued: null,
+              destroyed: false,
+            });
           } else if (name === "door") {
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "items")
@@ -306,6 +333,7 @@ export default class Game extends Phaser.Scene {
       ...this.flams,
       ...this.pandas,
       ...this.trexs,
+      ...this.octopuses,
     ];
 
     this.physics.add.overlap(this.sam.sprite, this.projectiles, () => {
@@ -448,7 +476,17 @@ export default class Game extends Phaser.Scene {
         });
       }
     });
-
+    this.octopuses.forEach((octopus) => {
+      if (octopus.statued || octopus.destroyed) return;
+      if (octopus.x === this.sam.x || octopus.y === this.sam.y) {
+        octopus.state = "angry";
+        octopus.sprite.play("octopus-angry", true);
+        this.stun(octopus);
+      } else {
+        octopus.state = "happy";
+        octopus.sprite.play("octopus-happy", true);
+      }
+    });
     this.slimes.forEach((slime) => {
       if (slime.statued || slime.destroyed) return;
       if (slime.state === "pursuing" && !slime.moving) {
@@ -517,6 +555,42 @@ export default class Game extends Phaser.Scene {
     } else if (!this.sam.moving) {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
+  }
+
+  stun(octopus) {
+    const dx = Math.sign(this.sam.x - octopus.x);
+    const dy = Math.sign(this.sam.y - octopus.y);
+    if (dx === 0 && dy === 1) {
+      octopus.lightning.setOffset(2, 6).setRotation(Phaser.Math.DegToRad(0));
+    } else if (dx === -1 && dy === 0) {
+      octopus.lightning
+        .setOffset(-12, -8)
+        .setRotation(Phaser.Math.DegToRad(90));
+    } else if (dx === 0 && dy === -1) {
+      octopus.lightning
+        .setOffset(2, -22)
+        .setRotation(Phaser.Math.DegToRad(180));
+    } else if (dx === 1 && dy === 0) {
+      octopus.lightning
+        .setOffset(16, -8)
+        .setRotation(Phaser.Math.DegToRad(270));
+    } else {
+      console.error("Invalid direction for octopus lightning stun:", dx, dy);
+      return;
+    }
+    const box = { x: octopus.x, y: octopus.y };
+    while (box.x !== this.sam.x || box.y !== this.sam.y) {
+      if (this.collides(box, dx, dy, true, true)) {
+        return;
+      }
+      box.x += dx;
+      box.y += dy;
+    }
+
+    this.sam.state = "stunned";
+    octopus.lightning.setVisible(true);
+    octopus.lightning.body.enable = true;
+    octopus.lightning.setVelocity(dx * 150, dy * 150);
   }
 
   die() {
@@ -691,6 +765,7 @@ export default class Game extends Phaser.Scene {
   }
 
   move(direction) {
+    if (this.sam.state === "stunned") return;
     const { dx, dy } = DIRECTIONS[direction];
     if (this.sam.moving) return;
     this.sam.direction = direction;
@@ -831,7 +906,7 @@ export default class Game extends Phaser.Scene {
     if (enemy) return enemy;
   }
 
-  collides(obj, dx, dy, isPushed = false) {
+  collides(obj, dx, dy, isPushed = false, skipGrass = false) {
     const x = obj.x + dx;
     const y = obj.y + dy;
 
@@ -842,7 +917,7 @@ export default class Game extends Phaser.Scene {
     if (this.outOfBounds(x, y)) return true;
 
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
-    if (tile && tile.index !== -1) {
+    if (tile && tile.index !== -1 && !(skipGrass && tile.index === 248)) {
       return true;
     }
 

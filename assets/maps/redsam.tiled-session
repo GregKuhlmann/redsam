@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert2.tmj",
+    "activeFile": "desert7.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -75,8 +75,8 @@
             "scale": 2.48,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 150.2016129032258,
-                "y": 109.67741935483872
+                "x": 159.8790322580645,
+                "y": 112.09677419354838
             }
         },
         "desert2.json": {
@@ -108,16 +108,16 @@
             "scale": 2.6,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 154.42307692307693,
-                "y": 103.07692307692307
+                "x": 159.8076923076923,
+                "y": 111.92307692307693
             }
         },
         "desert3.tmj": {
             "scale": 2.06,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 135.19417475728153,
-                "y": 92.71844660194175
+                "x": 159.95145631067962,
+                "y": 109.2233009708738
             }
         },
         "desert4.tmj": {
@@ -171,7 +171,7 @@
         },
         "tilesets/TilesetHouse.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
+            "scaleInDock": 2.2562,
             "scaleInEditor": 1
         },
         "tilesets/TilesetItems.tsx": {
@@ -179,13 +179,14 @@
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 1.8442
+            "scaleInDock": 2.815,
+            "scaleInEditor": 3.15
         },
         "tilesets/TilesetWater.tsx": {
-            "scaleInDock": 1
+            "scaleInDock": 2.8385
         }
     },
-    "frame.defaultDuration": 300,
+    "frame.defaultDuration": 500,
     "last.exportedFilePath": "/Users/kuhlmann/phaser/redsam/assets/maps",
     "last.externalTilesetPath": "/Users/kuhlmann/phaser/redsam/assets/maps/tilesets",
     "last.imagePath": "/Users/kuhlmann/phaser/lolo/assets/Ninja",
@@ -200,21 +201,25 @@
         "desert4.tmj",
         "desert5.tmj",
         "desert1.tmj",
-        "desert2.tmj"
+        "desert2.tmj",
+        "desert6.tmj",
+        "desert7.tmj",
+        "tilesets/TilesetNature.tsx"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
-        "desert6.tmj",
         "desert3.tmj",
         "desert4.tmj",
         "desert5.tmj",
         "desert1.tmj",
         "desert2.tmj",
+        "desert6.tmj",
+        "tilesets/TilesetNature.tsx",
+        "desert7.tmj",
         "tilesets/TilesetItems.tsx",
         "desert2.json",
         "desert1.json",
-        "tilesets/TilesetHouse.tsx",
-        "level1.json"
+        "tilesets/TilesetHouse.tsx"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

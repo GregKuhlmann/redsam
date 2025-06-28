@@ -22,6 +22,8 @@ import spriteSheetDragon from "/assets/Ninja/Actor/Monsters/Dragon/SpriteSheet.p
 import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet.png";
 import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
 import spriteSheetFlam from "/assets/Ninja/flam.png";
+import spriteSheetOctopus from "/assets/Ninja/Actor/Monsters/Octopus/SpriteSheet.png";
+import spriteSheetLightning from "/assets/Ninja/FX/Elemental/Thunder/SpriteSheet.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
 import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
@@ -98,6 +100,10 @@ export default class Start extends Phaser.Scene {
       frameWidth: 16,
       frameHeight: 16,
     });
+    this.load.spritesheet("octopus", spriteSheetOctopus, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
     this.load.spritesheet("sam", spriteSheetRedNinja3, {
       frameWidth: 16,
       frameHeight: 16,
@@ -113,6 +119,10 @@ export default class Start extends Phaser.Scene {
     this.load.spritesheet("items", tilesetItems, {
       frameWidth: 16,
       frameHeight: 16,
+    });
+    this.load.spritesheet("lightning", spriteSheetLightning, {
+      frameWidth: 20,
+      frameHeight: 28,
     });
     this.load.spritesheet("spark", spriteSheetSpark, {
       frameWidth: 30,
@@ -489,12 +499,37 @@ export default class Start extends Phaser.Scene {
       }),
     });
     this.anims.create({
+      key: "octopus-happy",
+      frames: this.anims.generateFrameNumbers("octopus", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 5,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "octopus-angry",
+      frames: this.anims.generateFrameNumbers("octopus", {
+        frames: [1],
+      }),
+      frameRate: 7,
+      repeat: -1,
+    });
+    this.anims.create({
       key: "spark",
       frames: this.anims.generateFrameNumbers("spark", {
         start: 0,
         end: 8,
       }),
       frameRate: 10,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "lightning",
+      frames: this.anims.generateFrameNumbers("lightning", {
+        start: 0,
+        end: 7,
+      }),
+      frameRate: 20,
       repeat: -1,
     });
     this.anims.create({

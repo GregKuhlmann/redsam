@@ -66,6 +66,11 @@
    <property name="name" value="flam"/>
   </properties>
  </tile>
+ <tile id="13">
+  <properties>
+   <property name="name" value="octopus"/>
+  </properties>
+ </tile>
  <tile id="20">
   <properties>
    <property name="name" value="crystal-1"/>
