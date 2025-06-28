@@ -1,13 +1,14 @@
 import * as Phaser from "phaser";
 
 const MAPS = [
-  "desert8",
+  "desert9",
   "desert2",
   "desert3",
   "desert4",
   "desert5",
   "desert6",
   "desert7",
+  "desert8",
 ];
 
 const DIRECTIONS = {
@@ -108,6 +109,7 @@ export default class Game extends Phaser.Scene {
     this.textAmmo.setFrame(this.ammo);
     this.lasers = this.physics.add.group();
     this.lightnings = this.physics.add.group();
+    this.swords = this.physics.add.group();
     this.absorbers = this.physics.add.group();
     this.paused = true;
 
@@ -316,12 +318,20 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "beast")
               .setOrigin(0)
               .play("beast-idle");
+            const sword = this.physics.add
+              .image(tile.x * 16 + 8, tile.y * 16 + 8, "sword")
+              .setOrigin(0.5, 1)
+              .setDepth(1100)
+              .setVisible(false);
+            this.swords.add(sword);
+            sword.body.enable = false;
             this.beasts.push({
               x: tile.x,
               y: tile.y,
               origX: tile.x,
               origY: tile.y,
               sprite,
+              sword,
               state: "stalking",
               moveDuration: 300,
               dx: 1,
@@ -407,6 +417,9 @@ export default class Game extends Phaser.Scene {
       this.die();
     });
     this.physics.add.overlap(this.sam.sprite, this.lightnings, () => {
+      this.die();
+    });
+    this.physics.add.overlap(this.sam.sprite, this.swords, () => {
       this.die();
     });
     this.physics.add.overlap(this.sam.sprite, this.lasers, (sam, laser) => {
@@ -623,6 +636,9 @@ export default class Game extends Phaser.Scene {
     });
     this.beasts.forEach((beast) => {
       if (beast.destroyed || beast.statued) return;
+      if (beast.x === this.sam.x || beast.y === this.sam.y) {
+        this.stab(beast);
+      }
       if (beast.state === "stalking" && !beast.moving) {
         const path = this.getBeastPath(beast);
         if (path) {
@@ -691,6 +707,46 @@ export default class Game extends Phaser.Scene {
     octopus.lightning.setVisible(true);
     octopus.lightning.body.enable = true;
     octopus.lightning.setVelocity(dx * 150, dy * 150);
+  }
+
+  stab(beast) {
+    const dx = Math.sign(this.sam.x - beast.x);
+    const dy = Math.sign(this.sam.y - beast.y);
+    if (dx === 0 && dy === 1) {
+      beast.sword.setRotation(Phaser.Math.DegToRad(180));
+    } else if (dx === -1 && dy === 0) {
+      beast.sword.setRotation(Phaser.Math.DegToRad(270));
+    } else if (dx === 0 && dy === -1) {
+      beast.sword.setRotation(Phaser.Math.DegToRad(0));
+    } else if (dx === 1 && dy === 0) {
+      beast.sword.setRotation(Phaser.Math.DegToRad(90));
+    } else {
+      console.error("Invalid direction for beast sword stab:", dx, dy);
+      return;
+    }
+    const box = { x: beast.x, y: beast.y };
+    while (box.x !== this.sam.x || box.y !== this.sam.y) {
+      if (this.collides(box, dx, dy, true, true)) {
+        return;
+      }
+      box.x += dx;
+      box.y += dy;
+      if (box.x > 100 || box.x < 0 || box.y > 100 || box.y < 0) {
+        console.error("Stab out of bounds:", box.x, box.y);
+        return; // out of bounds
+      }
+    }
+
+    this.sam.state = "stunned";
+    if (!beast.moving && beast.state === "stalking") {
+      beast.state = "idle";
+      beast.sprite.play("beast-idle");
+      beast.sword
+        .setPosition(beast.sprite.x + 8, beast.sprite.y + 8)
+        .setVisible(true);
+      beast.sword.body.enable = true;
+      beast.sword.setVelocity(dx * 200, dy * 200);
+    }
   }
 
   die() {

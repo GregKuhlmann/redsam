@@ -137,11 +137,11 @@
             }
         },
         "desert6.tmj": {
-            "scale": 2.60953125,
+            "scale": 2.6,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 159.9904197353452,
-                "y": 111.89749116819353
+                "x": 159.8076923076923,
+                "y": 111.92307692307693
             }
         },
         "desert7.tmj": {
@@ -150,6 +150,22 @@
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
+            }
+        },
+        "desert8.tmj": {
+            "scale": 2.83,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 146.46643109540634,
+                "y": 91.51943462897526
+            }
+        },
+        "desert9.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
             }
         },
         "level1.json": {
@@ -180,7 +196,7 @@
         },
         "tilesets/TilesetNature.tsx": {
             "scaleInDock": 2.815,
-            "scaleInEditor": 3.15
+            "scaleInEditor": 2.98
         },
         "tilesets/TilesetWater.tsx": {
             "scaleInDock": 2.8385
@@ -214,12 +230,12 @@
         "desert1.tmj",
         "desert2.tmj",
         "desert6.tmj",
-        "tilesets/TilesetNature.tsx",
         "desert7.tmj",
+        "tilesets/TilesetNature.tsx",
+        "desert8.tmj",
         "tilesets/TilesetItems.tsx",
         "desert2.json",
-        "desert1.json",
-        "tilesets/TilesetHouse.tsx"
+        "desert1.json"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
