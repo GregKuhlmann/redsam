@@ -1,6 +1,14 @@
 import * as Phaser from "phaser";
 
-const MAPS = ["desert7", "desert7", "desert3", "desert4", "desert5"];
+const MAPS = [
+  "desert2",
+  "desert2",
+  "desert3",
+  "desert4",
+  "desert5",
+  "desert6",
+  "desert7",
+];
 
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
@@ -8,6 +16,26 @@ const DIRECTIONS = {
   left: { dx: -1, dy: 0 },
   right: { dx: 1, dy: 0 },
 };
+
+const GRASS = 248; // Tile index for grass in LayerObstacles
+const ROCK = 319; // Tile index for rock in LayerObstacles
+
+function getIntersectionSize(rectA, rectB) {
+  const x1 = Math.max(rectA.x, rectB.x);
+  const y1 = Math.max(rectA.y, rectB.y);
+  const x2 = Math.min(rectA.x + rectA.width, rectB.x + rectB.width);
+  const y2 = Math.min(rectA.y + rectA.height, rectB.y + rectB.height);
+
+  const width = x2 - x1;
+  const height = y2 - y1;
+
+  if (width > 0 && height > 0) {
+    return { width, height };
+  } else {
+    // No intersection
+    return null;
+  }
+}
 
 export default class Game extends Phaser.Scene {
   constructor() {
@@ -77,8 +105,24 @@ export default class Game extends Phaser.Scene {
     this.textLives.setFrame(this.lives);
     this.ammo = 0;
     this.textAmmo.setFrame(this.ammo);
-    this.projectiles = this.physics.add.group();
+    this.lasers = this.physics.add.group();
+    this.lightnings = this.physics.add.group();
+    this.absorbers = this.physics.add.group();
     this.paused = true;
+
+    // iterate over tiles in LayerObstacles and set collision for grass tiles
+    this.level.getLayer("LayerObstacles").data.forEach((row) => {
+      row.forEach((tile) => {
+        if (tile && tile.index === ROCK) {
+          const absorber = this.physics.add
+            .image(tile.getCenterX(), tile.getCenterY(), null)
+            .setSize(16, 16)
+            .setVisible(false);
+          this.absorbers.add(absorber);
+          absorber.body.setImmovable(true);
+        }
+      });
+    });
 
     // iterate over the key, value pairs in the tilesetItems.tileProperties
     this.level.getLayer("LayerItems").data.forEach((row) => {
@@ -136,7 +180,7 @@ export default class Game extends Phaser.Scene {
               .setDisplaySize(2, 2)
               .setDepth(1100)
               .setVisible(false);
-            this.projectiles.add(laser);
+            this.lasers.add(laser);
             this.cyclopes.push({
               x: tile.x,
               y: tile.y,
@@ -146,10 +190,12 @@ export default class Game extends Phaser.Scene {
               laser,
               state: "closed",
               firing: false,
+              lastFireTime: null,
               direction,
               statued: null,
               destroyed: false,
             });
+            laser.parent = this.cyclopes[this.cyclopes.length - 1];
           } else if (name.startsWith("panda")) {
             const direction = name.split("-")[1];
             const sprite = this.physics.add
@@ -251,7 +297,7 @@ export default class Game extends Phaser.Scene {
               .setDepth(1100)
               .play("lightning")
               .setVisible(false);
-            this.projectiles.add(lightning);
+            this.lightnings.add(lightning);
             lightning.body.enable = false;
 
             this.octopuses.push({
@@ -272,11 +318,13 @@ export default class Game extends Phaser.Scene {
               .setOrigin(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
           } else if (name === "block") {
-            const sprite = this.add
+            const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
+            this.absorbers.add(sprite);
+            sprite.body.setImmovable(true);
           } else if (name.startsWith("crystal")) {
             const ammo = parseInt(name.split("-")[1], 10);
             const sprite = this.add
@@ -336,11 +384,25 @@ export default class Game extends Phaser.Scene {
       ...this.octopuses,
     ];
 
-    this.physics.add.overlap(this.sam.sprite, this.projectiles, () => {
-      this.die();
-    });
     this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
       this.die();
+    });
+    this.physics.add.overlap(this.sam.sprite, this.lightnings, () => {
+      this.die();
+    });
+    this.physics.add.overlap(this.sam.sprite, this.lasers, (sam, laser) => {
+      // get size of overlap
+      const overlap = getIntersectionSize(sam.getBounds(), laser.getBounds());
+      if (overlap && (overlap.width > 6 || overlap.height > 6)) {
+        this.die();
+      }
+    });
+    this.physics.add.collider(this.lasers, this.absorbers, (laser) => {
+      this.tweens.killTweensOf(laser);
+      laser.setVisible(false);
+      laser.setVelocity(0, 0);
+      laser.body.enable = false;
+      laser.parent.firing = false;
     });
 
     this.sam.sprite.setDepth(1000);
@@ -404,13 +466,15 @@ export default class Game extends Phaser.Scene {
           cyclope.laser.setVisible(false);
           cyclope.firing = false;
           cyclope.laser.setVelocity(0, 0);
+          cyclope.laser.body.enable = false;
         }
       }
       if (
         cyclope.state !== "open" ||
         cyclope.statued ||
         cyclope.destroyed ||
-        cyclope.firing
+        cyclope.firing ||
+        this.time.now - cyclope.lastFireTime < 200
       )
         return;
       cyclope.sprite.play(`cyclope-${cyclope.direction}-open`);
@@ -420,9 +484,11 @@ export default class Game extends Phaser.Scene {
         cyclope.y < this.sam.y
       ) {
         cyclope.firing = true;
+        cyclope.lastFireTime = this.time.now;
         this.sound.play("laser");
         cyclope.laser.setDisplaySize(2, 2);
         cyclope.laser.setVisible(true);
+        cyclope.laser.body.enable = true;
         cyclope.laser
           .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
           .setOrigin(0);
@@ -440,9 +506,11 @@ export default class Game extends Phaser.Scene {
         cyclope.x < this.sam.x
       ) {
         cyclope.firing = true;
+        cyclope.lastFireTime = this.time.now;
         this.sound.play("laser");
         cyclope.laser.setDisplaySize(2, 2);
         cyclope.laser.setVisible(true);
+        cyclope.laser.body.enable = true;
         cyclope.laser
           .setPosition(cyclope.x * 16 + 13, cyclope.y * 16 + 9)
           .setOrigin(0);
@@ -460,9 +528,11 @@ export default class Game extends Phaser.Scene {
         cyclope.x > this.sam.x
       ) {
         cyclope.firing = true;
+        cyclope.lastFireTime = this.time.now;
         this.sound.play("laser");
         cyclope.laser.setDisplaySize(2, 2);
         cyclope.laser.setVisible(true);
+        cyclope.laser.body.enable = true;
         cyclope.laser
           .setPosition(cyclope.x * 16 + 3, cyclope.y * 16 + 9)
           .setOrigin(1, 0);
@@ -717,8 +787,8 @@ export default class Game extends Phaser.Scene {
       duration: 1200,
       repeat: 0,
     });
-    enemy.x = -100;
-    enemy.y = -100;
+    enemy.x = null;
+    enemy.y = null;
     // wait 9 seconds then respawn the enemy
     this.time.delayedCall(9000, () => {
       if (this.chest.state === "collected") return;
@@ -917,7 +987,7 @@ export default class Game extends Phaser.Scene {
     if (this.outOfBounds(x, y)) return true;
 
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
-    if (tile && tile.index !== -1 && !(skipGrass && tile.index === 248)) {
+    if (tile && tile.index !== -1 && !(skipGrass && tile.index === GRASS)) {
       return true;
     }
 
