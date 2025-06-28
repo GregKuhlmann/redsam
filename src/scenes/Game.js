@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 const MAPS = [
-  "desert2",
+  "desert8",
   "desert2",
   "desert3",
   "desert4",
@@ -96,6 +96,7 @@ export default class Game extends Phaser.Scene {
     this.flams = [];
     this.flamBoxes = this.physics.add.group();
     this.octopuses = [];
+    this.beasts = [];
     this.pandas = [];
     this.trexs = [];
     this.trexBoxes = this.physics.add.group();
@@ -299,7 +300,6 @@ export default class Game extends Phaser.Scene {
               .setVisible(false);
             this.lightnings.add(lightning);
             lightning.body.enable = false;
-
             this.octopuses.push({
               x: tile.x,
               y: tile.y,
@@ -308,6 +308,24 @@ export default class Game extends Phaser.Scene {
               sprite,
               lightning,
               state: "happy",
+              statued: null,
+              destroyed: false,
+            });
+          } else if (name === "beast") {
+            const sprite = this.physics.add
+              .sprite(tile.x * 16, tile.y * 16, "beast")
+              .setOrigin(0)
+              .play("beast-idle");
+            this.beasts.push({
+              x: tile.x,
+              y: tile.y,
+              origX: tile.x,
+              origY: tile.y,
+              sprite,
+              state: "stalking",
+              moveDuration: 300,
+              dx: 1,
+              moving: false,
               statued: null,
               destroyed: false,
             });
@@ -382,6 +400,7 @@ export default class Game extends Phaser.Scene {
       ...this.pandas,
       ...this.trexs,
       ...this.octopuses,
+      ...this.beasts,
     ];
 
     this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
@@ -602,6 +621,17 @@ export default class Game extends Phaser.Scene {
         }
       }
     });
+    this.beasts.forEach((beast) => {
+      if (beast.destroyed || beast.statued) return;
+      if (beast.state === "stalking" && !beast.moving) {
+        const path = this.getBeastPath(beast);
+        if (path) {
+          this.moveEnemy(beast, path.x, path.y);
+          beast.sprite.play(`beast-walk`, true);
+        }
+      }
+    });
+
     this.trexs.forEach((trex) => {
       if (trex.destroyed || trex.statued) return;
       if (trex.state === "pursuing" && !trex.moving) {
@@ -749,6 +779,16 @@ export default class Game extends Phaser.Scene {
       options.shift(); // remove backward option if there are other options
     }
     return options[0];
+  }
+
+  getBeastPath(beast) {
+    if (!this.collides(beast, beast.dx, 0, true)) {
+      return { x: beast.x + beast.dx, y: beast.y };
+    }
+    beast.dx *= -1; // reverse direction
+    if (!this.collides(beast, beast.dx, 0, true)) {
+      return { x: beast.x + beast.dx, y: beast.y };
+    }
   }
 
   shoot() {
@@ -992,7 +1032,7 @@ export default class Game extends Phaser.Scene {
     }
 
     if (this.chest.x == x && this.chest.y == y) {
-      return isPushed || this.chest.state === "closed";
+      return isPushed;
     }
 
     if (this.blocks.some((block) => block.x == x && block.y == y)) {

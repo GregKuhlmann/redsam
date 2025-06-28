@@ -10,6 +10,7 @@ import desert4 from "/assets/maps/desert4.json";
 import desert5 from "/assets/maps/desert5.json";
 import desert6 from "/assets/maps/desert6.json";
 import desert7 from "/assets/maps/desert7.json";
+import desert8 from "/assets/maps/desert8.json";
 import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
 import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
@@ -23,6 +24,7 @@ import spriteSheetCyclope from "/assets/Ninja/Actor/Monsters/Cyclope/SpriteSheet
 import spriteSheetSlime from "/assets/Ninja/Actor/Monsters/Slime/Slime.png";
 import spriteSheetFlam from "/assets/Ninja/flam.png";
 import spriteSheetOctopus from "/assets/Ninja/Actor/Monsters/Octopus/SpriteSheet.png";
+import spriteSheetBeast from "/assets/Ninja/Actor/Monsters/Beast/BeastPink.png";
 import spriteSheetLightning from "/assets/Ninja/FX/Elemental/Thunder/SpriteSheet.png";
 import spriteSheetSpark from "/assets/Ninja/FX/Magic/Spark/SpriteSheet.png";
 import spriteSheetAura from "/assets/Ninja/FX/Magic/Aura/SpriteSheet.png";
@@ -48,6 +50,7 @@ import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
 import clickToStart from "/assets/images/click-to-start.png";
 import laser from "/assets/Ninja/laser.png";
+import sword from "/assets/Ninja/Items/Weapons/BigSword/Sprite.png";
 
 export default class Start extends Phaser.Scene {
   constructor() {
@@ -79,6 +82,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("desert5", desert5);
     this.load.tilemapTiledJSON("desert6", desert6);
     this.load.tilemapTiledJSON("desert7", desert7);
+    this.load.tilemapTiledJSON("desert8", desert8);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -101,6 +105,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("octopus", spriteSheetOctopus, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("beast", spriteSheetBeast, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -160,6 +168,7 @@ export default class Start extends Phaser.Scene {
     this.load.image("red-sam", redSam);
     this.load.image("click-to-start", clickToStart);
     this.load.image("laser", laser);
+    this.load.image("sword", sword);
   }
 
   create() {
@@ -512,6 +521,20 @@ export default class Start extends Phaser.Scene {
         frames: [1],
       }),
       frameRate: 7,
+      repeat: -1,
+    });
+    this.anims.create({
+      key: "beast-idle",
+      frames: this.anims.generateFrameNumbers("beast", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "beast-walk",
+      frames: this.anims.generateFrameNumbers("beast", {
+        frames: [0, 4, 8, 12],
+      }),
+      frameRate: 10,
       repeat: -1,
     });
     this.anims.create({

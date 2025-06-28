@@ -71,6 +71,11 @@
    <property name="name" value="octopus"/>
   </properties>
  </tile>
+ <tile id="14">
+  <properties>
+   <property name="name" value="beast"/>
+  </properties>
+ </tile>
  <tile id="20">
   <properties>
    <property name="name" value="crystal-1"/>
