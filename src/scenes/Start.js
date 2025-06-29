@@ -42,6 +42,7 @@ import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
 import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
 import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
+import audioHammer from "/assets/Ninja/Audio/Sounds/Hit & Impact/Hit8.wav";
 import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
 import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
 import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
@@ -71,6 +72,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("step", audioStep);
     this.load.audio("slash", audioSlash);
     this.load.audio("slash-reverse", audioSlashReverse);
+    this.load.audio("hammer", audioHammer);
     this.load.audio("freeze", audioFreeze);
     this.load.audio("killed", audioKilled);
     this.load.audio("game-over", audioGameOver);

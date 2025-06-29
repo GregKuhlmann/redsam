@@ -9,6 +9,7 @@ const MAPS = [
   "desert6",
   "desert7",
   "desert8",
+  "desert9",
 ];
 
 const DIRECTIONS = {
@@ -112,6 +113,8 @@ export default class Game extends Phaser.Scene {
     this.swords = this.physics.add.group();
     this.absorbers = this.physics.add.group();
     this.paused = true;
+    this.hammering = false;
+    this.hammer = null;
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
@@ -345,6 +348,11 @@ export default class Game extends Phaser.Scene {
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
+          } else if (name === "hammer") {
+            this.hammer = this.add
+              .sprite(tile.x * 16, tile.y * 16, "items")
+              .setFrame(tile.index - tilesetItems.firstgid)
+              .setOrigin(0);
           } else if (name === "block") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "items")
@@ -455,7 +463,11 @@ export default class Game extends Phaser.Scene {
         this.sam.chargeTween = null;
         this.sam.aura.setAlpha(0);
       }
-      this.shoot();
+      if (this.hammering) {
+        this.hammerIt();
+      } else {
+        this.shoot();
+      }
     });
     this.input.keyboard.on("keydown-R", () => {
       this.die();
@@ -847,6 +859,48 @@ export default class Game extends Phaser.Scene {
     }
   }
 
+  glowUp(sprite) {
+    const glow = sprite.postFX.addGlow(0xffd700, 2, 0.2, false);
+    this.tweens.addCounter({
+      from: 0,
+      to: 100,
+      duration: 300,
+      repeat: -1,
+      yoyo: true,
+      onUpdate: (tween) => {
+        const value = tween.getValue(); // 0 to 100
+        const color = Phaser.Display.Color.Interpolate.ColorWithColor(
+          Phaser.Display.Color.ValueToColor(0xffd700), // gold
+          Phaser.Display.Color.ValueToColor(0xff0000), // blue
+          100,
+          value
+        );
+        const hex = Phaser.Display.Color.GetColor(color.r, color.g, color.b);
+        glow.color = hex;
+      },
+    });
+    return glow;
+  }
+
+  hammerIt() {
+    const dir = DIRECTIONS[this.sam.direction];
+    let tile = this.level.getTileAt(
+      this.sam.x + dir.dx,
+      this.sam.y + dir.dy,
+      true,
+      "LayerObstacles"
+    );
+    if (tile && tile.index === ROCK) {
+      // remove the rock tile
+      tile.index = -1;
+      tile.setCollision(false);
+      tile.setVisible(false);
+      this.hammering = false;
+      this.hammer.setVisible(false);
+      this.sound.play("hammer");
+    }
+  }
+
   shoot() {
     if (this.ammo <= 0) return;
     this.ammo--;
@@ -1032,6 +1086,22 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo = Math.min(2, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
+            if (this.crystalsRemaining == 3 && this.hammer) {
+              this.crystals.forEach((crystal) => {
+                if (crystal.state !== "collected") {
+                  this.glowUp(crystal.sprite);
+                }
+              });
+            }
+            if (this.crystalsRemaining == 2 && this.hammer) {
+              this.hammering = true;
+              this.glowUp(this.hammer);
+              this.crystals.forEach((crystal) => {
+                if (crystal.sprite) {
+                  crystal.sprite.clearFX();
+                }
+              });
+            }
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
               this.chest.state = "sparkling";

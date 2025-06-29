@@ -76,6 +76,11 @@
    <property name="name" value="beast"/>
   </properties>
  </tile>
+ <tile id="16">
+  <properties>
+   <property name="name" value="hammer"/>
+  </properties>
+ </tile>
  <tile id="20">
   <properties>
    <property name="name" value="crystal-1"/>

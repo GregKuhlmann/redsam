@@ -195,7 +195,7 @@
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 2.815,
+            "scaleInDock": 2.1227,
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetWater.tsx": {
