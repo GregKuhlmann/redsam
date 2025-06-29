@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 const MAPS = [
-  "desert9",
+  "desert10",
   "desert2",
   "desert3",
   "desert4",
@@ -10,6 +10,7 @@ const MAPS = [
   "desert7",
   "desert8",
   "desert9",
+  "desert10",
 ];
 
 const DIRECTIONS = {
@@ -21,6 +22,7 @@ const DIRECTIONS = {
 
 const GRASS = 248; // Tile index for grass in LayerObstacles
 const ROCK = 319; // Tile index for rock in LayerObstacles
+const GREEN = 813; // Tile index for green grass in LayerBackground
 
 function getIntersectionSize(rectA, rectB) {
   const x1 = Math.max(rectA.x, rectB.x);
@@ -820,7 +822,7 @@ export default class Game extends Phaser.Scene {
     return null;
   }
 
-  getPath(enemy, targetX, targetY) {
+  getPath(enemy, targetX, targetY, avoidGreen = true) {
     const options = [];
     for (const option of [
       { dx: enemy.dx, dy: enemy.dy, dir: "forward" },
@@ -831,6 +833,12 @@ export default class Game extends Phaser.Scene {
       const { dx, dy, dir } = option;
       const newX = enemy.x + dx;
       const newY = enemy.y + dy;
+      if (
+        avoidGreen &&
+        this.level.getTileAt(newX, newY, true, "LayerBackground").index ===
+          GREEN
+      )
+        continue;
       if (!this.collides(enemy, dx, dy, true)) {
         options.push({
           x: newX,
