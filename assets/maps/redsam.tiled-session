@@ -79,6 +79,14 @@
                 "y": 112.09677419354838
             }
         },
+        "desert10.tmj": {
+            "scale": 1.9423,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 160.89172630386656,
+                "y": 93.18848787519951
+            }
+        },
         "desert2.json": {
             "scale": 2.6,
             "selectedLayer": 3,

@@ -34,8 +34,10 @@ import spriteSheetSmoke from "/assets/Ninja/FX/Smoke/Smoke/SpriteSheet.png";
 import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
 import spriteSheetShadow from "/assets/Ninja/shadow.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
+import spriteSheetArrow from "/assets/Ninja/arrow-tiles.png";
 import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
+import audioArrow from "/assets/Ninja/Audio/Sounds/Magic & Skill/Magic2.wav";
 import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
 import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
 import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
@@ -45,6 +47,7 @@ import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
 import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
 import audioHammer from "/assets/Ninja/Audio/Sounds/Hit & Impact/Hit8.wav";
 import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
+import audioJettison from "/assets/Ninja/Audio/Sounds/Magic & Skill/Magic3.wav";
 import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
 import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
 import audioMainTheme from "/assets/audio/lolo-main-theme.mp3";
@@ -66,6 +69,7 @@ export default class Start extends Phaser.Scene {
     this.load.image("tilesetWater", tilesetWater);
     this.load.image("tilesetItems", tilesetItems);
     this.load.image("tilesetGUI", tilesetGUI);
+    this.load.audio("arrow", audioArrow);
     this.load.audio("explosion", audioExplosion);
     this.load.audio("collect", audioCollect);
     this.load.audio("chestOpen", audioChestOpen);
@@ -75,6 +79,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("slash-reverse", audioSlashReverse);
     this.load.audio("hammer", audioHammer);
     this.load.audio("freeze", audioFreeze);
+    this.load.audio("jettison", audioJettison);
     this.load.audio("killed", audioKilled);
     this.load.audio("game-over", audioGameOver);
     this.load.audio("laser", audioLaser);
@@ -159,6 +164,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("chest", spriteSheetChest, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("arrow", spriteSheetArrow, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -599,26 +608,44 @@ export default class Start extends Phaser.Scene {
     this.anims.create({
       key: "chest-closed",
       frames: this.anims.generateFrameNumbers("chest", {
-        start: 0,
-        end: 0,
+        frames: [0],
       }),
-      frameRate: 10,
     });
     this.anims.create({
       key: "chest-sparkling",
       frames: this.anims.generateFrameNumbers("chest", {
-        start: 1,
-        end: 1,
+        frames: [1],
       }),
-      frameRate: 10,
     });
     this.anims.create({
       key: "chest-collected",
       frames: this.anims.generateFrameNumbers("chest", {
-        start: 2,
-        end: 2,
+        frames: [2],
       }),
-      frameRate: 10,
+    });
+    this.anims.create({
+      key: "arrow-right",
+      frames: this.anims.generateFrameNumbers("arrow", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "arrow-left",
+      frames: this.anims.generateFrameNumbers("arrow", {
+        frames: [1],
+      }),
+    });
+    this.anims.create({
+      key: "arrow-up",
+      frames: this.anims.generateFrameNumbers("arrow", {
+        frames: [2],
+      }),
+    });
+    this.anims.create({
+      key: "arrow-down",
+      frames: this.anims.generateFrameNumbers("arrow", {
+        frames: [3],
+      }),
     });
   }
 }

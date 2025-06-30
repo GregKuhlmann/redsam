@@ -106,6 +106,7 @@ export default class Game extends Phaser.Scene {
     this.trexBoxes = this.physics.add.group();
     this.crystals = [];
     this.blocks = [];
+    this.arrows = [];
     this.crystalsRemaining = 0;
     this.textLives.setFrame(this.lives);
     this.ammo = 0;
@@ -117,6 +118,8 @@ export default class Game extends Phaser.Scene {
     this.paused = true;
     this.hammering = false;
     this.hammer = null;
+    this.arrowing = false;
+    this.arrow = null;
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
@@ -403,6 +406,22 @@ export default class Game extends Phaser.Scene {
               spark,
               state: "closed",
             };
+          } else if (name.startsWith("arrow")) {
+            const direction = name.split("-")[1];
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "arrow")
+              .setOrigin(0)
+              .play(`arrow-${direction}`);
+            if (tile.x === 18) {
+              this.arrow = sprite;
+            } else {
+              this.arrows.push({
+                x: tile.x,
+                y: tile.y,
+                sprite,
+                direction,
+              });
+            }
           } else {
             console.error(
               `Unknown tile at (${tile.x}, ${tile.y}) with index ${tile.index} and name ${name}`
@@ -465,7 +484,9 @@ export default class Game extends Phaser.Scene {
         this.sam.chargeTween = null;
         this.sam.aura.setAlpha(0);
       }
-      if (this.hammering) {
+      if (this.arrowing) {
+        this.arrowIt();
+      } else if (this.hammering) {
         this.hammerIt();
       } else {
         this.shoot();
@@ -909,17 +930,36 @@ export default class Game extends Phaser.Scene {
     }
   }
 
+  arrowIt() {
+    const dir = DIRECTIONS[this.sam.direction];
+    this.arrows.forEach((arrow) => {
+      if (arrow.x !== this.sam.x + dir.dx || arrow.y !== this.sam.y + dir.dy)
+        return;
+      arrow.direction = {
+        up: "right",
+        right: "down",
+        down: "left",
+        left: "up",
+      }[arrow.direction];
+      arrow.sprite.play(`arrow-${arrow.direction}`);
+      this.arrowing = false;
+      this.arrow.setVisible(false);
+      this.sound.play("arrow");
+    });
+  }
+
   shoot() {
     if (this.ammo <= 0) return;
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
-    this.sound.play("freeze");
     const dir = DIRECTIONS[this.sam.direction];
     this.enemies.forEach((enemy) => {
       if (this.sam.x + dir.dx === enemy.x && this.sam.y + dir.dy === enemy.y) {
         if (enemy.statued) {
+          this.sound.play("jettison");
           this.jettison(enemy, dir);
         } else {
+          this.sound.play("freeze");
           enemy.statued = this.time.now;
           enemy.sprite.body.enable = false;
           enemy.sprite.anims.pause();
@@ -1094,7 +1134,7 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo = Math.min(2, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
-            if (this.crystalsRemaining == 3 && this.hammer) {
+            if (this.crystalsRemaining == 3 && (this.hammer || this.arrow)) {
               this.crystals.forEach((crystal) => {
                 if (crystal.state !== "collected") {
                   this.glowUp(crystal.sprite);
@@ -1104,6 +1144,14 @@ export default class Game extends Phaser.Scene {
             if (this.crystalsRemaining == 2 && this.hammer) {
               this.hammering = true;
               this.glowUp(this.hammer);
+              this.crystals.forEach((crystal) => {
+                if (crystal.sprite) {
+                  crystal.sprite.clearFX();
+                }
+              });
+            } else if (this.crystalsRemaining == 2 && this.arrow) {
+              this.arrowing = true;
+              this.glowUp(this.arrow);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
                   crystal.sprite.clearFX();
@@ -1150,6 +1198,14 @@ export default class Game extends Phaser.Scene {
     if (enemy) return enemy;
   }
 
+  opposingArrow(direction, dx, dy) {
+    if (direction === "up" && dx === 0 && dy === 1) return true;
+    if (direction === "down" && dx === 0 && dy === -1) return true;
+    if (direction === "left" && dx === 1 && dy === 0) return true;
+    if (direction === "right" && dx === -1 && dy === 0) return true;
+    return false;
+  }
+
   collides(obj, dx, dy, isPushed = false, skipGrass = false) {
     const x = obj.x + dx;
     const y = obj.y + dy;
@@ -1167,6 +1223,17 @@ export default class Game extends Phaser.Scene {
 
     if (this.chest.x == x && this.chest.y == y) {
       return isPushed;
+    }
+
+    if (
+      this.arrows.some(
+        (arrow) =>
+          arrow.x == x &&
+          arrow.y == y &&
+          this.opposingArrow(arrow.direction, dx, dy)
+      )
+    ) {
+      return true;
     }
 
     if (this.blocks.some((block) => block.x == x && block.y == y)) {
