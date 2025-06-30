@@ -1,7 +1,7 @@
 # Red Sam
 
-- trex doesn't walk on grass
-- add arrow tool
-- Fine tune stabbing box
+- Add PW in menu
+- Enforce lives, Start / Continue
 - Add sam shooting from a distance
-- Missing door on pandas level
+- Ending
+- Fine tune stabbing box

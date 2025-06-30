@@ -54,10 +54,10 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
-    // this.sound.play("main-theme", {
-    //   loop: true,
-    //   volume: 0.2,
-    // });
+    this.sound.play("main-theme", {
+      loop: true,
+      volume: 0.2,
+    });
     this.cameras.main.setBackgroundColor("#71ddee");
     this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(
@@ -149,12 +149,14 @@ export default class Game extends Phaser.Scene {
           if (name === "sam") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "sam")
-              .setOrigin(0);
+              .setOrigin(0)
+              .setDepth(10);
             const aura = this.add
               .sprite(tile.x * 16, tile.y * 16, "aura")
               .setScale(16 / 25)
               .setOrigin(0)
               .setAlpha(0)
+              .setDepth(11)
               .play("aura");
             this.sam = {
               x: tile.x,
@@ -166,10 +168,72 @@ export default class Game extends Phaser.Scene {
               chargeTween: null,
               state: "alive",
             };
+          } else if (name.startsWith("arrow")) {
+            const direction = name.split("-")[1];
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "arrow")
+              .setOrigin(0)
+              .setDepth(0)
+              .play(`arrow-${direction}`);
+            if (tile.x === 18) {
+              this.arrow = sprite;
+            } else {
+              this.arrows.push({
+                x: tile.x,
+                y: tile.y,
+                sprite,
+                direction,
+              });
+            }
+          } else if (name === "chest") {
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "chest")
+              .setOrigin(0)
+              .setDepth(0)
+              .play("chest-closed");
+            const spark = this.add
+              .sprite(tile.x * 16, tile.y * 16, "spark")
+              .setScale(16 / 35)
+              .setOrigin(0)
+              .setDepth(1)
+              .setVisible(false)
+              .play("spark");
+            this.chest = {
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              spark,
+              state: "closed",
+            };
+          } else if (name.startsWith("crystal")) {
+            const ammo = parseInt(name.split("-")[1], 10);
+            const sprite = this.add
+              .sprite(tile.x * 16, tile.y * 16, "crystal")
+              .setOrigin(0)
+              .setDepth(0);
+            const spark = this.add
+              .sprite(tile.x * 16, tile.y * 16, "spark")
+              .setScale(16 / 35)
+              .setOrigin(0)
+              .setDepth(1)
+              .play({
+                key: "spark",
+                repeatDelay: Phaser.Math.Between(500, 1500),
+              });
+            this.crystals.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              spark,
+              ammo,
+              state: "uncollected",
+            });
+            this.crystalsRemaining++;
           } else if (name === "dragon") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "dragon")
               .setOrigin(0)
+              .setDepth(10)
               .play("dragon-idle");
             this.dragons.push({
               x: tile.x,
@@ -185,11 +249,12 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "cyclope")
               .setOrigin(0)
+              .setDepth(10)
               .play(`cyclope-${direction}-closed`);
             const laser = this.physics.add
               .image(0, 0, "laser")
               .setDisplaySize(2, 2)
-              .setDepth(1100)
+              .setDepth(100)
               .setVisible(false);
             this.lasers.add(laser);
             this.cyclopes.push({
@@ -212,6 +277,7 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "panda")
               .setOrigin(0)
+              .setDepth(10)
               .play(`panda-walk-${direction}`);
             this.pandas.push({
               x: tile.x,
@@ -233,6 +299,7 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "trex")
               .setOrigin(0)
+              .setDepth(10)
               .play(`trex-walk-${direction}`);
             this.trexBoxes.add(sprite);
             this.trexs.push({
@@ -254,11 +321,13 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
+              .setDepth(10)
               .play("slime-bounce");
             const ice = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "ice")
               .setScale(16 / 32)
               .setOrigin(0)
+              .setDepth(11)
               .setVisible(false)
               .play("ice");
             this.slimes.push({
@@ -280,6 +349,7 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "flam")
               .setOrigin(0)
+              .setDepth(10)
               .play("flam-idle");
             this.flamBoxes.add(sprite);
             this.flams.push({
@@ -300,12 +370,13 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "octopus")
               .setOrigin(0)
+              .setDepth(10)
               .play("octopus-happy");
             const lightning = this.physics.add
               .sprite(tile.x * 16 + 8, tile.y * 16 + 8, "lightning")
               .setOrigin(0.5, 0)
               .setBodySize(16, 16)
-              .setDepth(1100)
+              .setDepth(100)
               .play("lightning")
               .setVisible(false);
             this.lightnings.add(lightning);
@@ -325,11 +396,12 @@ export default class Game extends Phaser.Scene {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "beast")
               .setOrigin(0)
+              .setDepth(10)
               .play("beast-idle");
             const sword = this.physics.add
               .image(tile.x * 16 + 8, tile.y * 16 + 8, "sword")
               .setOrigin(0.5, 1)
-              .setDepth(1100)
+              .setDepth(100)
               .setVisible(false);
             this.swords.add(sword);
             sword.body.enable = false;
@@ -351,77 +423,24 @@ export default class Game extends Phaser.Scene {
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
-              .setOrigin(0);
+              .setOrigin(0)
+              .setDepth(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
           } else if (name === "hammer") {
             this.hammer = this.add
               .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
-              .setOrigin(0);
+              .setOrigin(0)
+              .setDepth(0);
           } else if (name === "block") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
-              .setOrigin(0);
+              .setOrigin(0)
+              .setDepth(0);
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
             this.absorbers.add(sprite);
             sprite.body.setImmovable(true);
-          } else if (name.startsWith("crystal")) {
-            const ammo = parseInt(name.split("-")[1], 10);
-            const sprite = this.add
-              .sprite(tile.x * 16, tile.y * 16, "crystal")
-              .setOrigin(0);
-            const spark = this.add
-              .sprite(tile.x * 16, tile.y * 16, "spark")
-              .setScale(16 / 35)
-              .setOrigin(0)
-              .play({
-                key: "spark",
-                repeatDelay: Phaser.Math.Between(500, 1500),
-              });
-            this.crystals.push({
-              x: tile.x,
-              y: tile.y,
-              sprite,
-              spark,
-              ammo,
-              state: "uncollected",
-            });
-            this.crystalsRemaining++;
-          } else if (name === "chest") {
-            const sprite = this.add
-              .sprite(tile.x * 16, tile.y * 16, "chest")
-              .setOrigin(0)
-              .play("chest-closed");
-            const spark = this.add
-              .sprite(tile.x * 16, tile.y * 16, "spark")
-              .setScale(16 / 35)
-              .setOrigin(0)
-              .setVisible(false)
-              .play("spark");
-            this.chest = {
-              x: tile.x,
-              y: tile.y,
-              sprite,
-              spark,
-              state: "closed",
-            };
-          } else if (name.startsWith("arrow")) {
-            const direction = name.split("-")[1];
-            const sprite = this.add
-              .sprite(tile.x * 16, tile.y * 16, "arrow")
-              .setOrigin(0)
-              .play(`arrow-${direction}`);
-            if (tile.x === 18) {
-              this.arrow = sprite;
-            } else {
-              this.arrows.push({
-                x: tile.x,
-                y: tile.y,
-                sprite,
-                direction,
-              });
-            }
           } else {
             console.error(
               `Unknown tile at (${tile.x}, ${tile.y}) with index ${tile.index} and name ${name}`
@@ -466,8 +485,6 @@ export default class Game extends Phaser.Scene {
       laser.parent.firing = false;
     });
 
-    this.sam.sprite.setDepth(1000);
-    this.sam.aura.setDepth(1001);
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", () => {
       if (this.sam.chargeTween) return;
@@ -1013,6 +1030,7 @@ export default class Game extends Phaser.Scene {
       .sprite(enemy.sprite.x, enemy.sprite.y, "smoke")
       .setScale(16 / 32)
       .setOrigin(0)
+      .setDepth(100)
       .play("smoke");
     smoke.on("animationupdate", (animation, frame) => {
       if (frame.index === 3) {
@@ -1050,6 +1068,7 @@ export default class Game extends Phaser.Scene {
     const shadow = this.add
       .sprite(this.sam.sprite.x, this.sam.sprite.y, "shadow")
       .setOrigin(0)
+      .setDepth(0)
       .setAlpha(0.2)
       .play("shadow");
     shadow.on("animationcomplete", () => {
@@ -1103,6 +1122,7 @@ export default class Game extends Phaser.Scene {
             .sprite(this.door.x * 16, this.door.y * 16, "smoke")
             .setScale(16 / 32)
             .setOrigin(0)
+            .setDepth(100)
             .play("smoke");
           smoke.on("animationupdate", (animation, frame) => {
             if (frame.index === 3) {
