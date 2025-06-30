@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 const MAPS = [
-  "desert10",
+  "desert1",
   "desert2",
   "desert3",
   "desert4",
@@ -93,6 +93,8 @@ export default class Game extends Phaser.Scene {
 
     this.textLives = this.add.sprite(296, 82, "font").setOrigin(0);
     this.textAmmo = this.add.sprite(296, 114, "font").setOrigin(0);
+    this.add.sprite(288, 134, "font").setOrigin(0).setFrame(10); // "P"
+    this.add.sprite(296, 134, "font").setOrigin(0).setFrame(11); // "W"
 
     this.dragons = [];
     this.cyclopes = [];
