@@ -854,12 +854,8 @@ export default class Game extends Phaser.Scene {
       const { dx, dy, dir } = option;
       const newX = enemy.x + dx;
       const newY = enemy.y + dy;
-      if (
-        avoidGreen &&
-        this.level.getTileAt(newX, newY, true, "LayerBackground").index ===
-          GREEN
-      )
-        continue;
+      const tile = this.level.getTileAt(newX, newY, true, "LayerBackground");
+      if (avoidGreen && tile && tile.index === GREEN) continue;
       if (!this.collides(enemy, dx, dy, true)) {
         options.push({
           x: newX,
