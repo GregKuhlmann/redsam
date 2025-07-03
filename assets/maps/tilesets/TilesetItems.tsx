@@ -81,9 +81,19 @@
    <property name="name" value="hammer"/>
   </properties>
  </tile>
+ <tile id="19">
+  <properties>
+   <property name="name" value="door"/>
+  </properties>
+ </tile>
  <tile id="20">
   <properties>
    <property name="name" value="crystal-1"/>
+  </properties>
+ </tile>
+ <tile id="22">
+  <properties>
+   <property name="name" value="block"/>
   </properties>
  </tile>
  <tile id="23">

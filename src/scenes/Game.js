@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 
 const MAPS = [
+  "snow1",
   "desert1",
   "desert2",
   "desert3",
@@ -54,10 +55,10 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
-    this.sound.play("main-theme", {
-      loop: true,
-      volume: 0.2,
-    });
+    // this.sound.play("main-theme", {
+    //   loop: true,
+    //   volume: 0.2,
+    // });
     this.cameras.main.setBackgroundColor("#71ddee");
     this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(

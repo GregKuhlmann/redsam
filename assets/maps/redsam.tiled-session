@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert7.tmj",
+    "activeFile": "desert5.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -81,7 +81,7 @@
         },
         "desert10.tmj": {
             "scale": 1.9423,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 160.89172630386656,
                 "y": 93.18848787519951
@@ -138,7 +138,7 @@
         },
         "desert5.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
@@ -190,12 +190,20 @@
         "level1.json#GUI": {
             "scaleInDock": 1.8811
         },
+        "snow1.tmj": {
+            "scale": 2.44,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 157.9918032786885,
+                "y": 115.98360655737704
+            }
+        },
         "tilesets/TilesetGUI.tsx": {
             "scaleInDock": 1
         },
         "tilesets/TilesetHouse.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 2.2562,
+            "scaleInDock": 2.4261,
             "scaleInEditor": 1
         },
         "tilesets/TilesetItems.tsx": {
@@ -203,7 +211,7 @@
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 2.1227,
+            "scaleInDock": 3.4646,
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetWater.tsx": {
@@ -221,29 +229,25 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "desert3.tmj",
-        "desert4.tmj",
-        "desert5.tmj",
-        "desert1.tmj",
-        "desert2.tmj",
-        "desert6.tmj",
-        "desert7.tmj",
-        "tilesets/TilesetNature.tsx"
+        "tilesets/TilesetItems.tsx",
+        "desert9.tmj",
+        "desert10.tmj",
+        "desert5.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "tilesets/TilesetItems.tsx",
+        "desert9.tmj",
+        "desert10.tmj",
+        "desert5.tmj",
         "desert3.tmj",
         "desert4.tmj",
-        "desert5.tmj",
         "desert1.tmj",
         "desert2.tmj",
         "desert6.tmj",
         "desert7.tmj",
         "tilesets/TilesetNature.tsx",
-        "desert8.tmj",
-        "tilesets/TilesetItems.tsx",
-        "desert2.json",
-        "desert1.json"
+        "desert8.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
