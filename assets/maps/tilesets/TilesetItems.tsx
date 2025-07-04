@@ -161,4 +161,14 @@
    <property name="name" value="trex-right"/>
   </properties>
  </tile>
+ <tile id="48">
+  <properties>
+   <property name="name" value="ladder"/>
+  </properties>
+ </tile>
+ <tile id="49">
+  <properties>
+   <property name="name" value="ladder-horizontal"/>
+  </properties>
+ </tile>
 </tileset>

@@ -36,6 +36,7 @@ import spriteSheetIce from "/assets/Ninja/FX/Elemental/Ice/SpriteSheet.png";
 import spriteSheetShadow from "/assets/Ninja/shadow.png";
 import spriteSheetChest from "/assets/Ninja/Items/Treasure/BigTreasureChest.png";
 import spriteSheetArrow from "/assets/Ninja/arrow-tiles.png";
+import spriteSheetLadder from "/assets/Ninja/ladder-tiles.png";
 import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
 import audioArrow from "/assets/Ninja/Audio/Sounds/Magic & Skill/Magic2.wav";
@@ -170,6 +171,10 @@ export default class Start extends Phaser.Scene {
       frameHeight: 16,
     });
     this.load.spritesheet("arrow", spriteSheetArrow, {
+      frameWidth: 16,
+      frameHeight: 16,
+    });
+    this.load.spritesheet("ladder", spriteSheetLadder, {
       frameWidth: 16,
       frameHeight: 16,
     });
@@ -647,6 +652,18 @@ export default class Start extends Phaser.Scene {
       key: "arrow-down",
       frames: this.anims.generateFrameNumbers("arrow", {
         frames: [3],
+      }),
+    });
+    this.anims.create({
+      key: "ladder-vertical",
+      frames: this.anims.generateFrameNumbers("ladder", {
+        frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "ladder-horizontal",
+      frames: this.anims.generateFrameNumbers("ladder", {
+        frames: [1],
       }),
     });
   }

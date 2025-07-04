@@ -21,7 +21,6 @@ const DIRECTIONS = {
   right: { dx: 1, dy: 0 },
 };
 
-const GRASS = 248; // Tile index for grass in LayerObstacles
 const ROCK = 319; // Tile index for rock in LayerObstacles
 const GREEN = 813; // Tile index for green grass in LayerBackground
 
@@ -110,6 +109,7 @@ export default class Game extends Phaser.Scene {
     this.crystals = [];
     this.blocks = [];
     this.arrows = [];
+    this.ladders = [];
     this.crystalsRemaining = 0;
     this.textLives.setFrame(this.lives);
     this.ammo = 0;
@@ -123,6 +123,8 @@ export default class Game extends Phaser.Scene {
     this.hammer = null;
     this.arrowing = false;
     this.arrow = null;
+    this.laddering = false;
+    this.ladder = null;
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
@@ -435,12 +437,18 @@ export default class Game extends Phaser.Scene {
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0)
               .setDepth(0);
+          } else if (name === "ladder") {
+            this.ladder = this.add
+              .sprite(tile.x * 16, tile.y * 16, "items")
+              .setFrame(tile.index - tilesetItems.firstgid)
+              .setOrigin(0)
+              .setDepth(0);
           } else if (name === "block") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "items")
               .setFrame(tile.index - tilesetItems.firstgid)
               .setOrigin(0)
-              .setDepth(0);
+              .setDepth(1);
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
             this.absorbers.add(sprite);
             sprite.body.setImmovable(true);
@@ -508,6 +516,8 @@ export default class Game extends Phaser.Scene {
         this.arrowIt();
       } else if (this.hammering) {
         this.hammerIt();
+      } else if (this.laddering) {
+        this.ladderIt();
       } else {
         this.shoot();
       }
@@ -964,6 +974,33 @@ export default class Game extends Phaser.Scene {
     });
   }
 
+  ladderIt() {
+    const dir = DIRECTIONS[this.sam.direction];
+    const newX = this.sam.x + dir.dx;
+    const newY = this.sam.y + dir.dy;
+    let tile = this.level.getTileAt(newX, newY, true, "LayerObstacles");
+    if (tile.tileset && tile.tileset.name === "TilesetWater") {
+      const sprite = this.add
+        .sprite(newX * 16, newY * 16, "ladder")
+        .setOrigin(0)
+        .setDepth(0);
+      const orientation =
+        this.sam.direction === "up" || this.sam.direction === "down"
+          ? "vertical"
+          : "horizontal";
+      sprite.play(`ladder-${orientation}`);
+      this.ladders.push({
+        x: newX,
+        y: newY,
+        sprite,
+        orientation,
+      });
+      this.laddering = false;
+      this.ladder.setVisible(false);
+      this.sound.play("arrow");
+    }
+  }
+
   shoot() {
     if (this.ammo <= 0) return;
     this.ammo--;
@@ -1153,7 +1190,11 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo = Math.min(2, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
-            if (this.crystalsRemaining == 3 && (this.hammer || this.arrow)) {
+            if (
+              (this.crystalsRemaining == 3 && this.hammer) ||
+              (this.crystalsRemaining === 3 && this.arrow) ||
+              (this.crystalsRemaining === 4 && this.ladder)
+            ) {
               this.crystals.forEach((crystal) => {
                 if (crystal.state !== "collected") {
                   this.glowUp(crystal.sprite);
@@ -1171,6 +1212,14 @@ export default class Game extends Phaser.Scene {
             } else if (this.crystalsRemaining == 2 && this.arrow) {
               this.arrowing = true;
               this.glowUp(this.arrow);
+              this.crystals.forEach((crystal) => {
+                if (crystal.sprite) {
+                  crystal.sprite.clearFX();
+                }
+              });
+            } else if (this.crystalsRemaining == 3 && this.ladder) {
+              this.laddering = true;
+              this.glowUp(this.ladder);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
                   crystal.sprite.clearFX();
@@ -1225,7 +1274,7 @@ export default class Game extends Phaser.Scene {
     return false;
   }
 
-  collides(obj, dx, dy, isPushed = false, skipGrass = false) {
+  collides(obj, dx, dy, isPushed = false, rockOnly = false) {
     const x = obj.x + dx;
     const y = obj.y + dy;
 
@@ -1235,8 +1284,12 @@ export default class Game extends Phaser.Scene {
 
     if (this.outOfBounds(x, y)) return true;
 
+    if (this.ladders.some((ladder) => ladder.x == x && ladder.y == y)) {
+      return false;
+    }
+
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
-    if (tile && tile.index !== -1 && !(skipGrass && tile.index === GRASS)) {
+    if (tile && tile.index !== -1 && !(rockOnly && tile.index !== ROCK)) {
       return true;
     }
 
