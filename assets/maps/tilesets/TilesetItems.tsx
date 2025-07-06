@@ -91,6 +91,11 @@
    <property name="name" value="crystal-1"/>
   </properties>
  </tile>
+ <tile id="21">
+  <properties>
+   <property name="name" value="alchemy"/>
+  </properties>
+ </tile>
  <tile id="22">
   <properties>
    <property name="name" value="block"/>

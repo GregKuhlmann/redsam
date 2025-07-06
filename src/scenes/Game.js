@@ -168,7 +168,7 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "aura")
               .setScale(16 / 25)
               .setOrigin(0)
-              .setVisible(false)
+              .setAlpha(0)
               .setDepth(100)
               .play("aura");
             aura.body.enable = false;
@@ -481,9 +481,30 @@ export default class Game extends Phaser.Scene {
       (aura, enemySprite) => {
         this.freeze(enemySprite);
         aura.body.enable = false;
-        aura.setVisible(false);
+        this.tweens.add({
+          targets: aura,
+          alpha: 0,
+          x: enemySprite.x,
+          y: enemySprite.y,
+          duration: 300,
+        });
       }
     );
+    this.physics.add.collider(
+      this.sam.aura,
+      this.absorbers,
+      (aura, absorber) => {
+        aura.body.enable = false;
+        this.tweens.add({
+          targets: aura,
+          alpha: 0,
+          x: absorber.x,
+          y: absorber.y,
+          duration: 300,
+        });
+      }
+    );
+
     this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
       this.die();
     });
@@ -1070,7 +1091,7 @@ export default class Game extends Phaser.Scene {
     if (!jettisoned) {
       this.sam.aura.body.enable = true;
       this.sam.aura.setPosition(this.sam.sprite.x, this.sam.sprite.y);
-      this.sam.aura.setVisible(true);
+      this.sam.aura.setAlpha(1);
       this.sam.aura.setVelocity(dir.dx * 350, dir.dy * 350);
       this.sound.play("freeze");
     }
@@ -1191,7 +1212,7 @@ export default class Game extends Phaser.Scene {
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           this.sam.moving = true;
           this.tweens.killAll();
-          this.sam.aura.setVisible(false);
+          this.sam.aura.setAlpha(0);
           if (this.map === MAPS[MAPS.length - 1]) {
             this.endGame();
             return;

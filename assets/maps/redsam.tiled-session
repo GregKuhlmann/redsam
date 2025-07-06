@@ -73,18 +73,18 @@
         },
         "desert1.tmj": {
             "scale": 2.48,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8790322580645,
                 "y": 112.09677419354838
             }
         },
         "desert10.tmj": {
-            "scale": 1.8645,
-            "selectedLayer": 1,
+            "scale": 1.86,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 160.09654062751406,
-                "y": 112.09439528023599
+                "x": 159.94623655913975,
+                "y": 111.82795698924731
             }
         },
         "desert2.json": {
@@ -114,7 +114,7 @@
         },
         "desert2.tmj": {
             "scale": 2.6,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
@@ -122,7 +122,7 @@
         },
         "desert3.tmj": {
             "scale": 2.06,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.95145631067962,
                 "y": 109.2233009708738
@@ -130,7 +130,7 @@
         },
         "desert4.tmj": {
             "scale": 2.6,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
@@ -138,7 +138,7 @@
         },
         "desert5.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
@@ -146,7 +146,7 @@
         },
         "desert6.tmj": {
             "scale": 2.6,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
@@ -154,23 +154,23 @@
         },
         "desert7.tmj": {
             "scale": 2.6,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
             }
         },
         "desert8.tmj": {
-            "scale": 2.83,
-            "selectedLayer": 2,
+            "scale": 2.5049,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 146.46643109540634,
-                "y": 91.51943462897526
+                "x": 159.48740468681385,
+                "y": 116.57151982115053
             }
         },
         "desert9.tmj": {
             "scale": 2.6,
-            "selectedLayer": 3,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.8076923076923,
                 "y": 111.92307692307693
@@ -192,7 +192,7 @@
         },
         "snow1.tmj": {
             "scale": 2.44,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 157.9918032786885,
                 "y": 115.98360655737704
