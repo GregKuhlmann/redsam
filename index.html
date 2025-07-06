@@ -6,23 +6,134 @@
     <title>Red Sam</title>
     <style>
       html,
-      body,
-      .container {
-        margin: 0px;
-        height: 100vh;
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100%;
         width: 100vw;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
         background: #d7d7d7;
+        overflow: hidden;
+      }
+
+      #game-container {
+        flex: 1;
+        height: calc(var(--vh, 1vh) * 100);
+        overflow: hidden;
+      }
+
+      #keyboard {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        padding: 10px;
+        background: #ccc;
+        border-top: 2px solid #999;
+      }
+
+      #keyboard button {
+        font-size: 1.2rem;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        background: #eee;
+        cursor: pointer;
+      }
+
+      #keyboard button:active {
+        background: #aaa;
       }
     </style>
   </head>
   <body>
     <div id="game-container" class="container"></div>
-    <script type="module" src="/src/main.js"></script>
+    <div id="keyboard">
+      <button data-key="ArrowLeft">←</button>
+      <button data-key="ArrowUp">↑</button>
+      <button data-key="ArrowDown">↓</button>
+      <button data-key="ArrowRight">→</button>
+      <button data-key="Space">Space</button>
+      <button data-key="h">H</button>
+    </div>
     <script>
-      document.addEventListener("contextmenu", (event) => {
-        event.preventDefault();
+      function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
+      }
+
+      setViewportHeight();
+      window.addEventListener("resize", setViewportHeight);
+      const isMobile =
+        /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      if (!isMobile) {
+        document.getElementById("keyboard").style.display = "none";
+      }
+
+      // Prevent right-click context menu
+      document.addEventListener("contextmenu", (event) =>
+        event.preventDefault()
+      );
+
+      // Virtual keyboard logic
+      const simulateKeyPress = (phaserKeyObj, keyName) => {
+        if (phaserKeyObj) {
+          phaserKeyObj.isDown = true;
+          phaserKeyObj._justDown = true;
+          phaserKeyObj.timeDown = performance.now();
+        }
+        // Manually emit the Phaser keydown event
+        if (window.myPhaserInput) {
+          window.myPhaserInput.emit(`keydown`);
+          window.myPhaserInput.emit(`keydown-${keyName.toUpperCase()}`);
+        }
+      };
+
+      const simulateKeyRelease = (phaserKeyObj, keyName) => {
+        if (phaserKeyObj) {
+          phaserKeyObj.isDown = false;
+          phaserKeyObj._justUp = true;
+          phaserKeyObj.timeUp = performance.now();
+        }
+
+        if (window.myPhaserInput) {
+          window.myPhaserInput.emit(`keyup`);
+          window.myPhaserInput.emit(`keyup-${keyName.toUpperCase()}`);
+        }
+      };
+
+      const keyMap = {
+        ArrowLeft: () => window.myCursorKeys?.left,
+        ArrowRight: () => window.myCursorKeys?.right,
+        ArrowUp: () => window.myCursorKeys?.up,
+        ArrowDown: () => window.myCursorKeys?.down,
+      };
+
+      document.querySelectorAll("#keyboard button").forEach((btn) => {
+        const key = btn.dataset.key;
+        const getPhaserKey = () => keyMap[key]?.();
+        btn.addEventListener("mousedown", (e) => {
+          e.preventDefault();
+          simulateKeyPress(getPhaserKey(), key);
+        });
+        btn.addEventListener("mouseup", (e) => {
+          e.preventDefault();
+          simulateKeyRelease(getPhaserKey(), key);
+        });
+
+        btn.addEventListener("touchstart", (e) => {
+          e.preventDefault();
+          simulateKeyPress(getPhaserKey(), key);
+        });
+        btn.addEventListener("touchend", (e) => {
+          e.preventDefault();
+          simulateKeyRelease(getPhaserKey(), key);
+        });
       });
     </script>
+    <script type="module" src="/src/main.js"></script>
   </body>
 </html>

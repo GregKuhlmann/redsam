@@ -554,6 +554,9 @@ export default class Game extends Phaser.Scene {
     });
 
     this.cursors = this.input.keyboard.createCursorKeys();
+    window.myCursorKeys = this.cursors;
+    window.myPhaserInput = this.input.keyboard;
+
     this.input.keyboard.on("keydown-SPACE", () => {
       if (this.paused) return;
       (this.arrowing && this.arrowIt()) ||
