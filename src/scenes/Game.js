@@ -13,6 +13,8 @@ export const MAPS = [
   "desert10",
 ];
 
+export const MUSIC_VOLUME = 0.5;
+
 const DIRECTIONS = {
   up: { dx: 0, dy: -1 },
   down: { dx: 0, dy: 1 },
@@ -56,7 +58,7 @@ export default class Game extends Phaser.Scene {
     if (!this.registry.get("bgm")) {
       const music = this.sound.add("main-theme", {
         loop: true,
-        volume: 0.4,
+        volume: MUSIC_VOLUME,
       });
       music.play();
       this.registry.set("bgm", music);
@@ -431,6 +433,17 @@ export default class Game extends Phaser.Scene {
               .setOrigin(0)
               .setDepth(0);
             this.door = { x: tile.x, y: tile.y, sprite, state: "closed" };
+          } else if (name === "help") {
+            const help = this.add
+              .sprite(tile.x * 16, tile.y * 16, "items")
+              .setFrame(tile.index - tilesetItems.firstgid)
+              .setOrigin(0)
+              .setDepth(0)
+              .setInteractive();
+            help.on("pointerdown", () => {
+              this.scene.pause();
+              this.scene.launch("Help");
+            });
           } else if (name === "hammer") {
             this.hammer = this.add
               .sprite(tile.x * 16, tile.y * 16, "items")

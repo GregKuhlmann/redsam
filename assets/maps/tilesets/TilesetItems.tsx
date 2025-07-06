@@ -146,6 +146,11 @@
    <property name="name" value="crystal-2"/>
   </properties>
  </tile>
+ <tile id="37">
+  <properties>
+   <property name="name" value="help"/>
+  </properties>
+ </tile>
  <tile id="39">
   <properties>
    <property name="name" value="trex-down"/>

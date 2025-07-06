@@ -212,7 +212,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      //this.scene.start("Ending");
+      //this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
