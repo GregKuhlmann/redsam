@@ -17,8 +17,13 @@ export default class Ending extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
-    this.add.image(width / 2, height / 2, "bfd");
-
+    // fade in camera
+    this.cameras.main.fadeIn(2500, 0, 0, 0);
+    this.cameras.main.once("camerafadeincomplete", () => {
+      this.time.delayedCall(1000, () => {
+        this.add.image(width / 2, height / 2, "bfd").setDepth(0);
+      });
+    });
     [
       { sprite: "sam", anim: "sam-walk-down" },
       { sprite: "dragon", anim: "dragon-idle" },
@@ -41,6 +46,7 @@ export default class Ending extends Phaser.Scene {
         .setOrigin(0.5, 0.5)
         .setScale(4)
         .setAlpha(0.5)
+        .setDepth(1)
         .setCollideWorldBounds(true)
         .setBounce(1, 1)
         .setVelocity(vel.x, vel.y)

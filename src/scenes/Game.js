@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "desert1",
+  "desert10",
   "desert2",
   "desert3",
   "desert4",
@@ -483,9 +483,19 @@ export default class Game extends Phaser.Scene {
     this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
       this.die();
     });
-    this.physics.add.overlap(this.sam.sprite, this.lightnings, () => {
-      this.die();
-    });
+    this.physics.add.overlap(
+      this.sam.sprite,
+      this.lightnings,
+      (sam, lightning) => {
+        const overlap = getIntersectionSize(
+          sam.getBounds(),
+          lightning.getBounds()
+        );
+        if (overlap && (overlap.width > 6 || overlap.height > 6)) {
+          this.die();
+        }
+      }
+    );
     this.physics.add.overlap(this.sam.sprite, this.swords, () => {
       this.die();
     });
@@ -520,15 +530,10 @@ export default class Game extends Phaser.Scene {
         this.sam.chargeTween = null;
         this.sam.aura.setAlpha(0);
       }
-      if (this.arrowing) {
-        this.arrowIt();
-      } else if (this.hammering) {
-        this.hammerIt();
-      } else if (this.laddering) {
-        this.ladderIt();
-      } else {
+      (this.arrowing && this.arrowIt()) ||
+        (this.hammering && this.hammerIt()) ||
+        (this.laddering && this.ladderIt()) ||
         this.shoot();
-      }
     });
     this.input.keyboard.on("keydown-R", () => {
       this.die();
@@ -846,7 +851,7 @@ export default class Game extends Phaser.Scene {
       this.time.delayedCall(5000, () => {
         this.cameras.main.fadeOut(5000, 0, 0, 0);
         this.cameras.main.once("camerafadeoutcomplete", () => {
-          this.time.delayedCall(3000, () => {
+          this.time.delayedCall(1000, () => {
             this.scene.start("Ending");
           });
         });
@@ -999,10 +1004,13 @@ export default class Game extends Phaser.Scene {
       this.hammering = false;
       this.hammer.setVisible(false);
       this.sound.play("hammer");
+      return true;
     }
+    return false;
   }
 
   arrowIt() {
+    let arrowed = false;
     const dir = DIRECTIONS[this.sam.direction];
     this.arrows.forEach((arrow) => {
       if (arrow.x !== this.sam.x + dir.dx || arrow.y !== this.sam.y + dir.dy)
@@ -1014,10 +1022,12 @@ export default class Game extends Phaser.Scene {
         left: "up",
       }[arrow.direction];
       arrow.sprite.play(`arrow-${arrow.direction}`);
+      arrowed = true;
       this.arrowing = false;
       this.arrow.setVisible(false);
       this.sound.play("arrow");
     });
+    return arrowed;
   }
 
   ladderIt() {
@@ -1044,7 +1054,9 @@ export default class Game extends Phaser.Scene {
       this.laddering = false;
       this.ladder.setVisible(false);
       this.sound.play("arrow");
+      return true;
     }
+    return false;
   }
 
   shoot() {
