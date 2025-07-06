@@ -537,6 +537,7 @@ export default class Game extends Phaser.Scene {
     if (this.paused) return;
     if (this.sam.state === "dead") return;
     this.enemies.forEach((enemy) => {
+      if (enemy.destroyed) return;
       const timeDiff = this.time.now - enemy.sprite.statued;
       if (enemy.sprite.statued && timeDiff > 6500) {
         enemy.sprite.statued = null;
