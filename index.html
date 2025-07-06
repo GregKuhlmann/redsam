@@ -45,6 +45,7 @@
         grid-template-columns: 40px 40px 40px;
         grid-template-rows: 40px 40px 40px;
         gap: 5px;
+        touch-action: none;
       }
 
       .keypad button {
@@ -57,7 +58,7 @@
         cursor: pointer;
       }
 
-      .keypad button:active {
+      .keypad button.pressed {
         background: #aaa;
       }
 
@@ -191,6 +192,68 @@
         btn.addEventListener("mouseup", upHandler);
         btn.addEventListener("touchstart", downHandler);
         btn.addEventListener("touchend", upHandler);
+      });
+      let currentTouchKey = null;
+      let currentTouchBtn = null;
+
+      const getPhaserKey = (key) => keyMap[key]?.();
+
+      const simulateKeyChange = (newBtn) => {
+        const newKey = newBtn?.dataset?.key;
+        if (newKey === currentTouchKey) return;
+
+        // Release old key
+        if (currentTouchKey && currentTouchBtn) {
+          simulateKeyRelease(getPhaserKey(currentTouchKey), currentTouchKey);
+          currentTouchBtn.classList.remove("pressed");
+        }
+
+        // Press new key
+        if (newKey && newBtn) {
+          simulateKeyPress(getPhaserKey(newKey), newKey);
+          newBtn.classList.add("pressed");
+        }
+
+        currentTouchKey = newKey;
+        currentTouchBtn = newBtn;
+      };
+
+      const keypad = document.querySelector(".keypad");
+
+      keypad.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (el?.dataset?.key) {
+            simulateKeyChange(el);
+          }
+        },
+        { passive: false }
+      );
+
+      keypad.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+          const touch = e.touches[0];
+          const el = document.elementFromPoint(touch.clientX, touch.clientY);
+          if (el?.dataset?.key && el !== currentTouchBtn) {
+            simulateKeyChange(el);
+          }
+        },
+        { passive: false }
+      );
+
+      keypad.addEventListener("touchend", (e) => {
+        e.preventDefault();
+        if (currentTouchKey && currentTouchBtn) {
+          simulateKeyRelease(getPhaserKey(currentTouchKey), currentTouchKey);
+          currentTouchBtn.classList.remove("pressed");
+        }
+        currentTouchKey = null;
+        currentTouchBtn = null;
       });
     </script>
 

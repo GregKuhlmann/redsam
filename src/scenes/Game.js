@@ -49,7 +49,7 @@ export default class Game extends Phaser.Scene {
 
   init(data) {
     this.map = data.map || MAPS[0];
-    this.lives = data.lives || 5;
+    this.lives = data.lives || 1;
   }
 
   preload() {}

@@ -32,19 +32,21 @@ export default class GameOver extends Phaser.Scene {
     });
     this.cameras.main.setBackgroundColor("#000000");
 
-    const restart = this.add
+    this.restart = this.add
       .sprite(width / 2, height / 2 + 20, "restart-continue")
       .setOrigin(0.5)
       .setFrame(0)
       .setInteractive();
-    restart
+    this.restart
       .on("pointerover", () => {
-        restart.setTint(0xff0000);
+        this.restart.setTint(0xff0000);
       })
       .on("pointerout", () => {
-        restart.clearTint();
+        this.restart.clearTint();
       })
       .on("pointerdown", () => {
+        this.restart.disableInteractive();
+        this.cont.disableInteractive();
         restartMode = true;
         this.sound.stopAll();
         this.sound.play("slash-reverse");
@@ -59,19 +61,21 @@ export default class GameOver extends Phaser.Scene {
       });
     });
 
-    const cont = this.add
+    this.cont = this.add
       .sprite(width / 2, height / 2 - 20, "restart-continue")
       .setOrigin(0.5)
       .setFrame(1)
       .setInteractive();
-    cont
+    this.cont
       .on("pointerover", () => {
-        cont.setTint(0xff0000);
+        this.cont.setTint(0xff0000);
       })
       .on("pointerout", () => {
-        cont.clearTint();
+        this.cont.clearTint();
       })
       .on("pointerdown", () => {
+        this.cont.disableInteractive();
+        this.restart.disableInteractive();
         this.sound.stopAll();
         this.sound.play("slash");
         this.cameras.main.fadeOut(500, 0, 0, 0);
