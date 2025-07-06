@@ -567,19 +567,20 @@ export default class Game extends Phaser.Scene {
     });
   }
 
-  update() {
+  update(_time, delta) {
     if (this.paused) return;
     if (this.sam.state === "dead") return;
     this.enemies.forEach((enemy) => {
       if (enemy.destroyed) return;
-      const timeDiff = this.time.now - enemy.sprite.statued;
-      if (enemy.sprite.statued && timeDiff > 6500) {
+      if (enemy.sprite.statued == null) return;
+      enemy.sprite.statued += delta;
+      if (enemy.sprite.statued > 6500) {
         enemy.sprite.statued = null;
         //enemy.sprite.body.enable = true;
         enemy.sprite.resetPipeline();
         enemy.sprite.anims.resume();
-      } else if (enemy.sprite.statued && timeDiff > 4500) {
-        const frame = Math.floor((timeDiff / 75) % 2);
+      } else if (enemy.sprite.statued > 4500) {
+        const frame = Math.floor((enemy.sprite.statued / 75) % 2);
         if (frame === 0) {
           enemy.sprite.resetPipeline();
         } else {
@@ -1111,7 +1112,7 @@ export default class Game extends Phaser.Scene {
   }
 
   freeze(enemySprite) {
-    enemySprite.statued = this.time.now;
+    enemySprite.statued = 1e-12; // small value to avoid 0
     //enemySprite.body.enable = false;
     enemySprite.anims.pause();
     enemySprite.setPipeline("Grayscale");
