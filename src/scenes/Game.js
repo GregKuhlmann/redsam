@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "desert10",
+  "desert1",
   "desert2",
   "desert3",
   "desert4",
@@ -164,13 +164,14 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "sam")
               .setOrigin(0)
               .setDepth(10);
-            const aura = this.add
+            const aura = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "aura")
               .setScale(16 / 25)
               .setOrigin(0)
-              .setAlpha(0)
-              .setDepth(11)
+              .setVisible(false)
+              .setDepth(100)
               .play("aura");
+            aura.body.enable = false;
             this.sam = {
               x: tile.x,
               y: tile.y,
@@ -178,7 +179,6 @@ export default class Game extends Phaser.Scene {
               aura,
               moving: false,
               direction: "down",
-              chargeTween: null,
               state: "alive",
             };
           } else if (name.startsWith("arrow")) {
@@ -254,7 +254,6 @@ export default class Game extends Phaser.Scene {
               origX: tile.x,
               origY: tile.y,
               sprite,
-              statued: null,
               destroyed: false,
             });
           } else if (name.startsWith("cyclope")) {
@@ -281,7 +280,6 @@ export default class Game extends Phaser.Scene {
               firing: false,
               lastFireTime: null,
               direction,
-              statued: null,
               destroyed: false,
             });
             laser.parent = this.cyclopes[this.cyclopes.length - 1];
@@ -304,7 +302,6 @@ export default class Game extends Phaser.Scene {
               direction,
               moveDuration: 400,
               moving: false,
-              statued: null,
               destroyed: false,
             });
           } else if (name.startsWith("trex")) {
@@ -327,7 +324,6 @@ export default class Game extends Phaser.Scene {
               direction,
               moveDuration: 300,
               moving: false,
-              statued: null,
               destroyed: false,
             });
           } else if (name.startsWith("slime")) {
@@ -355,7 +351,6 @@ export default class Game extends Phaser.Scene {
               dx: 0,
               dy: -1,
               moving: false,
-              statued: null,
               destroyed: false,
             });
           } else if (name === "flam") {
@@ -376,7 +371,6 @@ export default class Game extends Phaser.Scene {
               dx: 1,
               dy: 0,
               moving: false,
-              statued: null,
               destroyed: false,
             });
           } else if (name === "octopus") {
@@ -402,7 +396,6 @@ export default class Game extends Phaser.Scene {
               sprite,
               lightning,
               state: "happy",
-              statued: null,
               destroyed: false,
             });
           } else if (name === "beast") {
@@ -429,7 +422,6 @@ export default class Game extends Phaser.Scene {
               moveDuration: 300,
               dx: 1,
               moving: false,
-              statued: null,
               destroyed: false,
             });
           } else if (name === "door") {
@@ -479,7 +471,19 @@ export default class Game extends Phaser.Scene {
       ...this.octopuses,
       ...this.beasts,
     ];
+    this.enemySprites = this.physics.add.group(
+      this.enemies.map((enemy) => enemy.sprite)
+    );
 
+    this.physics.add.overlap(
+      this.sam.aura,
+      this.enemySprites,
+      (aura, enemySprite) => {
+        this.freeze(enemySprite);
+        aura.body.enable = false;
+        aura.setVisible(false);
+      }
+    );
     this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
       this.die();
     });
@@ -516,26 +520,12 @@ export default class Game extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", () => {
-      if (this.sam.chargeTween) return;
-      this.sam.chargeTween = this.tweens.add({
-        targets: this.sam.aura,
-        alpha: 1,
-        duration: 500,
-        ease: "Power2",
-      });
-    });
-    this.input.keyboard.on("keyup-SPACE", () => {
-      if (this.sam.chargeTween) {
-        this.sam.chargeTween.destroy();
-        this.sam.chargeTween = null;
-        this.sam.aura.setAlpha(0);
-      }
       (this.arrowing && this.arrowIt()) ||
         (this.hammering && this.hammerIt()) ||
         (this.laddering && this.ladderIt()) ||
         this.shoot();
     });
-    this.input.keyboard.on("keydown-R", () => {
+    this.input.keyboard.on("keydown-H", () => {
       this.die();
     });
     this.input.keyboard.on("keydown", () => {
@@ -547,13 +537,13 @@ export default class Game extends Phaser.Scene {
     if (this.paused) return;
     if (this.sam.state === "dead") return;
     this.enemies.forEach((enemy) => {
-      const timeDiff = this.time.now - enemy.statued;
-      if (enemy.statued && timeDiff > 6500) {
-        enemy.statued = null;
-        enemy.sprite.body.enable = true;
+      const timeDiff = this.time.now - enemy.sprite.statued;
+      if (enemy.sprite.statued && timeDiff > 6500) {
+        enemy.sprite.statued = null;
+        //enemy.sprite.body.enable = true;
         enemy.sprite.resetPipeline();
         enemy.sprite.anims.resume();
-      } else if (enemy.statued && timeDiff > 4500) {
+      } else if (enemy.sprite.statued && timeDiff > 4500) {
         const frame = Math.floor((timeDiff / 75) % 2);
         if (frame === 0) {
           enemy.sprite.resetPipeline();
@@ -581,7 +571,7 @@ export default class Game extends Phaser.Scene {
       }
       if (
         cyclope.state !== "open" ||
-        cyclope.statued ||
+        cyclope.sprite.statued ||
         cyclope.destroyed ||
         cyclope.firing ||
         this.time.now - cyclope.lastFireTime < 200
@@ -657,7 +647,7 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.octopuses.forEach((octopus) => {
-      if (octopus.statued || octopus.destroyed) return;
+      if (octopus.sprite.statued || octopus.destroyed) return;
       if (octopus.x === this.sam.x || octopus.y === this.sam.y) {
         octopus.state = "angry";
         octopus.sprite.play("octopus-angry", true);
@@ -668,7 +658,7 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.slimes.forEach((slime) => {
-      if (slime.statued || slime.destroyed) return;
+      if (slime.sprite.statued || slime.destroyed) return;
       if (slime.state === "pursuing" && !slime.moving) {
         if (
           Math.abs(slime.x - this.sam.x) <= 1 &&
@@ -691,7 +681,7 @@ export default class Game extends Phaser.Scene {
       if (this.chest.state === "sparkling") {
         flam.state = "pursuing";
       }
-      if (flam.destroyed || flam.statued) return;
+      if (flam.destroyed || flam.sprite.statued) return;
       flam.sprite.setFlipX(flam.sprite.x <= this.sam.sprite.x);
       if (flam.state === "pursuing" && !flam.moving) {
         flam.sprite.play("flam-pursue", true);
@@ -702,7 +692,7 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.pandas.forEach((panda) => {
-      if (panda.destroyed || panda.statued) return;
+      if (panda.destroyed || panda.sprite.statued) return;
       if (panda.state === "pursuing" && !panda.moving) {
         const path = this.getPath(panda, this.sam.x, this.sam.y);
         if (path && (path.x !== this.sam.x || path.y !== this.sam.y)) {
@@ -713,7 +703,7 @@ export default class Game extends Phaser.Scene {
       }
     });
     this.beasts.forEach((beast) => {
-      if (beast.destroyed || beast.statued) return;
+      if (beast.destroyed || beast.sprite.statued) return;
       if (beast.x === this.sam.x || beast.y === this.sam.y) {
         this.stab(beast);
       }
@@ -727,7 +717,7 @@ export default class Game extends Phaser.Scene {
     });
 
     this.trexs.forEach((trex) => {
-      if (trex.destroyed || trex.statued) return;
+      if (trex.destroyed || trex.sprite.statued) return;
       if (trex.state === "pursuing" && !trex.moving) {
         const path = this.getPath(trex, this.sam.x, this.sam.y);
         if (path) {
@@ -1063,25 +1053,37 @@ export default class Game extends Phaser.Scene {
     if (this.ammo <= 0) return;
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
+    let jettisoned = false;
     const dir = DIRECTIONS[this.sam.direction];
     this.enemies.forEach((enemy) => {
-      if (this.sam.x + dir.dx === enemy.x && this.sam.y + dir.dy === enemy.y) {
-        if (enemy.statued) {
-          this.sound.play("jettison");
-          this.jettison(enemy, dir);
-        } else {
-          this.sound.play("freeze");
-          enemy.statued = this.time.now;
-          enemy.sprite.body.enable = false;
-          enemy.sprite.anims.pause();
-          enemy.sprite.setPipeline("Grayscale");
-        }
+      if (
+        this.sam.x + dir.dx === enemy.x &&
+        this.sam.y + dir.dy === enemy.y &&
+        enemy.sprite.statued
+      ) {
+        this.sound.play("jettison");
+        this.jettison(enemy, dir);
+        jettisoned = true;
       }
     });
+    if (!jettisoned) {
+      this.sam.aura.body.enable = true;
+      this.sam.aura.setPosition(this.sam.sprite.x, this.sam.sprite.y);
+      this.sam.aura.setVisible(true);
+      this.sam.aura.setVelocity(dir.dx * 350, dir.dy * 350);
+      this.sound.play("freeze");
+    }
+  }
+
+  freeze(enemySprite) {
+    enemySprite.statued = this.time.now;
+    //enemySprite.body.enable = false;
+    enemySprite.anims.pause();
+    enemySprite.setPipeline("Grayscale");
   }
 
   jettison(enemy, direction) {
-    enemy.statued = null;
+    enemy.sprite.statued = null;
     enemy.moving = false;
     enemy.sprite
       .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
@@ -1115,7 +1117,7 @@ export default class Game extends Phaser.Scene {
           enemy.x = enemy.origX;
           enemy.y = enemy.origY;
           enemy.sprite.setPosition(enemy.x * 16, enemy.y * 16);
-          enemy.sprite.body.enable = true;
+          //enemy.sprite.body.enable = true;
         }
       });
     });
@@ -1178,7 +1180,6 @@ export default class Game extends Phaser.Scene {
       y: this.sam.sprite.y + dy * 16,
       duration: 200,
       onUpdate: () => {
-        this.sam.aura.setPosition(this.sam.sprite.x, this.sam.sprite.y);
         if (pushed) {
           pushed.sprite.x = this.sam.sprite.x + dx * 16;
           pushed.sprite.y = this.sam.sprite.y + dy * 16;
@@ -1319,7 +1320,7 @@ export default class Game extends Phaser.Scene {
       (enemy) =>
         enemy.x === targetX &&
         enemy.y === targetY &&
-        enemy.statued &&
+        enemy.sprite.statued &&
         !enemy.destroyed
     );
     if (enemy) return enemy;

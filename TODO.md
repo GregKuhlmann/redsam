@@ -1,4 +1,5 @@
 # Red Sam
 
-- Add sam shooting from a distance
+- setPipeline bug (enemy.sprite.statued?)
+- Instruction scene
 - Fine tune stabbing box
