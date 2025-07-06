@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 import spriteSheetRestartContinue from "/assets/images/restart-continue.png";
-import audioRestart from "/assets/Ninja/Audio/Musics/19 - Ascension.ogg";
+import audioRestart from "/assets/audio/ascension.mp3";
 
 import { MAPS } from "/src/scenes/Game.js";
 
