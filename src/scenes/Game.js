@@ -128,6 +128,7 @@ export default class Game extends Phaser.Scene {
     this.lightnings = this.physics.add.group();
     this.swords = this.physics.add.group();
     this.absorbers = this.physics.add.group();
+    this.starting = true;
     this.paused = true;
     this.hammering = false;
     this.hammer = null;
@@ -554,16 +555,21 @@ export default class Game extends Phaser.Scene {
 
     this.cursors = this.input.keyboard.createCursorKeys();
     this.input.keyboard.on("keydown-SPACE", () => {
+      if (this.paused) return;
       (this.arrowing && this.arrowIt()) ||
         (this.hammering && this.hammerIt()) ||
         (this.laddering && this.ladderIt()) ||
         this.shoot();
     });
     this.input.keyboard.on("keydown-H", () => {
+      if (this.paused) return;
       this.die();
     });
     this.input.keyboard.on("keydown", () => {
-      this.paused = false;
+      if (this.starting) {
+        this.paused = false;
+        this.starting = false;
+      }
     });
   }
 
@@ -887,6 +893,7 @@ export default class Game extends Phaser.Scene {
   }
 
   die() {
+    this.paused = true;
     if (this.sam.state === "dead") return;
     this.sam.state = "dead";
     this.sam.sprite.anims.pause();
@@ -1224,7 +1231,8 @@ export default class Game extends Phaser.Scene {
       onComplete: () => {
         this.sam.moving = false;
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
-          this.sam.moving = true;
+          //this.sam.moving = true;
+          this.paused = true;
           this.tweens.killAll();
           this.sam.aura.setAlpha(0);
           if (this.map === MAPS[MAPS.length - 1]) {
