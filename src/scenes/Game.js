@@ -1,7 +1,6 @@
 import * as Phaser from "phaser";
 
-const MAPS = [
-  "snow1",
+export const MAPS = [
   "desert1",
   "desert2",
   "desert3",
@@ -54,10 +53,19 @@ export default class Game extends Phaser.Scene {
   preload() {}
 
   create() {
-    // this.sound.play("main-theme", {
-    //   loop: true,
-    //   volume: 0.2,
-    // });
+    if (!this.registry.get("bgm")) {
+      const music = this.sound.add("main-theme", {
+        loop: true,
+        volume: 0.4,
+      });
+      music.play();
+      this.registry.set("bgm", music);
+    } else {
+      const music = this.registry.get("bgm");
+      if (!music.isPlaying) {
+        music.play();
+      }
+    }
     this.cameras.main.setBackgroundColor("#71ddee");
     this.level = this.make.tilemap({ key: this.map });
     const tilesetHouse = this.level.addTilesetImage(
@@ -364,7 +372,7 @@ export default class Game extends Phaser.Scene {
               origY: tile.y,
               sprite,
               state: "idle",
-              moveDuration: 150,
+              moveDuration: 175,
               dx: 1,
               dy: 0,
               moving: false,
@@ -814,6 +822,39 @@ export default class Game extends Phaser.Scene {
     }
   }
 
+  endGame() {
+    this.paused = true;
+    this.sam.sprite.play("sam-idle-down");
+    const celebrate = this.sound.add("celebrate");
+    // when celebrate sound ends...
+    celebrate.once("complete", () => {
+      this.sound.stopAll();
+      this.sound.play("ending", {
+        loop: true,
+        volume: 0.5,
+      });
+      this.sam.sprite.play({ key: "sam-celebrate", repeat: -1 });
+      this.tweens.add({
+        targets: this.cameras.main,
+        rotation: Phaser.Math.DegToRad(360), // full spin
+        zoom: 4,
+        scrollX: this.sam.sprite.x + 8 - this.cameras.main.width / 2,
+        scrollY: this.sam.sprite.y + 8 - this.cameras.main.height / 2,
+        duration: 5000,
+        ease: "Sine.easeInOut",
+      });
+      this.time.delayedCall(5000, () => {
+        this.cameras.main.fadeOut(5000, 0, 0, 0);
+        this.cameras.main.once("camerafadeoutcomplete", () => {
+          this.time.delayedCall(3000, () => {
+            this.scene.start("Ending");
+          });
+        });
+      });
+    });
+    celebrate.play();
+  }
+
   die() {
     if (this.sam.state === "dead") return;
     this.sam.state = "dead";
@@ -836,7 +877,12 @@ export default class Game extends Phaser.Scene {
         this.sound.play("game-over");
         heroCam.fadeOut(1000, 255, 0, 0);
         this.time.delayedCall(2000, () => {
-          this.scene.restart({ map: this.map, lives: this.lives - 1 });
+          this.lives--;
+          if (this.lives <= 0) {
+            this.scene.start("GameOver", { map: this.map });
+            return;
+          }
+          this.scene.restart({ map: this.map, lives: this.lives });
         });
       },
       [],
@@ -1131,15 +1177,13 @@ export default class Game extends Phaser.Scene {
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           this.sam.moving = true;
           this.tweens.killAll();
-          this.sound.stopAll();
-          this.sound.play("celebrate");
-          this.sam.sprite.play("sam-celebrate");
           this.sam.aura.setVisible(false);
-          this.sam.sprite.on("animationcomplete", (animation) => {
-            if (animation.key === "sam-celebrate") {
-              this.cameras.main.fadeOut(500, 0, 0, 0); // duration in ms, RGB fade color
-            }
-          });
+          if (this.map === MAPS[MAPS.length - 1]) {
+            this.endGame();
+            return;
+          }
+          this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
+          this.cameras.main.fadeOut(500, 0, 0, 0); // duration in ms, RGB fade color
           this.cameras.main.once("camerafadeoutcomplete", () => {
             this.anims.resumeAll(); // TODO: is this necessary?
             this.scene.restart({
@@ -1203,6 +1247,7 @@ export default class Game extends Phaser.Scene {
             }
             if (this.crystalsRemaining == 2 && this.hammer) {
               this.hammering = true;
+              this.sound.play("glow");
               this.glowUp(this.hammer);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
@@ -1211,6 +1256,7 @@ export default class Game extends Phaser.Scene {
               });
             } else if (this.crystalsRemaining == 2 && this.arrow) {
               this.arrowing = true;
+              this.sound.play("glow");
               this.glowUp(this.arrow);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
@@ -1219,6 +1265,7 @@ export default class Game extends Phaser.Scene {
               });
             } else if (this.crystalsRemaining == 3 && this.ladder) {
               this.laddering = true;
+              this.sound.play("glow");
               this.glowUp(this.ladder);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {

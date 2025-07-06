@@ -39,11 +39,12 @@ import spriteSheetArrow from "/assets/Ninja/arrow-tiles.png";
 import spriteSheetLadder from "/assets/Ninja/ladder-tiles.png";
 import spriteSheetCrystal from "/assets/Ninja/purple-crystal.png";
 import spriteSheetFont from "/assets/Ninja/font.png";
+import audioGlow from "/assets/audio/glow.mp3";
 import audioArrow from "/assets/Ninja/Audio/Sounds/Magic & Skill/Magic2.wav";
 import audioExplosion from "/assets/Ninja/Audio/Sounds/Elemental/Fire3.wav";
 import audioCollect from "/assets/Ninja/Audio/Sounds/Bonus/PowerUp1.wav";
 import audioChestOpen from "/assets/Ninja/Audio/Sounds/Bonus/Bonus.wav";
-import audioCelebrate from "/assets/Ninja/Audio/Jingles/Success4.wav";
+import audioCelebrate from "/assets/Ninja/Audio/Sounds/Bonus/Bonus3.wav";
 import audioStep from "/assets/Ninja/Audio/Sounds/Elemental/Grass2.wav";
 import audioSlash from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash2.wav";
 import audioSlashReverse from "/assets/audio/Slash2Reverse.mp3";
@@ -52,7 +53,8 @@ import audioFreeze from "/assets/Ninja/Audio/Sounds/Elemental/Water9.wav";
 import audioJettison from "/assets/Ninja/Audio/Sounds/Magic & Skill/Magic3.wav";
 import audioKilled from "/assets/Ninja/Audio/Sounds/Hit & Impact/Impact2.wav";
 import audioGameOver from "/assets/Ninja/Audio/Jingles/GameOver.wav";
-import audioMainTheme from "/assets/audio/lolo-main-theme.mp3";
+import audioMainTheme from "/assets/audio/windmill-hut.mp3";
+import audioEnding from "/assets/audio/redsam-ending.mp3";
 import audioLaser from "/assets/Ninja/Audio/Sounds/Whoosh & Slash/Slash5.wav";
 import startBackground from "/assets/images/start-bg.png";
 import redSam from "/assets/images/red-sam.png";
@@ -71,6 +73,7 @@ export default class Start extends Phaser.Scene {
     this.load.image("tilesetWater", tilesetWater);
     this.load.image("tilesetItems", tilesetItems);
     this.load.image("tilesetGUI", tilesetGUI);
+    this.load.audio("glow", audioGlow);
     this.load.audio("arrow", audioArrow);
     this.load.audio("explosion", audioExplosion);
     this.load.audio("collect", audioCollect);
@@ -86,6 +89,7 @@ export default class Start extends Phaser.Scene {
     this.load.audio("game-over", audioGameOver);
     this.load.audio("laser", audioLaser);
     this.load.audio("main-theme", audioMainTheme);
+    this.load.audio("ending", audioEnding);
     this.load.tilemapTiledJSON("desert1", desert1);
     this.load.tilemapTiledJSON("desert2", desert2);
     this.load.tilemapTiledJSON("desert3", desert3);
@@ -208,7 +212,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      this.scene.start("Game");
+      //this.scene.start("Ending");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
@@ -440,6 +444,12 @@ export default class Start extends Phaser.Scene {
       key: "dragon-frozen",
       frames: this.anims.generateFrameNumbers("dragon", {
         frames: [0],
+      }),
+    });
+    this.anims.create({
+      key: "cyclope-blink",
+      frames: this.anims.generateFrameNumbers("cyclope", {
+        frames: [4, 4, 4, 4, 4, 4, 0],
       }),
     });
     this.anims.create({

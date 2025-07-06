@@ -229,17 +229,16 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "tilesets/TilesetItems.tsx",
         "desert9.tmj",
         "desert10.tmj",
         "snow1.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
-        "tilesets/TilesetItems.tsx",
         "desert9.tmj",
         "desert10.tmj",
         "snow1.tmj",
+        "tilesets/TilesetItems.tsx",
         "desert5.tmj",
         "desert3.tmj",
         "desert4.tmj",

@@ -1,6 +1,8 @@
 import * as Phaser from "phaser";
 import Start from "/src/scenes/Start.js";
 import Game from "/src/scenes/Game.js";
+import GameOver from "/src/scenes/GameOver.js";
+import Ending from "/src/scenes/Ending.js";
 
 const config = {
   type: Phaser.WEBGL,
@@ -9,7 +11,7 @@ const config = {
   pixelArt: true,
   antialias: false,
   parent: "game-container",
-  scene: [Start, Game],
+  scene: [Start, Ending, Game, GameOver],
   physics: {
     default: "arcade",
     arcade: {
