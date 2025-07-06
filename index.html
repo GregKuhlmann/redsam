@@ -5,24 +5,195 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Red Sam</title>
     <style>
+      * {
+        -webkit-user-select: none; /* Safari */
+        -webkit-touch-callout: none; /* iOS long-press callout */
+        user-select: none; /* Other browsers */
+      }
+
       html,
-      body,
-      .container {
-        margin: 0px;
-        height: 100vh;
+      body {
+        touch-action: none; /* Prevent pan/zoom gestures */
+        overscroll-behavior: none; /* Prevent pull-to-refresh */
+        margin: 0;
+        padding: 0;
+        height: 100%;
         width: 100vw;
-        overflow: hidden;
+        display: flex;
+        flex-direction: column;
         background: #d7d7d7;
+        overflow: hidden;
+      }
+
+      #game-container {
+        flex: 1;
+        height: calc(var(--vh, 1vh) * 100);
+        overflow: hidden;
+      }
+
+      #keyboard {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        background: #ccc;
+        border-top: 2px solid #999;
+      }
+
+      .keypad {
+        display: grid;
+        grid-template-columns: 40px 40px 40px;
+        grid-template-rows: 40px 40px 40px;
+        gap: 5px;
+      }
+
+      .keypad button {
+        font-size: 1.2rem;
+        width: 40px;
+        height: 40px;
+        border: none;
+        border-radius: 5px;
+        background: #eee;
+        cursor: pointer;
+      }
+
+      .keypad button:active {
+        background: #aaa;
+      }
+
+      #h-button {
+        padding: 10px 15px;
+        background: #e44;
+        color: white;
+        border-radius: 50%;
+        font-weight: bold;
+        font-size: 1rem;
+        border: none;
+        cursor: pointer;
+      }
+
+      #h-button:active {
+        background: #a00;
+      }
+
+      #space-button {
+        font-size: 1.2rem;
+        padding: 30px 30px;
+        border: none;
+        border-radius: 10px;
+        background: #eee;
+        cursor: pointer;
+      }
+
+      #space-button:active {
+        background: #aaa;
+      }
+
+      @media (min-width: 768px) {
+        #keyboard {
+          display: none;
+        }
       }
     </style>
-    <script type="module" crossorigin src="/redsam/assets/index-BHPkMFws.js"></script>
+    <script type="module" crossorigin src="/redsam/assets/index-DnFHuJi-.js"></script>
   </head>
   <body>
     <div id="game-container" class="container"></div>
+
+    <div id="keyboard">
+      <div class="keypad">
+        <div></div>
+        <button data-key="ArrowUp">↑</button>
+        <div></div>
+
+        <button data-key="ArrowLeft">←</button>
+        <div></div>
+        <button data-key="ArrowRight">→</button>
+
+        <div></div>
+        <button data-key="ArrowDown">↓</button>
+        <div></div>
+      </div>
+
+      <button id="h-button" data-key="h">H</button>
+      <button id="space-button" data-key="Space">Space</button>
+    </div>
+
     <script>
-      document.addEventListener("contextmenu", (event) => {
-        event.preventDefault();
+      function setViewportHeight() {
+        const vh = window.innerHeight * 0.01;
+        document.documentElement.style.setProperty("--vh", `${vh}px`);
+      }
+
+      setViewportHeight();
+      window.addEventListener("resize", setViewportHeight);
+
+      const isMobile =
+        /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+          navigator.userAgent
+        );
+      if (!isMobile) {
+        document.getElementById("keyboard").style.display = "none";
+      }
+
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+      document.addEventListener("gesturestart", (e) => e.preventDefault());
+      document.addEventListener("gesturechange", (e) => e.preventDefault());
+      document.addEventListener("gestureend", (e) => e.preventDefault());
+
+      const simulateKeyPress = (phaserKeyObj, keyName) => {
+        if (phaserKeyObj) {
+          phaserKeyObj.isDown = true;
+          phaserKeyObj._justDown = true;
+          phaserKeyObj.timeDown = performance.now();
+        }
+        if (window.myPhaserInput) {
+          window.myPhaserInput.emit(`keydown`);
+          window.myPhaserInput.emit(`keydown-${keyName.toUpperCase()}`);
+        }
+      };
+
+      const simulateKeyRelease = (phaserKeyObj, keyName) => {
+        if (phaserKeyObj) {
+          phaserKeyObj.isDown = false;
+          phaserKeyObj._justUp = true;
+          phaserKeyObj.timeUp = performance.now();
+        }
+        if (window.myPhaserInput) {
+          window.myPhaserInput.emit(`keyup`);
+          window.myPhaserInput.emit(`keyup-${keyName.toUpperCase()}`);
+        }
+      };
+
+      const keyMap = {
+        ArrowLeft: () => window.myCursorKeys?.left,
+        ArrowRight: () => window.myCursorKeys?.right,
+        ArrowUp: () => window.myCursorKeys?.up,
+        ArrowDown: () => window.myCursorKeys?.down,
+        Space: () => window.mySpaceKey,
+        H: () => window.myHKey,
+      };
+
+      document.querySelectorAll("#keyboard button").forEach((btn) => {
+        const key = btn.dataset.key;
+        const getPhaserKey = () => keyMap[key]?.();
+
+        const downHandler = (e) => {
+          e.preventDefault();
+          simulateKeyPress(getPhaserKey(), key);
+        };
+
+        const upHandler = (e) => {
+          e.preventDefault();
+          simulateKeyRelease(getPhaserKey(), key);
+        };
+
+        btn.addEventListener("mousedown", downHandler);
+        btn.addEventListener("mouseup", upHandler);
+        btn.addEventListener("touchstart", downHandler);
+        btn.addEventListener("touchend", upHandler);
       });
     </script>
+
   </body>
 </html>
