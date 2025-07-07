@@ -14,11 +14,13 @@ import desert8 from "/assets/maps/desert8.json";
 import desert9 from "/assets/maps/desert9.json";
 import desert10 from "/assets/maps/desert10.json";
 import snow1 from "/assets/maps/snow1.json";
-import tilesetHouse from "/assets/Ninja/Backgrounds/Tilesets/TilesetHouse.png";
-import tilesetNature from "/assets/Ninja/Backgrounds/Tilesets/TilesetNature.png";
-import tilesetWater from "/assets/Ninja/Backgrounds/Tilesets/TilesetWater.png";
-import tilesetItems from "/assets/Ninja/TilesetItems.png";
-import tilesetGUI from "/assets/Ninja/TilesetGUI.png";
+
+import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
+import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
+import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
+import tilesetItems from "/assets/maps/tilesets/TilesetItems.png";
+import tilesetGUI from "/assets/maps/tilesets/TilesetGUI.png";
+
 import spriteSheetRedNinja3 from "/assets/Ninja/Actor/Characters/RedNinja3/SpriteSheet.png";
 import spriteSheetPanda from "/assets/Ninja/Actor/Monsters/Panda/SpriteSheet.png";
 import spriteSheetTrex from "/assets/Ninja/Actor/Monsters/Grey Trex/SpriteSheet.png";

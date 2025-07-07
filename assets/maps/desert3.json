@@ -112,7 +112,7 @@
         {
          "columns":24,
          "firstgid":1,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetNature.png",
+         "image":"tilesets\/TilesetNature.png",
          "imageheight":336,
          "imagewidth":384,
          "margin":0,
@@ -125,7 +125,7 @@
         {
          "columns":28,
          "firstgid":505,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetWater.png",
+         "image":"tilesets\/TilesetWater.png",
          "imageheight":272,
          "imagewidth":448,
          "margin":0,
@@ -138,7 +138,7 @@
         {
          "columns":33,
          "firstgid":981,
-         "image":"..\/Ninja\/Backgrounds\/Tilesets\/TilesetHouse.png",
+         "image":"tilesets\/TilesetHouse.png",
          "imageheight":368,
          "imagewidth":528,
          "margin":0,
@@ -151,7 +151,7 @@
         {
          "columns":16,
          "firstgid":1740,
-         "image":"..\/Ninja\/TilesetItems.png",
+         "image":"tilesets\/TilesetItems.png",
          "imageheight":256,
          "imagewidth":256,
          "margin":0,
@@ -490,7 +490,7 @@
         {
          "columns":8,
          "firstgid":1996,
-         "image":"..\/Ninja\/TilesetGUI.png",
+         "image":"tilesets\/TilesetGUI.png",
          "imageheight":64,
          "imagewidth":128,
          "margin":0,

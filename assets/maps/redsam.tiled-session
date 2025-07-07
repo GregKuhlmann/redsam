@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "desert5.tmj",
+    "activeFile": "snow1.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -76,7 +76,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 159.8790322580645,
-                "y": 112.09677419354838
+                "y": 109.67741935483872
             }
         },
         "desert10.tmj": {
@@ -125,7 +125,7 @@
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 159.95145631067962,
-                "y": 109.2233009708738
+                "y": 112.13592233009706
             }
         },
         "desert4.tmj": {
@@ -164,8 +164,8 @@
             "scale": 2.5049,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 159.48740468681385,
-                "y": 116.57151982115053
+                "x": 159.88662222044792,
+                "y": 112.18012695117568
             }
         },
         "desert9.tmj": {
@@ -248,14 +248,14 @@
         "desert2.tmj",
         "desert3.tmj",
         "desert4.tmj",
-        "snow1.tmj",
-        "desert10.tmj",
-        "tilesets/TilesetItems.tsx",
-        "desert9.tmj",
-        "desert8.tmj",
-        "desert7.tmj",
+        "desert5.tmj",
         "desert6.tmj",
-        "desert5.tmj"
+        "desert7.tmj",
+        "desert8.tmj",
+        "desert9.tmj",
+        "tilesets/TilesetItems.tsx",
+        "desert10.tmj",
+        "snow1.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
