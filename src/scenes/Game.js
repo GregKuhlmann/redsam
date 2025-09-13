@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow5",
+  "snow6",
   "desert1",
   "desert2",
   "desert3",
@@ -17,6 +17,7 @@ export const MAPS = [
   "snow3",
   "snow4",
   "snow5",
+  "snow6",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -29,7 +30,12 @@ const DIRECTIONS = {
 };
 
 const ROCK = 319; // Tile index for rock in LayerObstacles
+const SNOWBALL = 323; // Tile index for snowball in LayerObstacles
 const GREEN = 813; // Tile index for green grass in LayerBackground
+
+function isRock(tile) {
+  return tile && (tile.index === ROCK || tile.index === SNOWBALL);
+}
 
 function getIntersectionSize(rectA, rectB) {
   const x1 = Math.max(rectA.x, rectB.x);
@@ -147,7 +153,7 @@ export default class Game extends Phaser.Scene {
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
       row.forEach((tile) => {
-        if (tile && tile.index === ROCK) {
+        if (isRock(tile)) {
           const absorber = this.physics.add
             .image(tile.getCenterX(), tile.getCenterY(), null)
             .setSize(16, 16)
@@ -1110,7 +1116,7 @@ export default class Game extends Phaser.Scene {
       true,
       "LayerObstacles"
     );
-    if (tile && tile.index === ROCK) {
+    if (isRock(tile)) {
       // remove the rock tile
       tile.index = -1;
       tile.setCollision(false);
@@ -1552,7 +1558,7 @@ export default class Game extends Phaser.Scene {
     }
 
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
-    if (tile && tile.index !== -1 && !(rockOnly && tile.index !== ROCK)) {
+    if (tile && tile.index !== -1 && !(rockOnly && !isRock(tile))) {
       return true;
     }
 
