@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow4",
+  "snow5",
   "desert1",
   "desert2",
   "desert3",
@@ -15,6 +15,8 @@ export const MAPS = [
   "snow1",
   "snow2",
   "snow3",
+  "snow4",
+  "snow5",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -496,6 +498,7 @@ export default class Game extends Phaser.Scene {
     this.enemySprites = this.physics.add.group(
       this.enemies.map((enemy) => enemy.sprite)
     );
+    this.absorbers.addMultiple(this.enemySprites.getChildren());
 
     this.physics.add.overlap(
       this.sam.aura,
@@ -560,13 +563,18 @@ export default class Game extends Phaser.Scene {
         this.die();
       }
     });
-    this.physics.add.collider(this.lasers, this.absorbers, (laser) => {
-      this.tweens.killTweensOf(laser);
-      laser.setVisible(false);
-      laser.setVelocity(0, 0);
-      laser.body.enable = false;
-      laser.parent.firing = false;
-    });
+    this.physics.add.collider(
+      this.lasers,
+      this.absorbers,
+      (laser, absorber) => {
+        if (laser.parent.sprite === absorber) return; // ignore collision with parent
+        this.tweens.killTweensOf(laser);
+        laser.setVisible(false);
+        laser.setVelocity(0, 0);
+        laser.body.enable = false;
+        laser.parent.firing = false;
+      }
+    );
 
     this.cursors = this.input.keyboard.createCursorKeys();
     window.myCursorKeys = this.cursors;
@@ -674,6 +682,28 @@ export default class Game extends Phaser.Scene {
           duration: 300,
           onComplete: () => {
             cyclope.laser.setVelocityY(300);
+          },
+        });
+      } else if (
+        cyclope.direction === "up" &&
+        cyclope.x == this.sam.x &&
+        cyclope.y > this.sam.y
+      ) {
+        cyclope.firing = true;
+        cyclope.lastFireTime = this.time.now;
+        this.sound.play("laser");
+        cyclope.laser.setDisplaySize(2, 2);
+        cyclope.laser.setVisible(true);
+        cyclope.laser.body.enable = true;
+        cyclope.laser
+          .setPosition(cyclope.x * 16 + 7, cyclope.y * 16 + 10)
+          .setOrigin(0, 1);
+        this.tweens.add({
+          targets: cyclope.laser,
+          displayHeight: 50,
+          duration: 300,
+          onComplete: () => {
+            cyclope.laser.setVelocityY(-300);
           },
         });
       } else if (
