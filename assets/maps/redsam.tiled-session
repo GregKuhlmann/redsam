@@ -252,6 +252,8 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "desert10.tmj",
+        "snow1.tmj",
         "tilesets/TilesetItems.tsx",
         "desert1.tmj",
         "desert2.tmj",
@@ -261,9 +263,7 @@
         "desert6.tmj",
         "desert7.tmj",
         "desert8.tmj",
-        "desert9.tmj",
-        "desert10.tmj",
-        "snow1.tmj"
+        "desert9.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
