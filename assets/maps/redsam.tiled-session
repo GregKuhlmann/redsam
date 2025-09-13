@@ -206,6 +206,22 @@
                 "y": 111.92307692307693
             }
         },
+        "snow3.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "snow4.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
         "tilesets/TilesetGUI.tsx": {
             "scaleInDock": 4.227
         },

@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow3",
+  "snow4",
   "desert1",
   "desert2",
   "desert3",
@@ -14,6 +14,7 @@ export const MAPS = [
   "desert10",
   "snow1",
   "snow2",
+  "snow3",
 ];
 
 export const MUSIC_VOLUME = 0.5;
