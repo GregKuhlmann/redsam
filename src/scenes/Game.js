@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
+  "snow2",
   "desert1",
   "desert2",
   "desert3",
@@ -136,6 +137,7 @@ export default class Game extends Phaser.Scene {
     this.arrow = null;
     this.laddering = false;
     this.ladder = null;
+    this.floatMap = {};
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
@@ -303,7 +305,7 @@ export default class Game extends Phaser.Scene {
               sprite,
               state: "pursuing",
               direction,
-              moveDuration: 400,
+              moveDuration: 450,
               moving: false,
               destroyed: false,
             });
@@ -466,6 +468,9 @@ export default class Game extends Phaser.Scene {
             this.blocks.push({ x: tile.x, y: tile.y, sprite });
             this.absorbers.add(sprite);
             sprite.body.setImmovable(true);
+          } else if (name.startsWith("float")) {
+            const direction = name.split("-")[1];
+            this.floatMap[tile.x + "-" + tile.y] = DIRECTIONS[direction];
           } else {
             console.error(
               `Unknown tile at (${tile.x}, ${tile.y}) with index ${tile.index} and name ${name}`
@@ -519,9 +524,16 @@ export default class Game extends Phaser.Scene {
       }
     );
 
-    this.physics.add.overlap(this.sam.sprite, this.trexBoxes, () => {
-      this.die();
-    });
+    this.physics.add.overlap(
+      this.sam.sprite,
+      this.trexBoxes,
+      (samSprite, trexBox) => {
+        const trex = this.trexs.find((t) => t.sprite === trexBox);
+        if (trex && !trex.floating && !trex.destroyed) {
+          this.die();
+        }
+      }
+    );
     this.physics.add.overlap(
       this.sam.sprite,
       this.lightnings,
@@ -582,6 +594,22 @@ export default class Game extends Phaser.Scene {
     this.enemies.forEach((enemy) => {
       if (enemy.destroyed) return;
       if (enemy.sprite.statued == null) return;
+      if (enemy.floating) {
+        if (!enemy.moving && !enemy.docking) {
+          const floatDir = this.floatMap[`${enemy.x}-${enemy.y}`];
+          if (floatDir) {
+            this.moveEnemy(
+              enemy,
+              enemy.x + floatDir.dx,
+              enemy.y + floatDir.dy,
+              1000
+            );
+          } else {
+            this.sink(enemy);
+          }
+        }
+        return;
+      }
       enemy.sprite.statued += delta;
       if (enemy.sprite.statued > 6500) {
         enemy.sprite.statued = null;
@@ -809,7 +837,7 @@ export default class Game extends Phaser.Scene {
     }
     const box = { x: octopus.x, y: octopus.y };
     while (box.x !== this.sam.x || box.y !== this.sam.y) {
-      if (this.collides(box, dx, dy, true, true)) {
+      if (this.collides(box, dx, dy, false, true)) {
         return;
       }
       box.x += dx;
@@ -839,7 +867,7 @@ export default class Game extends Phaser.Scene {
     }
     const box = { x: beast.x, y: beast.y };
     while (box.x !== this.sam.x || box.y !== this.sam.y) {
-      if (this.collides(box, dx, dy, true, true)) {
+      if (this.collides(box, dx, dy, false, true)) {
         return;
       }
       box.x += dx;
@@ -935,7 +963,7 @@ export default class Game extends Phaser.Scene {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
   }
 
-  moveEnemy(enemy, targetX, targetY) {
+  moveEnemy(enemy, targetX, targetY, moveDuration = null) {
     enemy.moving = true;
     enemy.dx = targetX - enemy.x;
     enemy.dy = targetY - enemy.y;
@@ -945,7 +973,14 @@ export default class Game extends Phaser.Scene {
       targets: enemy.sprite,
       x: targetX * 16,
       y: targetY * 16,
-      duration: enemy.moveDuration,
+      duration: moveDuration || enemy.moveDuration,
+      onUpdate: () => {
+        if (enemy.docked) {
+          this.sam.x = enemy.x;
+          this.sam.y = enemy.y;
+          this.sam.sprite.setPosition(enemy.sprite.x, enemy.sprite.y);
+        }
+      },
       onComplete: () => {
         enemy.moving = false;
       },
@@ -973,7 +1008,17 @@ export default class Game extends Phaser.Scene {
       const newY = enemy.y + dy;
       const tile = this.level.getTileAt(newX, newY, true, "LayerBackground");
       if (avoidGreen && tile && tile.index === GREEN) continue;
-      if (!this.collides(enemy, dx, dy, true)) {
+      if (this.chest.x === newX && this.chest.y === newY) continue;
+      if (
+        this.crystals.some(
+          (crystal) =>
+            crystal.x == newX &&
+            crystal.y == newY &&
+            crystal.state === "uncollected"
+        )
+      )
+        continue;
+      if (!this.collides(enemy, dx, dy)) {
         options.push({
           x: newX,
           y: newY,
@@ -992,11 +1037,11 @@ export default class Game extends Phaser.Scene {
   }
 
   getBeastPath(beast) {
-    if (!this.collides(beast, beast.dx, 0, true)) {
+    if (!this.collides(beast, beast.dx, 0)) {
       return { x: beast.x + beast.dx, y: beast.y };
     }
     beast.dx *= -1; // reverse direction
-    if (!this.collides(beast, beast.dx, 0, true)) {
+    if (!this.collides(beast, beast.dx, 0)) {
       return { x: beast.x + beast.dx, y: beast.y };
     }
   }
@@ -1128,6 +1173,29 @@ export default class Game extends Phaser.Scene {
     enemySprite.setPipeline("Grayscale");
   }
 
+  sink(enemy) {
+    enemy.floating = false;
+    enemy.sprite.statued = null;
+    enemy.moving = false;
+    enemy.sprite
+      .setPosition(enemy.sprite.x + 8, enemy.sprite.y + 8)
+      .setOrigin(0.5);
+    this.tweens.add({
+      targets: enemy.sprite,
+      angle: 720,
+      scale: 0.1,
+      ease: "Power2",
+      duration: 1000,
+      repeat: 0,
+      onComplete: () => {
+        enemy.sprite.setVisible(false);
+      },
+    });
+    enemy.x = null;
+    enemy.y = null;
+    this.respawn(enemy);
+  }
+
   jettison(enemy, direction) {
     enemy.sprite.statued = null;
     enemy.moving = false;
@@ -1146,6 +1214,10 @@ export default class Game extends Phaser.Scene {
     });
     enemy.x = null;
     enemy.y = null;
+    this.respawn(enemy);
+  }
+
+  respawn(enemy) {
     // wait 9 seconds then respawn the enemy
     this.time.delayedCall(9000, () => {
       if (this.chest.state === "collected") return;
@@ -1200,14 +1272,44 @@ export default class Game extends Phaser.Scene {
     this.sam.sprite.play(`sam-walk-${direction}`, true);
 
     const pushed = this.pushable(dx, dy);
-    if (pushed && this.collides(pushed, dx, dy, true)) return;
-    if (!pushed && this.collides(this.sam, dx, dy)) return;
+    if (
+      pushed &&
+      !this.intoWater(pushed, dx, dy) &&
+      this.collides(pushed, dx, dy, true)
+    )
+      return;
+    const floater = this.enemies.find(
+      (enemy) =>
+        enemy.sprite.x === this.sam.sprite.x + dx * 16 &&
+        enemy.sprite.y === this.sam.sprite.y + dy * 16 &&
+        enemy.floating &&
+        !enemy.destroyed
+    );
+    if (!pushed && floater) {
+      floater.moving = false;
+      floater.docking = true;
+      this.tweens.killTweensOf(floater.sprite);
+      floater.x = this.sam.x + dx;
+      floater.y = this.sam.y + dy;
+    } else if (!pushed && this.collides(this.sam, dx, dy)) return;
+
+    // sam is moving, so if docked, detach from docker
+    if (this.sam.docker) {
+      if (this.sam.sprite.x % 16 !== 0 || this.sam.sprite.y % 16 !== 0) return;
+      this.sam.docker.docked = false;
+      this.sam.docker = null;
+    }
 
     this.sam.moving = true;
     this.sound.play("step");
     this.sam.x += dx;
     this.sam.y += dy;
     if (pushed) {
+      if (this.intoWater(pushed, dx, dy)) {
+        this.freeze(pushed.sprite);
+        pushed.floating = true;
+        pushed.moving = true;
+      }
       pushed.x += dx;
       pushed.y += dy;
     }
@@ -1233,6 +1335,15 @@ export default class Game extends Phaser.Scene {
       },
       onComplete: () => {
         this.sam.moving = false;
+        if (pushed) {
+          pushed.moving = false;
+        }
+        const docker = this.enemies.find((enemy) => enemy.docking);
+        if (docker) {
+          docker.docking = false;
+          docker.docked = true;
+          this.sam.docker = docker;
+        }
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           //this.sam.moving = true;
           this.paused = true;
@@ -1368,6 +1479,7 @@ export default class Game extends Phaser.Scene {
         enemy.x === targetX &&
         enemy.y === targetY &&
         enemy.sprite.statued &&
+        !enemy.floating &&
         !enemy.destroyed
     );
     if (enemy) return enemy;
@@ -1378,6 +1490,17 @@ export default class Game extends Phaser.Scene {
     if (direction === "down" && dx === 0 && dy === -1) return true;
     if (direction === "left" && dx === 1 && dy === 0) return true;
     if (direction === "right" && dx === -1 && dy === 0) return true;
+    return false;
+  }
+
+  intoWater(obj, dx, dy) {
+    if (!obj.sprite || !obj.sprite.statued) return false; // only frozen enemies can be pushed into water
+    const x = obj.x + dx;
+    const y = obj.y + dy;
+    let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
+    if (tile && tile.tileset && tile.tileset.name === "TilesetWater") {
+      return this.floatMap[`${x}-${y}`] != null;
+    }
     return false;
   }
 
@@ -1398,10 +1521,6 @@ export default class Game extends Phaser.Scene {
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
     if (tile && tile.index !== -1 && !(rockOnly && tile.index !== ROCK)) {
       return true;
-    }
-
-    if (this.chest.x == x && this.chest.y == y) {
-      return isPushed;
     }
 
     if (
@@ -1428,6 +1547,10 @@ export default class Game extends Phaser.Scene {
     }
 
     if (isPushed) {
+      if (this.chest.x == x && this.chest.y == y) {
+        return true;
+      }
+
       if (
         this.crystals.some(
           (crystal) =>

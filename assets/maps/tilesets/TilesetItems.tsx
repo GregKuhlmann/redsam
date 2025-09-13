@@ -181,4 +181,24 @@
    <property name="name" value="ladder-horizontal"/>
   </properties>
  </tile>
+ <tile id="50">
+  <properties>
+   <property name="name" value="float-right"/>
+  </properties>
+ </tile>
+ <tile id="51">
+  <properties>
+   <property name="name" value="float-left"/>
+  </properties>
+ </tile>
+ <tile id="52">
+  <properties>
+   <property name="name" value="float-up"/>
+  </properties>
+ </tile>
+ <tile id="53">
+  <properties>
+   <property name="name" value="float-down"/>
+  </properties>
+ </tile>
 </tileset>

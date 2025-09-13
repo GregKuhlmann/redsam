@@ -198,6 +198,14 @@
                 "y": 115.98360655737704
             }
         },
+        "snow2.tmj": {
+            "scale": 2.6,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.8076923076923,
+                "y": 111.92307692307693
+            }
+        },
         "tilesets/TilesetGUI.tsx": {
             "scaleInDock": 4.227
         },
@@ -244,6 +252,7 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "tilesets/TilesetItems.tsx",
         "desert1.tmj",
         "desert2.tmj",
         "desert3.tmj",
@@ -253,7 +262,6 @@
         "desert7.tmj",
         "desert8.tmj",
         "desert9.tmj",
-        "tilesets/TilesetItems.tsx",
         "desert10.tmj",
         "snow1.tmj"
     ],
