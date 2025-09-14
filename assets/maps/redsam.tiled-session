@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "snow8.tmj",
+    "activeFile": "snow7.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -309,7 +309,8 @@
         "snow7.tmj",
         "snow9.tmj",
         "snow10.tmj",
-        "snow8.tmj"
+        "snow8.tmj",
+        "desert1.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
@@ -318,13 +319,13 @@
         "snow4.tmj",
         "snow5.tmj",
         "snow6.tmj",
-        "snow7.tmj",
-        "snow9.tmj",
-        "snow10.tmj",
+        "desert1.tmj",
         "snow8.tmj",
+        "snow10.tmj",
+        "snow9.tmj",
+        "snow7.tmj",
         "desert9.tmj",
-        "desert8.tmj",
-        "desert7.tmj"
+        "desert8.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

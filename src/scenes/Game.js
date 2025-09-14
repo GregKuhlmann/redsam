@@ -341,6 +341,7 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "slime")
               .setOrigin(0)
               .setDepth(10)
+              .setPushable(false)
               .play("slime-bounce");
             const ice = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "ice")
@@ -506,6 +507,8 @@ export default class Game extends Phaser.Scene {
       this.sam.aura,
       this.enemySprites,
       (aura, enemySprite) => {
+        // a slime can't be shot
+        if (this.slimes.find((s) => s.sprite === enemySprite)) return;
         this.freeze(enemySprite);
         aura.body.enable = false;
         this.tweens.add({
