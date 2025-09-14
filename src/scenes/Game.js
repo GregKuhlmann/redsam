@@ -414,7 +414,8 @@ export default class Game extends Phaser.Scene {
               state: "happy",
               destroyed: false,
             });
-          } else if (name === "beast") {
+          } else if (name.startsWith("beast")) {
+            const dir = DIRECTIONS[name.split("-")[1]];
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "beast")
               .setOrigin(0)
@@ -436,7 +437,8 @@ export default class Game extends Phaser.Scene {
               sword,
               state: "stalking",
               moveDuration: 300,
-              dx: 1,
+              dx: dir.dx,
+              dy: dir.dy,
               moving: false,
               destroyed: false,
             });
@@ -606,9 +608,10 @@ export default class Game extends Phaser.Scene {
   }
 
   update(_time, delta) {
+    // ...existing code...
     if (this.paused) return;
     if (this.sam.state === "dead") return;
-    this.enemies.forEach((enemy) => {
+    this.enemies.forEach((enemy, i) => {
       if (enemy.destroyed) return;
       if (enemy.sprite.statued == null) return;
       if (enemy.floating) {
@@ -629,6 +632,7 @@ export default class Game extends Phaser.Scene {
       }
       enemy.sprite.statued += delta;
       if (enemy.sprite.statued > 6500) {
+        // ...existing code...
         enemy.sprite.statued = null;
         //enemy.sprite.body.enable = true;
         enemy.sprite.resetPipeline();
@@ -906,7 +910,7 @@ export default class Game extends Phaser.Scene {
     }
     const box = { x: beast.x, y: beast.y };
     while (box.x !== this.sam.x || box.y !== this.sam.y) {
-      if (this.collides(box, dx, dy, false, true)) {
+      if (this.collides(box, dx, dy, true, true)) {
         return;
       }
       box.x += dx;
@@ -1035,6 +1039,7 @@ export default class Game extends Phaser.Scene {
   }
 
   getPath(enemy, targetX, targetY, avoidGreen = true) {
+    // ...existing code...
     const options = [];
     for (const option of [
       { dx: enemy.dx, dy: enemy.dy, dir: "forward" },
@@ -1066,22 +1071,28 @@ export default class Game extends Phaser.Scene {
         });
       }
     }
+    // ...existing code...
     Phaser.Utils.Array.Shuffle(options);
     options.sort((a, b) => a.dist - b.dist);
-    if (options.length === 0) return;
+    if (options.length === 0) {
+      // ...existing code...
+      return;
+    }
     if (options[0].dir === "backward" && options.length > 1) {
       options.shift(); // remove backward option if there are other options
     }
+    // ...existing code...
     return options[0];
   }
 
   getBeastPath(beast) {
-    if (!this.collides(beast, beast.dx, 0)) {
-      return { x: beast.x + beast.dx, y: beast.y };
+    if (!this.collides(beast, beast.dx, beast.dy)) {
+      return { x: beast.x + beast.dx, y: beast.y + beast.dy };
     }
     beast.dx *= -1; // reverse direction
-    if (!this.collides(beast, beast.dx, 0)) {
-      return { x: beast.x + beast.dx, y: beast.y };
+    beast.dy *= -1;
+    if (!this.collides(beast, beast.dx, beast.dy)) {
+      return { x: beast.x + beast.dx, y: beast.y + beast.dy };
     }
   }
 

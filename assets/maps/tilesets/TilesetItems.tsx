@@ -73,7 +73,12 @@
  </tile>
  <tile id="14">
   <properties>
-   <property name="name" value="beast"/>
+   <property name="name" value="beast-left"/>
+  </properties>
+ </tile>
+ <tile id="15">
+  <properties>
+   <property name="name" value="beast-up"/>
   </properties>
  </tile>
  <tile id="16">
@@ -119,6 +124,16 @@
  <tile id="26">
   <properties>
    <property name="name" value="panda-right"/>
+  </properties>
+ </tile>
+ <tile id="30">
+  <properties>
+   <property name="name" value="beast-right"/>
+  </properties>
+ </tile>
+ <tile id="31">
+  <properties>
+   <property name="name" value="beast-down"/>
   </properties>
  </tile>
  <tile id="32">
