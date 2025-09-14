@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "desert1",
+  "snow1",
   "snow2",
   "snow3",
   "snow4",
@@ -1179,6 +1179,7 @@ export default class Game extends Phaser.Scene {
 
   shoot() {
     if (this.ammo <= 0) return;
+    if (this.sam.state === "stunned") return;
     this.ammo--;
     this.textAmmo.setFrame(this.ammo);
     let jettisoned = false;
