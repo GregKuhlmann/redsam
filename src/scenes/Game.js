@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow1",
+  "desert1",
   "snow2",
   "snow3",
   "snow4",
@@ -1555,7 +1555,7 @@ export default class Game extends Phaser.Scene {
     const y = obj.y + dy;
 
     if (this.door.x == x && this.door.y == y) {
-      return this.door.state === "closed";
+      return this.door.state === "closed" || isPushed;
     }
 
     if (this.outOfBounds(x, y)) return true;

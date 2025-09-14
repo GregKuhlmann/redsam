@@ -87,7 +87,7 @@
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1776, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 1741, 0, 0, 0, 1742, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1746, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 1740, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1777, 0,
@@ -292,7 +292,16 @@
                         {
                          "name":"name",
                          "type":"string",
-                         "value":"beast"
+                         "value":"beast-left"
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-up"
                         }]
                 }, 
                 {
@@ -330,7 +339,8 @@
                          "type":"string",
                          "value":"alchemy"
                         }]
-                }, 
+                },
+            
                 {
                  "id":22,
                  "properties":[
@@ -339,8 +349,7 @@
                          "type":"string",
                          "value":"block"
                         }]
-                },
-            
+                }, 
                 {
                  "id":23,
                  "properties":[
@@ -375,6 +384,24 @@
                          "name":"name",
                          "type":"string",
                          "value":"panda-right"
+                        }]
+                }, 
+                {
+                 "id":30,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-right"
+                        }]
+                }, 
+                {
+                 "id":31,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-down"
                         }]
                 }, 
                 {
@@ -483,6 +510,43 @@
                          "name":"name",
                          "type":"string",
                          "value":"ladder-horizontal"
+                        }]
+                }, 
+                {
+                 "id":50,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-right"
+                        }]
+                },
+            
+                {
+                 "id":51,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-left"
+                        }]
+                }, 
+                {
+                 "id":52,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-up"
+                        }]
+                }, 
+                {
+                 "id":53,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-down"
                         }]
                 }],
          "tilewidth":16
