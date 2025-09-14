@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "snow1.tmj",
+    "activeFile": "snow8.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -248,7 +248,7 @@
         },
         "snow7.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
@@ -283,7 +283,7 @@
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetNature.tsx": {
-            "scaleInDock": 1.2831,
+            "scaleInDock": 2.8364,
             "scaleInEditor": 2.98
         },
         "tilesets/TilesetWater.tsx": {
@@ -301,33 +301,30 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "desert1.tmj",
-        "desert2.tmj",
-        "desert3.tmj",
-        "desert4.tmj",
-        "desert5.tmj",
-        "desert6.tmj",
-        "desert7.tmj",
-        "desert8.tmj",
-        "desert9.tmj",
-        "tilesets/TilesetItems.tsx",
-        "desert10.tmj",
-        "snow1.tmj"
+        "snow2.tmj",
+        "snow3.tmj",
+        "snow4.tmj",
+        "snow5.tmj",
+        "snow6.tmj",
+        "snow7.tmj",
+        "snow9.tmj",
+        "snow10.tmj",
+        "snow8.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "snow2.tmj",
+        "snow3.tmj",
+        "snow4.tmj",
+        "snow5.tmj",
+        "snow6.tmj",
+        "snow7.tmj",
+        "snow9.tmj",
+        "snow10.tmj",
+        "snow8.tmj",
         "desert9.tmj",
         "desert8.tmj",
-        "desert7.tmj",
-        "desert6.tmj",
-        "desert5.tmj",
-        "desert4.tmj",
-        "desert3.tmj",
-        "desert2.tmj",
-        "desert1.tmj",
-        "snow8.tmj",
-        "tilesets/TilesetItems.tsx",
-        "desert10.tmj"
+        "desert7.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
