@@ -1223,15 +1223,19 @@ export default class Game extends Phaser.Scene {
       angle: 720,
       scale: 0.1,
       ease: "Power2",
-      duration: 1000,
+      duration: 800,
       repeat: 0,
       onComplete: () => {
         enemy.sprite.setVisible(false);
+        if (enemy.x === this.sam.x && enemy.y === this.sam.y) {
+          this.die();
+        } else {
+          enemy.x = null;
+          enemy.y = null;
+          this.respawn(enemy);
+        }
       },
     });
-    enemy.x = null;
-    enemy.y = null;
-    this.respawn(enemy);
   }
 
   jettison(enemy, direction) {
