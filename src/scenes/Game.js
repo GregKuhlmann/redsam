@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow10",
+  "snow9",
   "snow1",
   "snow2",
   "snow3",
