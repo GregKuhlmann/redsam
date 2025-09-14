@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow8",
+  "snow9",
   "snow1",
   "snow2",
   "snow3",
@@ -426,7 +426,7 @@ export default class Game extends Phaser.Scene {
               sprite,
               sword,
               state: "stalking",
-              moveDuration: 300,
+              moveDuration: 275,
               dx: dir.dx,
               dy: dir.dy,
               moving: false,
@@ -1472,7 +1472,11 @@ export default class Game extends Phaser.Scene {
                   crystal.sprite.clearFX();
                 }
               });
-            } else if (this.crystalsRemaining == 3 && this.ladder) {
+            } else if (
+              ((this.crystalsRemaining == 3 && this.map != "snow9") ||
+                (this.crystalsRemaining == 1 && this.map == "snow9")) &&
+              this.ladder
+            ) {
               this.laddering = true;
               this.sound.play("glow");
               this.glowUp(this.ladder);
