@@ -1,6 +1,14 @@
 import * as Phaser from "phaser";
 
-export const MAPS = ["snow1", "snow2", "snow3", "snow4", "snow5", "snow6"];
+export const MAPS = [
+  "snow7",
+  "snow1",
+  "snow2",
+  "snow3",
+  "snow4",
+  "snow5",
+  "snow6",
+];
 
 export const MUSIC_VOLUME = 0.5;
 
@@ -602,7 +610,7 @@ export default class Game extends Phaser.Scene {
               enemy,
               enemy.x + floatDir.dx,
               enemy.y + floatDir.dy,
-              1000
+              1300
             );
           } else {
             this.sink(enemy);
