@@ -547,7 +547,6 @@ export default class Game extends Phaser.Scene {
       this.die();
     });
     this.physics.add.overlap(this.sam.sprite, this.lasers, (sam, laser) => {
-      // get size of overlap
       const overlap = getIntersectionSize(sam.getBounds(), laser.getBounds());
       if (overlap && (overlap.width > 6 || overlap.height > 6)) {
         this.die();
@@ -590,7 +589,6 @@ export default class Game extends Phaser.Scene {
   }
 
   update(_time, delta) {
-    // ...existing code...
     if (this.paused) return;
     if (this.sam.state === "dead") return;
     this.enemies.forEach((enemy, i) => {
@@ -614,7 +612,6 @@ export default class Game extends Phaser.Scene {
       }
       enemy.sprite.statued += delta;
       if (enemy.sprite.statued > 6500) {
-        // ...existing code...
         enemy.sprite.statued = null;
         //enemy.sprite.body.enable = true;
         enemy.sprite.resetPipeline();
@@ -1021,7 +1018,6 @@ export default class Game extends Phaser.Scene {
   }
 
   getPath(enemy, targetX, targetY, avoidGreen = true) {
-    // ...existing code...
     const options = [];
     for (const option of [
       { dx: enemy.dx, dy: enemy.dy, dir: "forward" },
@@ -1053,17 +1049,14 @@ export default class Game extends Phaser.Scene {
         });
       }
     }
-    // ...existing code...
     Phaser.Utils.Array.Shuffle(options);
     options.sort((a, b) => a.dist - b.dist);
     if (options.length === 0) {
-      // ...existing code...
       return;
     }
     if (options[0].dir === "backward" && options.length > 1) {
       options.shift(); // remove backward option if there are other options
     }
-    // ...existing code...
     return options[0];
   }
 
@@ -1276,6 +1269,11 @@ export default class Game extends Phaser.Scene {
   destroy(enemy) {
     this.tweens.killTweensOf(enemy.sprite);
     enemy.sprite.anims.pause();
+    if (enemy.firing) {
+      enemy.laser.setVisible(false);
+      enemy.laser.setVelocity(0, 0);
+      enemy.laser.body.enable = false;
+    }
     const smoke = this.add
       .sprite(enemy.sprite.x, enemy.sprite.y, "smoke")
       .setScale(16 / 32)
