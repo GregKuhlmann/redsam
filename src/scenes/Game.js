@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "snow9",
+  "snow10",
   "snow1",
   "snow2",
   "snow3",
@@ -268,6 +268,7 @@ export default class Game extends Phaser.Scene {
               .sprite(tile.x * 16, tile.y * 16, "cyclope")
               .setOrigin(0)
               .setDepth(10)
+              .setPushable(false)
               .play(`cyclope-${direction}-closed`);
             const laser = this.physics.add
               .image(0, 0, "laser")
