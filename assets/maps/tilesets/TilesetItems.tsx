@@ -86,6 +86,11 @@
    <property name="name" value="hammer"/>
   </properties>
  </tile>
+ <tile id="18">
+  <properties>
+   <property name="name" value="door"/>
+  </properties>
+ </tile>
  <tile id="19">
   <properties>
    <property name="name" value="door"/>
