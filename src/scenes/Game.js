@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon3",
+  "moon4",
   "desert1",
   "snow2",
   "snow3",
@@ -47,6 +47,8 @@ function crystalsToGlow(map) {
       return 2;
     case "moon2":
       return 5;
+    case "moon4":
+      return 7; // and 5
   }
 }
 
@@ -1235,7 +1237,6 @@ export default class Game extends Phaser.Scene {
   }
 
   sink(enemy) {
-    enemy.floating = false;
     enemy.sprite.statued = null;
     enemy.moving = false;
     enemy.sprite
@@ -1249,6 +1250,7 @@ export default class Game extends Phaser.Scene {
       duration: 800,
       repeat: 0,
       onComplete: () => {
+        enemy.floating = false;
         enemy.sprite.setVisible(false);
         if (enemy.x === this.sam.x && enemy.y === this.sam.y) {
           this.die();
@@ -1557,7 +1559,7 @@ export default class Game extends Phaser.Scene {
     const y = obj.y + dy;
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
     if (tile && tile.tileset && tile.tileset.name === "TilesetWater") {
-      return this.floatMap[`${x}-${y}`] != null;
+      return true;
     }
     return false;
   }
@@ -1573,6 +1575,14 @@ export default class Game extends Phaser.Scene {
     if (this.outOfBounds(x, y)) return true;
 
     if (this.ladders.some((ladder) => ladder.x == x && ladder.y == y)) {
+      return false;
+    }
+
+    if (
+      this.enemies.some(
+        (enemy) => enemy.floating && enemy.x == x && enemy.y == y
+      )
+    ) {
       return false;
     }
 
