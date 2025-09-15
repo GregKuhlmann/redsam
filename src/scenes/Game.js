@@ -1,8 +1,8 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon1",
-  "snow1",
+  "moon2",
+  "desert1",
   "snow2",
   "snow3",
   "snow4",
@@ -25,10 +25,29 @@ const DIRECTIONS = {
 
 const ROCK = 319; // Tile index for rock in LayerObstacles
 const SNOWBALL = 323; // Tile index for snowball in LayerObstacles
+const METEOR = 318; // Tile index for meteor in LayerObstacles
 const GREEN = 813; // Tile index for green grass in LayerBackground
 
 function isRock(tile) {
-  return tile && (tile.index === ROCK || tile.index === SNOWBALL);
+  return (
+    tile &&
+    (tile.index === ROCK || tile.index === SNOWBALL || tile.index === METEOR)
+  );
+}
+
+function crystalsToGlow(map) {
+  switch (map) {
+    case "desert9":
+      return 3;
+    case "desert10":
+      return 3;
+    case "snow1":
+      return 4;
+    case "snow9":
+      return 2;
+    case "moon2":
+      return 5;
+  }
 }
 
 function getIntersectionSize(rectA, rectB) {
@@ -1456,48 +1475,32 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo = Math.min(2, this.ammo + crystal.ammo);
             this.textAmmo.setFrame(this.ammo);
-            if (
-              (this.crystalsRemaining == 3 && this.hammer) ||
-              (this.crystalsRemaining === 3 && this.arrow) ||
-              (this.crystalsRemaining === 4 && this.ladder)
-            ) {
+            if (this.crystalsRemaining === crystalsToGlow(this.map)) {
               this.crystals.forEach((crystal) => {
                 if (crystal.state !== "collected") {
                   this.glowUp(crystal.sprite);
                 }
               });
             }
-            if (this.crystalsRemaining == 2 && this.hammer) {
-              this.hammering = true;
-              this.sound.play("glow");
-              this.glowUp(this.hammer);
-              this.crystals.forEach((crystal) => {
-                if (crystal.sprite) {
-                  crystal.sprite.clearFX();
-                }
-              });
-            } else if (this.crystalsRemaining == 2 && this.arrow) {
-              this.arrowing = true;
-              this.sound.play("glow");
-              this.glowUp(this.arrow);
-              this.crystals.forEach((crystal) => {
-                if (crystal.sprite) {
-                  crystal.sprite.clearFX();
-                }
-              });
-            } else if (
-              ((this.crystalsRemaining == 3 && this.map != "snow9") ||
-                (this.crystalsRemaining == 1 && this.map == "snow9")) &&
-              this.ladder
+            const item = this.hammer || this.arrow || this.ladder;
+            if (
+              item &&
+              this.crystalsRemaining === crystalsToGlow(this.map) - 1
             ) {
-              this.laddering = true;
               this.sound.play("glow");
-              this.glowUp(this.ladder);
+              this.glowUp(item);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
                   crystal.sprite.clearFX();
                 }
               });
+              if (this.hammer) {
+                this.hammering = true;
+              } else if (this.arrow) {
+                this.arrowing = true;
+              } else if (this.ladder) {
+                this.laddering = true;
+              }
             }
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");

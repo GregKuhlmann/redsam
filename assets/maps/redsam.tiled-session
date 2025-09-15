@@ -128,6 +128,29 @@
                 "y": 112.13592233009706
             }
         },
+        "desert4.json": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "desert4.json#TilesetGUI": {
+            "scaleInDock": 1
+        },
+        "desert4.json#TilesetHouse": {
+            "scaleInDock": 1
+        },
+        "desert4.json#TilesetItems": {
+            "scaleInDock": 1
+        },
+        "desert4.json#TilesetNature": {
+            "scaleInDock": 1
+        },
+        "desert4.json#TilesetWater": {
+            "scaleInDock": 1
+        },
         "desert4.tmj": {
             "scale": 2.6,
             "selectedLayer": 3,
@@ -191,11 +214,19 @@
             "scaleInDock": 1.8811
         },
         "moon1.tmj": {
-            "scale": 2.60953125,
-            "selectedLayer": 1,
+            "scale": 2.6,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 159.9904197353452,
-                "y": 111.89749116819353
+                "x": 159.8076923076923,
+                "y": 111.92307692307693
+            }
+        },
+        "moon2.tmj": {
+            "scale": 2.6,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 158.26923076923075,
+                "y": 121.53846153846152
             }
         },
         "snow1.tmj": {
@@ -322,18 +353,18 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "desert9.tmj",
+        "desert8.tmj",
+        "desert7.tmj",
+        "desert6.tmj",
+        "desert10.tmj",
+        "snow1.tmj",
+        "desert5.tmj",
+        "desert4.json",
         "tilesets/TilesetItems.tsx",
         "desert1.tmj",
         "snow2.tmj",
-        "snow3.tmj",
-        "snow4.tmj",
-        "snow5.tmj",
-        "snow6.tmj",
-        "snow8.tmj",
-        "snow10.tmj",
-        "snow9.tmj",
-        "snow7.tmj",
-        "desert9.tmj"
+        "snow3.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {
