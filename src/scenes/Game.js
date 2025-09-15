@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-export const MAPS = ["moon1", "moon2", "moon3", "moon4"];
+export const MAPS = ["moon2", "moon3", "moon4"];
 
 export const MUSIC_VOLUME = 0.5;
 
@@ -145,7 +145,7 @@ export default class Game extends Phaser.Scene {
     this.starting = true;
     this.paused = true;
     this.tool = null;
-    this.tools = TOOLS[this.map] || [];
+    this.tools = [...(TOOLS[this.map] || [])];
     this.floatMap = {};
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
