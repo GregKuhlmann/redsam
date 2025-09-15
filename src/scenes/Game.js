@@ -1,18 +1,6 @@
 import * as Phaser from "phaser";
 
-export const MAPS = [
-  "moon4",
-  "desert1",
-  "snow2",
-  "snow3",
-  "snow4",
-  "snow5",
-  "snow6",
-  "snow7",
-  "snow8",
-  "snow9",
-  "snow10",
-];
+export const MAPS = ["moon1", "moon2", "moon3", "moon4"];
 
 export const MUSIC_VOLUME = 0.5;
 
@@ -28,28 +16,27 @@ const SNOWBALL = 323; // Tile index for snowball in LayerObstacles
 const METEOR = 318; // Tile index for meteor in LayerObstacles
 const GREEN = 813; // Tile index for green grass in LayerBackground
 
+const ARROW = 1774; // Tile index for arrow in LayerItems
+const HAMMER = 1756; // Tile index for hammer in LayerItems
+const LADDER = 1788; // Tile index for ladder in LayerItems
+
+const TOOLS = {
+  desert9: [{ index: HAMMER, crystalsRemaining: 2 }],
+  desert10: [{ index: ARROW, crystalsRemaining: 2 }],
+  snow1: [{ index: LADDER, crystalsRemaining: 3 }],
+  snow9: [{ index: LADDER, crystalsRemaining: 2 }],
+  moon2: [{ index: ARROW, crystalsRemaining: 4 }],
+  moon4: [
+    { index: LADDER, crystalsRemaining: 6 },
+    { index: LADDER, crystalsRemaining: 4 },
+  ],
+};
+
 function isRock(tile) {
   return (
     tile &&
     (tile.index === ROCK || tile.index === SNOWBALL || tile.index === METEOR)
   );
-}
-
-function crystalsToGlow(map) {
-  switch (map) {
-    case "desert9":
-      return 3;
-    case "desert10":
-      return 3;
-    case "snow1":
-      return 4;
-    case "snow9":
-      return 2;
-    case "moon2":
-      return 5;
-    case "moon4":
-      return 7; // and 5
-  }
 }
 
 function getIntersectionSize(rectA, rectB) {
@@ -157,12 +144,8 @@ export default class Game extends Phaser.Scene {
     this.absorbers = this.physics.add.group();
     this.starting = true;
     this.paused = true;
-    this.hammering = false;
-    this.hammer = null;
-    this.arrowing = false;
-    this.arrow = null;
-    this.laddering = false;
-    this.ladder = null;
+    this.tool = null;
+    this.tools = TOOLS[this.map] || [];
     this.floatMap = {};
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
@@ -182,6 +165,7 @@ export default class Game extends Phaser.Scene {
     // iterate over the key, value pairs in the tilesetItems.tileProperties
     this.level.getLayer("LayerItems").data.forEach((row) => {
       row.forEach((tile) => {
+        if (tile.x === 18) return; // skip right UI column
         if (tile.index !== -1) {
           const name = tilesetItems.getTileProperties(tile.index)?.name;
           if (!name) {
@@ -219,16 +203,12 @@ export default class Game extends Phaser.Scene {
               .setOrigin(0)
               .setDepth(0)
               .play(`arrow-${direction}`);
-            if (tile.x === 18) {
-              this.arrow = sprite;
-            } else {
-              this.arrows.push({
-                x: tile.x,
-                y: tile.y,
-                sprite,
-                direction,
-              });
-            }
+            this.arrows.push({
+              x: tile.x,
+              y: tile.y,
+              sprite,
+              direction,
+            });
           } else if (name === "chest") {
             const sprite = this.add
               .sprite(tile.x * 16, tile.y * 16, "chest")
@@ -477,18 +457,6 @@ export default class Game extends Phaser.Scene {
               this.scene.pause();
               this.scene.launch("Help");
             });
-          } else if (name === "hammer") {
-            this.hammer = this.add
-              .sprite(tile.x * 16, tile.y * 16, "items")
-              .setFrame(tile.index - tilesetItems.firstgid)
-              .setOrigin(0)
-              .setDepth(0);
-          } else if (name === "ladder") {
-            this.ladder = this.add
-              .sprite(tile.x * 16, tile.y * 16, "items")
-              .setFrame(tile.index - tilesetItems.firstgid)
-              .setOrigin(0)
-              .setDepth(0);
           } else if (name === "block") {
             const sprite = this.physics.add
               .sprite(tile.x * 16, tile.y * 16, "items")
@@ -509,6 +477,17 @@ export default class Game extends Phaser.Scene {
         }
       });
     });
+
+    // tools
+    for (let i = 0; i < this.tools.length; i++) {
+      const index = this.tools[i].index;
+      const sprite = this.add
+        .sprite(18 * 16, (i + 9) * 16, "items")
+        .setFrame(index - tilesetItems.firstgid)
+        .setOrigin(0)
+        .setDepth(0);
+      this.tools[i].sprite = sprite;
+    }
 
     this.enemies = [
       ...this.dragons,
@@ -608,9 +587,9 @@ export default class Game extends Phaser.Scene {
 
     this.input.keyboard.on("keydown-SPACE", () => {
       if (this.paused) return;
-      (this.arrowing && this.arrowIt()) ||
-        (this.hammering && this.hammerIt()) ||
-        (this.laddering && this.ladderIt()) ||
+      (this.tool?.index === ARROW && this.arrowIt()) ||
+        (this.tool?.index === HAMMER && this.hammerIt()) ||
+        (this.tool?.index === LADDER && this.ladderIt()) ||
         this.shoot();
     });
     this.input.keyboard.on("keydown-H", () => {
@@ -1144,8 +1123,8 @@ export default class Game extends Phaser.Scene {
       tile.index = -1;
       tile.setCollision(false);
       tile.setVisible(false);
-      this.hammering = false;
-      this.hammer.setVisible(false);
+      this.tool.sprite.setVisible(false);
+      this.tool = null;
       this.sound.play("hammer");
       return true;
     }
@@ -1166,8 +1145,8 @@ export default class Game extends Phaser.Scene {
       }[arrow.direction];
       arrow.sprite.play(`arrow-${arrow.direction}`);
       arrowed = true;
-      this.arrowing = false;
-      this.arrow.setVisible(false);
+      this.tool.sprite.setVisible(false);
+      this.tool = null;
       this.sound.play("arrow");
     });
     return arrowed;
@@ -1194,8 +1173,8 @@ export default class Game extends Phaser.Scene {
         sprite,
         orientation,
       });
-      this.laddering = false;
-      this.ladder.setVisible(false);
+      this.tool.sprite.setVisible(false);
+      this.tool = null;
       this.sound.play("arrow");
       return true;
     }
@@ -1477,32 +1456,25 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo += crystal.ammo;
             this.textAmmo.setFrame(this.ammo);
-            if (this.crystalsRemaining === crystalsToGlow(this.map)) {
+            const tool = this.tools[0] ?? null;
+            if (tool && this.crystalsRemaining === tool.crystalsRemaining + 1) {
               this.crystals.forEach((crystal) => {
                 if (crystal.state !== "collected") {
                   this.glowUp(crystal.sprite);
                 }
               });
-            }
-            const item = this.hammer || this.arrow || this.ladder;
-            if (
-              item &&
-              this.crystalsRemaining === crystalsToGlow(this.map) - 1
+            } else if (
+              tool &&
+              this.crystalsRemaining === tool.crystalsRemaining
             ) {
               this.sound.play("glow");
-              this.glowUp(item);
+              this.glowUp(tool.sprite);
               this.crystals.forEach((crystal) => {
                 if (crystal.sprite) {
                   crystal.sprite.clearFX();
                 }
               });
-              if (this.hammer) {
-                this.hammering = true;
-              } else if (this.arrow) {
-                this.arrowing = true;
-              } else if (this.ladder) {
-                this.laddering = true;
-              }
+              this.tool = this.tools.shift();
             }
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
