@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon2",
+  "moon3",
   "desert1",
   "snow2",
   "snow3",
@@ -1473,7 +1473,7 @@ export default class Game extends Phaser.Scene {
             crystal.sprite.destroy();
             crystal.spark.destroy();
             this.crystalsRemaining--;
-            this.ammo = Math.min(2, this.ammo + crystal.ammo);
+            this.ammo += crystal.ammo;
             this.textAmmo.setFrame(this.ammo);
             if (this.crystalsRemaining === crystalsToGlow(this.map)) {
               this.crystals.forEach((crystal) => {
