@@ -1,6 +1,14 @@
 import * as Phaser from "phaser";
 
-export const MAPS = ["moon6", "moon1", "moon2", "moon3", "moon4", "moon5"];
+export const MAPS = [
+  "moon7",
+  "moon1",
+  "moon2",
+  "moon3",
+  "moon4",
+  "moon5",
+  "moon6",
+];
 
 export const MUSIC_VOLUME = 0.5;
 
