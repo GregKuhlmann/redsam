@@ -32,7 +32,8 @@ export const MAPS = [
   // "moon9",
   // "moon10",
   // "ice1",
-  "ice2",
+  // "ice2",
+  "ice3",
 ];
 
 export const MUSIC_VOLUME = 0.5;

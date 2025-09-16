@@ -246,8 +246,24 @@
             }
         },
         "ice1.tmj": {
+            "scale": 3.019,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 160.8148393507784,
+                "y": 38.42331897979463
+            }
+        },
+        "ice2.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "ice3.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
