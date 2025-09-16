@@ -1,7 +1,8 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon8",
+  "moon9",
+  "snow2",
   "moon1",
   "moon2",
   "moon3",
@@ -38,6 +39,7 @@ const TOOLS = {
     { index: LADDER, crystalsRemaining: 6 },
     { index: LADDER, crystalsRemaining: 4 },
   ],
+  moon9: [{ index: LADDER, crystalsRemaining: 1 }],
 };
 
 function isRock(tile) {
