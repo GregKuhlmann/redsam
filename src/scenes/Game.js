@@ -1,6 +1,6 @@
 import * as Phaser from "phaser";
 
-export const MAPS = ["moon1", "moon2", "moon3", "moon4", "moon5"];
+export const MAPS = ["moon6", "moon1", "moon2", "moon3", "moon4", "moon5"];
 
 export const MUSIC_VOLUME = 0.5;
 
@@ -875,7 +875,7 @@ export default class Game extends Phaser.Scene {
     }
     const box = { x: octopus.x, y: octopus.y };
     while (box.x !== this.sam.x || box.y !== this.sam.y) {
-      if (this.collides(box, dx, dy, false, true)) {
+      if (this.collides(box, dx, dy, true, true)) {
         return;
       }
       box.x += dx;
