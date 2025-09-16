@@ -1,15 +1,36 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon10",
-  "moon9",
+  "desert1",
+  "desert2",
+  "desert3",
+  "desert4",
+  "desert5",
+  "desert6",
+  "desert7",
+  "desert8",
+  "desert9",
+  "desert10",
+  "snow1",
   "snow2",
+  "snow3",
+  "snow4",
+  "snow5",
+  "snow6",
+  "snow7",
+  "snow8",
+  "snow9",
+  "snow10",
   "moon1",
   "moon2",
   "moon3",
   "moon4",
   "moon5",
   "moon6",
+  "moon7",
+  "moon8",
+  "moon9",
+  "moon10",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -158,6 +179,9 @@ export default class Game extends Phaser.Scene {
     this.tool = null;
     this.tools = [...(TOOLS[this.map] || [])];
     this.floatMap = {};
+    this.floater = null;
+    this.docked = false;
+    this.dockWait = 0;
 
     // iterate over tiles in LayerObstacles and set collision for grass tiles
     this.level.getLayer("LayerObstacles").data.forEach((row) => {
@@ -552,7 +576,7 @@ export default class Game extends Phaser.Scene {
       this.trexBoxes,
       (samSprite, trexBox) => {
         const trex = this.trexs.find((t) => t.sprite === trexBox);
-        if (trex && !trex.floating && !trex.destroyed) {
+        if (trex && !trex.sprite.statued && !trex.destroyed) {
           this.die();
         }
       }
@@ -621,16 +645,13 @@ export default class Game extends Phaser.Scene {
     this.enemies.forEach((enemy, i) => {
       if (enemy.destroyed) return;
       if (enemy.sprite.statued == null) return;
-      if (enemy.floating) {
-        if (!enemy.moving && !enemy.docking) {
+      if (this.floater === enemy) {
+        if (this.dockWait > 0) {
+          this.dockWait -= delta;
+        } else if (!enemy.moving) {
           const floatDir = this.floatMap[`${enemy.x}-${enemy.y}`];
           if (floatDir) {
-            this.moveEnemy(
-              enemy,
-              enemy.x + floatDir.dx,
-              enemy.y + floatDir.dy,
-              1300
-            );
+            this.moveFloater(floatDir.dx, floatDir.dy);
           } else {
             this.sink(enemy);
           }
@@ -861,6 +882,9 @@ export default class Game extends Phaser.Scene {
     } else if (!this.sam.moving) {
       this.sam.sprite.play(`sam-idle-${this.sam.direction}`);
     }
+    if (!this.sam.moving) {
+      this.dockWait = 0;
+    }
   }
 
   stun(octopus) {
@@ -1012,7 +1036,7 @@ export default class Game extends Phaser.Scene {
     return Math.abs(x1 - x2) + Math.abs(y1 - y2);
   }
 
-  moveEnemy(enemy, targetX, targetY, moveDuration = null) {
+  moveEnemy(enemy, targetX, targetY) {
     enemy.moving = true;
     enemy.dx = targetX - enemy.x;
     enemy.dy = targetY - enemy.y;
@@ -1022,16 +1046,37 @@ export default class Game extends Phaser.Scene {
       targets: enemy.sprite,
       x: targetX * 16,
       y: targetY * 16,
-      duration: moveDuration || enemy.moveDuration,
+      duration: enemy.moveDuration,
+      onComplete: () => {
+        enemy.moving = false;
+      },
+    });
+  }
+
+  moveFloater(dx, dy) {
+    this.floater.moving = true;
+    this.floater.dx = dx;
+    this.floater.dy = dy;
+    this.floater.x += dx;
+    this.floater.y += dy;
+    this.tweens.add({
+      targets: this.floater.sprite,
+      x: this.floater.x * 16,
+      y: this.floater.y * 16,
+      duration: 1200,
       onUpdate: () => {
-        if (enemy.docked) {
-          this.sam.x = enemy.x;
-          this.sam.y = enemy.y;
-          this.sam.sprite.setPosition(enemy.sprite.x, enemy.sprite.y);
+        if (this.docked) {
+          this.sam.sprite.x = this.floater.sprite.x;
+          this.sam.sprite.y = this.floater.sprite.y;
+          this.sam.x = this.floater.x;
+          this.sam.y = this.floater.y;
         }
       },
       onComplete: () => {
-        enemy.moving = false;
+        this.floater.moving = false;
+        if (this.docked) {
+          this.dockWait = 1000; // wait 1 second before next move
+        }
       },
     });
   }
@@ -1240,7 +1285,7 @@ export default class Game extends Phaser.Scene {
       duration: 800,
       repeat: 0,
       onComplete: () => {
-        enemy.floating = false;
+        this.floater = null;
         enemy.sprite.setVisible(false);
         if (enemy.x === this.sam.x && enemy.y === this.sam.y) {
           this.die();
@@ -1283,6 +1328,7 @@ export default class Game extends Phaser.Scene {
         .setOrigin(0)
         .setAngle(0)
         .setScale(1)
+        .setDepth(10)
         .setPipeline("Shadow")
         .setVisible(true);
       this.time.delayedCall(1000, () => {
@@ -1333,34 +1379,19 @@ export default class Game extends Phaser.Scene {
     this.sam.direction = direction;
     this.sam.sprite.play(`sam-walk-${direction}`, true);
 
+    if (this.docked && this.floater && this.floater.moving) return;
+
     const pushed = this.pushable(dx, dy);
+    if (pushed && this.intoWater(pushed, dx, dy) && this.floater) return; // can't push into water if already on floater
     if (
       pushed &&
       !this.intoWater(pushed, dx, dy) &&
       this.collides(pushed, dx, dy, true)
     )
       return;
-    const floater = this.enemies.find(
-      (enemy) =>
-        enemy.sprite.x === this.sam.sprite.x + dx * 16 &&
-        enemy.sprite.y === this.sam.sprite.y + dy * 16 &&
-        enemy.floating &&
-        !enemy.destroyed
-    );
-    if (!pushed && floater) {
-      floater.moving = false;
-      floater.docking = true;
-      this.tweens.killTweensOf(floater.sprite);
-      floater.x = this.sam.x + dx;
-      floater.y = this.sam.y + dy;
-    } else if (!pushed && this.collides(this.sam, dx, dy)) return;
 
-    // sam is moving, so if docked, detach from docker
-    if (this.sam.docker) {
-      if (this.sam.sprite.x % 16 !== 0 || this.sam.sprite.y % 16 !== 0) return;
-      this.sam.docker.docked = false;
-      this.sam.docker = null;
-    }
+    const dockable = this.dockable(dx, dy);
+    if (!pushed && !dockable && this.collides(this.sam, dx, dy)) return;
 
     this.sam.moving = true;
     this.sound.play("step");
@@ -1369,9 +1400,11 @@ export default class Game extends Phaser.Scene {
     if (pushed) {
       if (this.intoWater(pushed, dx, dy)) {
         this.freeze(pushed.sprite);
-        pushed.floating = true;
-        pushed.moving = true;
+        pushed.sprite.setDepth(0);
+        this.floater = pushed;
+        this.dockWait = 1000; // wait 1 second before moving
       }
+      pushed.moving = true;
       pushed.x += dx;
       pushed.y += dy;
     }
@@ -1397,14 +1430,12 @@ export default class Game extends Phaser.Scene {
       },
       onComplete: () => {
         this.sam.moving = false;
+        if (this.docked != dockable) {
+          this.dockWait = 1000;
+        }
+        this.docked = dockable;
         if (pushed) {
           pushed.moving = false;
-        }
-        const docker = this.enemies.find((enemy) => enemy.docking);
-        if (docker) {
-          docker.docking = false;
-          docker.docked = true;
-          this.sam.docker = docker;
         }
         if (this.door.x == this.sam.x && this.door.y == this.sam.y) {
           //this.sam.moving = true;
@@ -1506,11 +1537,25 @@ export default class Game extends Phaser.Scene {
     return x < 4 || x > 14 || y < 2 || y > 12;
   }
 
+  dockable(dx, dy) {
+    const targetX = this.sam.x + dx;
+    const targetY = this.sam.y + dy;
+
+    return !!(
+      this.floater &&
+      this.floater.x === targetX &&
+      this.floater.y === targetY &&
+      Math.abs(this.floater.sprite.x - targetX * 16) +
+        Math.abs(this.floater.sprite.y - targetY * 16) <
+        3
+    );
+  }
+
   pushable(dx, dy) {
     const targetX = this.sam.x + dx;
     const targetY = this.sam.y + dy;
 
-    if (this.outOfBounds(targetX, targetY)) return false;
+    if (this.outOfBounds(targetX, targetY)) return null;
 
     const block = this.blocks.find(
       (block) => block.x === targetX && block.y === targetY
@@ -1522,7 +1567,7 @@ export default class Game extends Phaser.Scene {
         enemy.x === targetX &&
         enemy.y === targetY &&
         enemy.sprite.statued &&
-        !enemy.floating &&
+        (!this.floater || enemy !== this.floater) &&
         !enemy.destroyed
     );
     if (enemy) return enemy;
@@ -1561,14 +1606,6 @@ export default class Game extends Phaser.Scene {
       return false;
     }
 
-    if (
-      this.enemies.some(
-        (enemy) => enemy.floating && enemy.x == x && enemy.y == y
-      )
-    ) {
-      return false;
-    }
-
     let tile = this.level.getTileAt(x, y, true, "LayerObstacles");
     if (tile && tile.index !== -1 && !(rockOnly && !isRock(tile))) {
       return true;
@@ -1591,7 +1628,11 @@ export default class Game extends Phaser.Scene {
 
     if (
       this.enemies.some(
-        (enemy) => enemy.x == x && enemy.y == y && !enemy.destroyed
+        (enemy) =>
+          enemy.x == x &&
+          enemy.y == y &&
+          !enemy.destroyed &&
+          (!this.floater || enemy !== this.floater)
       )
     ) {
       return true;
