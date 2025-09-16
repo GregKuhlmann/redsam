@@ -33,7 +33,7 @@ import moon7 from "/assets/maps/moon7.json";
 import moon8 from "/assets/maps/moon8.json";
 import moon9 from "/assets/maps/moon9.json";
 import moon10 from "/assets/maps/moon10.json";
-
+import ice1 from "/assets/maps/ice1.json";
 import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
 import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
@@ -143,6 +143,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("moon8", moon8);
     this.load.tilemapTiledJSON("moon9", moon9);
     this.load.tilemapTiledJSON("moon10", moon10);
+    this.load.tilemapTiledJSON("ice1", ice1);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -254,7 +255,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      //this.scene.start("Game");
+      this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;

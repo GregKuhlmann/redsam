@@ -27,7 +27,6 @@ export const MAPS = [
   // "moon4",
   // "moon5",
   // "moon6",
-  "moon7",
   "moon8",
   "moon9",
   "moon10",
@@ -804,8 +803,8 @@ export default class Game extends Phaser.Scene {
       if (slime.sprite.statued || slime.destroyed) return;
       if (slime.state === "pursuing" && !slime.moving) {
         if (
-          Math.abs(slime.x - this.sam.x) <= 1 &&
-          Math.abs(slime.y - this.sam.y) <= 1 // include diagonal movement
+          Math.abs(slime.x - this.sam.x) + Math.abs(slime.y - this.sam.y) <=
+          1
         ) {
           this.sound.play("freeze");
           slime.state = "frozen";
