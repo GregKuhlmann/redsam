@@ -79,6 +79,29 @@
                 "y": 109.67741935483872
             }
         },
+        "desert10.json": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "desert10.json#TilesetGUI": {
+            "scaleInDock": 1
+        },
+        "desert10.json#TilesetHouse": {
+            "scaleInDock": 1
+        },
+        "desert10.json#TilesetItems": {
+            "scaleInDock": 1
+        },
+        "desert10.json#TilesetNature": {
+            "scaleInDock": 1
+        },
+        "desert10.json#TilesetWater": {
+            "scaleInDock": 1
+        },
         "desert10.tmj": {
             "scale": 1.86,
             "selectedLayer": 3,
@@ -292,6 +315,14 @@
                 "y": 111.89749116819353
             }
         },
+        "moon8.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
         "snow1.tmj": {
             "scale": 2.44,
             "selectedLayer": 3,
@@ -412,6 +443,8 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "desert10.tmj",
+        "desert10.json",
         "moon1.tmj",
         "moon2.tmj",
         "moon3.tmj",
@@ -421,9 +454,7 @@
         "snow8.tmj",
         "snow10.tmj",
         "snow9.tmj",
-        "snow7.tmj",
-        "snow6.tmj",
-        "snow5.tmj"
+        "snow7.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

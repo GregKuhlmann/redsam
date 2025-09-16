@@ -1,7 +1,7 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  "moon7",
+  "moon8",
   "moon1",
   "moon2",
   "moon3",
@@ -790,7 +790,7 @@ export default class Game extends Phaser.Scene {
           slime.sprite.play("slime-frozen");
           return;
         }
-        const path = this.getPath(slime, this.sam.x, this.sam.y);
+        const path = this.getPath(slime, this.sam.x, this.sam.y, true);
         if (path && (path.x !== this.sam.x || path.y !== this.sam.y)) {
           this.moveEnemy(slime, path.x, path.y);
         }
