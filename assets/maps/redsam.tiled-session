@@ -293,6 +293,22 @@
                 "y": 111.89749116819353
             }
         },
+        "ice7.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "ice8.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
         "level1.json": {
             "scale": 2.21,
             "selectedLayer": 2,
