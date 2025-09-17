@@ -35,7 +35,8 @@ export const MAPS = [
   // "ice2",
   // "ice3",
   // "ice4",
-  "ice5",
+  // "ice5",
+  "ice6",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -75,6 +76,7 @@ const TOOLS = {
     { index: ARROW, crystalsRemaining: 5 },
     { index: ARROW, crystalsRemaining: 2 },
   ],
+  ice6: [{ index: HAMMER, crystalsRemaining: 0 }],
 };
 
 function isRock(tile) {

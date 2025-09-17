@@ -38,6 +38,7 @@ import ice2 from "/assets/maps/ice2.json";
 import ice3 from "/assets/maps/ice3.json";
 import ice4 from "/assets/maps/ice4.json";
 import ice5 from "/assets/maps/ice5.json";
+import ice6 from "/assets/maps/ice6.json";
 import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
 import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
@@ -152,6 +153,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("ice3", ice3);
     this.load.tilemapTiledJSON("ice4", ice4);
     this.load.tilemapTiledJSON("ice5", ice5);
+    this.load.tilemapTiledJSON("ice6", ice6);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
