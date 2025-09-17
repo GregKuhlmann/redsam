@@ -33,7 +33,8 @@ export const MAPS = [
   // "moon10",
   // "ice1",
   // "ice2",
-  "ice3",
+  // "ice3",
+  "ice4",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -65,6 +66,10 @@ const TOOLS = {
     { index: LADDER, crystalsRemaining: 4 },
   ],
   moon9: [{ index: LADDER, crystalsRemaining: 1 }],
+  ice4: [
+    { index: ARROW, crystalsRemaining: 7 },
+    { index: ARROW, crystalsRemaining: 6 },
+  ],
 };
 
 function isRock(tile) {
@@ -179,8 +184,8 @@ export default class Game extends Phaser.Scene {
     this.absorbers = this.physics.add.group();
     this.starting = true;
     this.paused = true;
-    this.tool = null;
     this.tools = [...(TOOLS[this.map] || [])];
+    this.tool = this.tools[0] ?? null;
     this.floatMap = {};
     this.floater = null;
     this.docked = false;
@@ -525,6 +530,7 @@ export default class Game extends Phaser.Scene {
         .setOrigin(0)
         .setDepth(0);
       this.tools[i].sprite = sprite;
+      this.tools[i].active = false;
     }
 
     this.enemies = [
@@ -625,9 +631,9 @@ export default class Game extends Phaser.Scene {
 
     this.input.keyboard.on("keydown-SPACE", () => {
       if (this.paused) return;
-      (this.tool?.index === ARROW && this.arrowIt()) ||
-        (this.tool?.index === HAMMER && this.hammerIt()) ||
-        (this.tool?.index === LADDER && this.ladderIt()) ||
+      (this.tool?.index === ARROW && this.tool?.active && this.arrowIt()) ||
+        (this.tool?.index === HAMMER && this.tool?.active && this.hammerIt()) ||
+        (this.tool?.index === LADDER && this.tool?.active && this.ladderIt()) ||
         this.shoot();
     });
     this.input.keyboard.on("keydown-H", () => {
@@ -1166,7 +1172,6 @@ export default class Game extends Phaser.Scene {
         glow.color = hex;
       },
     });
-    return glow;
   }
 
   hammerIt() {
@@ -1182,8 +1187,9 @@ export default class Game extends Phaser.Scene {
       tile.index = -1;
       tile.setCollision(false);
       tile.setVisible(false);
+      this.tools.shift();
       this.tool.sprite.setVisible(false);
-      this.tool = null;
+      this.tool = this.tools[0] ?? null;
       this.sound.play("hammer");
       return true;
     }
@@ -1204,8 +1210,9 @@ export default class Game extends Phaser.Scene {
       }[arrow.direction];
       arrow.sprite.play(`arrow-${arrow.direction}`);
       arrowed = true;
+      this.tools.shift();
       this.tool.sprite.setVisible(false);
-      this.tool = null;
+      this.tool = this.tools[0] ?? null;
       this.sound.play("arrow");
     });
     return arrowed;
@@ -1232,8 +1239,9 @@ export default class Game extends Phaser.Scene {
         sprite,
         orientation,
       });
+      this.tools.shift();
       this.tool.sprite.setVisible(false);
-      this.tool = null;
+      this.tool = this.tools[0] ?? null;
       this.sound.play("arrow");
       return true;
     }
@@ -1501,26 +1509,24 @@ export default class Game extends Phaser.Scene {
             this.crystalsRemaining--;
             this.ammo += crystal.ammo;
             this.textAmmo.setFrame(this.ammo);
-            const tool = this.tools[0] ?? null;
-            if (tool && this.crystalsRemaining === tool.crystalsRemaining + 1) {
-              this.crystals.forEach((crystal) => {
-                if (crystal.state !== "collected") {
-                  this.glowUp(crystal.sprite);
-                }
-              });
-            } else if (
-              tool &&
-              this.crystalsRemaining === tool.crystalsRemaining
-            ) {
-              this.sound.play("glow");
-              this.glowUp(tool.sprite);
-              this.crystals.forEach((crystal) => {
-                if (crystal.sprite) {
-                  crystal.sprite.clearFX();
-                }
-              });
-              this.tool = this.tools.shift();
+            let staging = false;
+            for (let i = 0; i < this.tools.length; i++) {
+              const tool = this.tools[i];
+              if (this.crystalsRemaining === tool.crystalsRemaining + 1) {
+                staging = true;
+              } else if (this.crystalsRemaining === tool.crystalsRemaining) {
+                tool.active = true;
+                this.sound.play("glow");
+                this.glowUp(tool.sprite);
+              }
             }
+            this.crystals.forEach((crystal) => {
+              if (crystal.state === "collected") return;
+              crystal.sprite.clearFX();
+              if (staging) {
+                this.glowUp(crystal.sprite);
+              }
+            });
             if (this.crystalsRemaining == 0) {
               this.sound.play("chestOpen");
               this.chest.state = "sparkling";
