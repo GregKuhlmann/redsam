@@ -1,6 +1,5 @@
 # Red Sam
 
-- Add help button back
 - Don't let lightning go through chest? moon6
 - Add tile type that slows sam down (quicksand)
 - Gamepad support - https://github.com/GaryStanton/phaser3-merged-input

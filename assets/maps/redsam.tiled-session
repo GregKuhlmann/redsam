@@ -539,9 +539,9 @@
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "tilesets/TilesetItems.tsx",
         "moon10-backup.tmj",
         "snow2.tmj",
-        "tilesets/TilesetItems.tsx",
         "desert10.tmj",
         "desert10.json",
         "moon1.tmj",
