@@ -292,7 +292,16 @@
                         {
                          "name":"name",
                          "type":"string",
-                         "value":"beast"
+                         "value":"beast-left"
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-up"
                         }]
                 }, 
                 {
@@ -302,6 +311,15 @@
                          "name":"name",
                          "type":"string",
                          "value":"hammer"
+                        }]
+                }, 
+                {
+                 "id":18,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"door"
                         }]
                 }, 
                 {
@@ -321,7 +339,8 @@
                          "type":"string",
                          "value":"crystal-1"
                         }]
-                }, 
+                },
+            
                 {
                  "id":21,
                  "properties":[
@@ -339,8 +358,7 @@
                          "type":"string",
                          "value":"block"
                         }]
-                },
-            
+                }, 
                 {
                  "id":23,
                  "properties":[
@@ -375,6 +393,24 @@
                          "name":"name",
                          "type":"string",
                          "value":"panda-right"
+                        }]
+                }, 
+                {
+                 "id":30,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-right"
+                        }]
+                }, 
+                {
+                 "id":31,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-down"
                         }]
                 }, 
                 {
@@ -483,6 +519,43 @@
                          "name":"name",
                          "type":"string",
                          "value":"ladder-horizontal"
+                        }]
+                },
+            
+                {
+                 "id":50,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-right"
+                        }]
+                }, 
+                {
+                 "id":51,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-left"
+                        }]
+                }, 
+                {
+                 "id":52,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-up"
+                        }]
+                }, 
+                {
+                 "id":53,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-down"
                         }]
                 }],
          "tilewidth":16
