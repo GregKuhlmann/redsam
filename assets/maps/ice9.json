@@ -1,0 +1,580 @@
+{ "compressionlevel":-1,
+ "height":14,
+ "infinite":false,
+ "layers":[
+        {
+         "data":[547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546,
+            547, 547, 579, 520, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 518, 519, 519, 519, 580,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 548, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 658, 546, 547, 547, 547, 547,
+            547, 547, 547, 579, 519, 519, 519, 519, 519, 519, 519, 519, 519, 519, 519, 580, 547, 547, 547, 547],
+         "height":14,
+         "id":1,
+         "name":"LayerBackground",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 1682, 1615, 1682, 1615, 1682, 1616, 1383, 1384, 1385, 321, 0, 0, 322, 0, 0,
+            0, 0, 0, 0, 0, 1715, 1648, 1715, 1648, 1715, 1649, 1416, 1417, 1418, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2009, 2013, 2010,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2006, 2023, 2004,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2017, 1997, 2018],
+         "height":14,
+         "id":3,
+         "name":"LayerDecorations",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 1386, 1324, 0, 0, 0, 0, 0, 0, 1354, 1355, 1356, 1320, 1390, 0, 0, 0, 0,
+            0, 0, 0, 0, 1386, 1321, 1321, 1321, 1321, 1321, 1321, 1387, 1388, 1389, 1390, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 323, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 323, 323, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 323, 0, 0, 0, 323, 0, 0, 0, 0, 1741, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1761, 0,
+            0, 0, 0, 0, 323, 0, 323, 0, 0, 0, 0, 0, 323, 0, 323, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 323, 0, 0, 0, 323, 0, 0, 0, 323, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 323, 323, 0, 0, 0, 0, 0, 323, 323, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 323, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":14,
+         "id":2,
+         "name":"LayerObstacles",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "data":[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1759, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1762, 1762, 1762, 0, 1773, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 1762, 0, 0, 0, 0, 0, 1752, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1744, 1773, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 1775, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 1775, 0, 1744, 0, 1753, 0, 1744, 0, 1774, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1774, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 1772, 1744, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 1741, 0, 0, 0, 1740, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 1772, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1777, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+         "height":14,
+         "id":6,
+         "name":"LayerItems",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":20,
+         "x":0,
+         "y":0
+        }],
+ "nextlayerid":7,
+ "nextobjectid":1,
+ "orientation":"orthogonal",
+ "renderorder":"right-down",
+ "tiledversion":"1.11.2",
+ "tileheight":16,
+ "tilesets":[
+        {
+         "columns":24,
+         "firstgid":1,
+         "image":"tilesets\/TilesetNature.png",
+         "imageheight":336,
+         "imagewidth":384,
+         "margin":0,
+         "name":"TilesetNature",
+         "spacing":0,
+         "tilecount":504,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":28,
+         "firstgid":505,
+         "image":"tilesets\/TilesetWater.png",
+         "imageheight":272,
+         "imagewidth":448,
+         "margin":0,
+         "name":"TilesetWater",
+         "spacing":0,
+         "tilecount":476,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":33,
+         "firstgid":981,
+         "image":"tilesets\/TilesetHouse.png",
+         "imageheight":368,
+         "imagewidth":528,
+         "margin":0,
+         "name":"TilesetHouse",
+         "spacing":0,
+         "tilecount":759,
+         "tileheight":16,
+         "tilewidth":16
+        }, 
+        {
+         "columns":16,
+         "firstgid":1740,
+         "image":"tilesets\/TilesetItems.png",
+         "imageheight":256,
+         "imagewidth":256,
+         "margin":0,
+         "name":"TilesetItems",
+         "spacing":0,
+         "tilecount":256,
+         "tileheight":16,
+         "tiles":[
+                {
+                 "id":0,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"chest"
+                        }]
+                }, 
+                {
+                 "id":1,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"sam"
+                        }]
+                }, 
+                {
+                 "id":2,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"dragon"
+                        }]
+                }, 
+                {
+                 "id":3,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"door"
+                        }]
+                }, 
+                {
+                 "id":4,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"crystal-0"
+                        }]
+                }, 
+                {
+                 "id":5,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"shuriken"
+                        }]
+                }, 
+                {
+                 "id":6,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"block"
+                        }]
+                }, 
+                {
+                 "id":7,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"cyclope-down"
+                        }]
+                }, 
+                {
+                 "id":8,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"cyclope-up"
+                        }]
+                }, 
+                {
+                 "id":9,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"cyclope-left"
+                        }]
+                }, 
+                {
+                 "id":10,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"cyclope-right"
+                        }]
+                }, 
+                {
+                 "id":11,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"slime"
+                        }]
+                }, 
+                {
+                 "id":12,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"flam"
+                        }]
+                }, 
+                {
+                 "id":13,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"octopus"
+                        }]
+                }, 
+                {
+                 "id":14,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-left"
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-up"
+                        }]
+                }, 
+                {
+                 "id":16,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"hammer"
+                        }]
+                }, 
+                {
+                 "id":18,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"door"
+                        }]
+                }, 
+                {
+                 "id":19,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"door"
+                        }]
+                }, 
+                {
+                 "id":20,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"crystal-1"
+                        }]
+                },
+            
+                {
+                 "id":21,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"alchemy"
+                        }]
+                }, 
+                {
+                 "id":22,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"block"
+                        }]
+                }, 
+                {
+                 "id":23,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"panda-down"
+                        }]
+                }, 
+                {
+                 "id":24,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"panda-up"
+                        }]
+                }, 
+                {
+                 "id":25,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"panda-left"
+                        }]
+                }, 
+                {
+                 "id":26,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"panda-right"
+                        }]
+                }, 
+                {
+                 "id":30,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-right"
+                        }]
+                }, 
+                {
+                 "id":31,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"beast-down"
+                        }]
+                }, 
+                {
+                 "id":32,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"arrow-right"
+                        }]
+                }, 
+                {
+                 "id":33,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"arrow-left"
+                        }]
+                }, 
+                {
+                 "id":34,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"arrow-up"
+                        }]
+                }, 
+                {
+                 "id":35,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"arrow-down"
+                        }]
+                }, 
+                {
+                 "id":36,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"crystal-2"
+                        }]
+                }, 
+                {
+                 "id":37,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"help"
+                        }]
+                }, 
+                {
+                 "id":39,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"trex-down"
+                        }]
+                }, 
+                {
+                 "id":40,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"trex-up"
+                        }]
+                }, 
+                {
+                 "id":41,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"trex-left"
+                        }]
+                }, 
+                {
+                 "id":42,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"trex-right"
+                        }]
+                }, 
+                {
+                 "id":48,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"ladder"
+                        }]
+                }, 
+                {
+                 "id":49,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"ladder-horizontal"
+                        }]
+                },
+            
+                {
+                 "id":50,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-right"
+                        }]
+                }, 
+                {
+                 "id":51,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-left"
+                        }]
+                }, 
+                {
+                 "id":52,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-up"
+                        }]
+                }, 
+                {
+                 "id":53,
+                 "properties":[
+                        {
+                         "name":"name",
+                         "type":"string",
+                         "value":"float-down"
+                        }]
+                }],
+         "tilewidth":16
+        }, 
+        {
+         "columns":8,
+         "firstgid":1996,
+         "image":"tilesets\/TilesetGUI.png",
+         "imageheight":64,
+         "imagewidth":128,
+         "margin":0,
+         "name":"TilesetGUI",
+         "spacing":0,
+         "tilecount":32,
+         "tileheight":16,
+         "tilewidth":16
+        }],
+ "tilewidth":16,
+ "type":"map",
+ "version":"1.10",
+ "width":20
+}
