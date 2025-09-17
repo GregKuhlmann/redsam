@@ -34,7 +34,8 @@ export const MAPS = [
   // "ice1",
   // "ice2",
   // "ice3",
-  "ice4",
+  // "ice4",
+  "ice5",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -69,6 +70,10 @@ const TOOLS = {
   ice4: [
     { index: ARROW, crystalsRemaining: 7 },
     { index: ARROW, crystalsRemaining: 6 },
+  ],
+  ice5: [
+    { index: ARROW, crystalsRemaining: 5 },
+    { index: ARROW, crystalsRemaining: 2 },
   ],
 };
 

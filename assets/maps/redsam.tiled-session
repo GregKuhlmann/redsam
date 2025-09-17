@@ -271,10 +271,18 @@
         },
         "ice4.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
+            }
+        },
+        "ice5.tmj": {
+            "scale": 2.6541,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 149.39150747899473,
+                "y": 90.42613315248107
             }
         },
         "level1.json": {
