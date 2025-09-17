@@ -873,7 +873,19 @@ export default class Game extends Phaser.Scene {
       }
       if (beast.state === "stalking" && !beast.moving) {
         const path = this.getBeastPath(beast);
-        if (path) {
+        if (beast.stabDir) {
+          beast.state = "idle";
+          beast.sprite.play("beast-idle");
+          beast.sword
+            .setPosition(beast.sprite.x + 8, beast.sprite.y + 8)
+            .setVisible(true);
+          beast.sword.body.enable = true;
+          beast.sword.setVelocity(
+            beast.stabDir.dx * 200,
+            beast.stabDir.dy * 200
+          );
+          beast.stabDir = null;
+        } else if (path) {
           this.moveEnemy(beast, path.x, path.y);
           beast.sprite.play(`beast-walk`, true);
         }
@@ -973,15 +985,7 @@ export default class Game extends Phaser.Scene {
     }
 
     this.sam.state = "stunned";
-    if (!beast.moving && beast.state === "stalking") {
-      beast.state = "idle";
-      beast.sprite.play("beast-idle");
-      beast.sword
-        .setPosition(beast.sprite.x + 8, beast.sprite.y + 8)
-        .setVisible(true);
-      beast.sword.body.enable = true;
-      beast.sword.setVelocity(dx * 200, dy * 200);
-    }
+    beast.stabDir = { dx, dy };
   }
 
   endGame() {
