@@ -39,7 +39,8 @@ export const MAPS = [
   // "ice6",
   // "ice7",
   // "ice8",
-  "ice9",
+  // "ice9",
+  "ice10",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -1153,12 +1154,12 @@ export default class Game extends Phaser.Scene {
   }
 
   getBeastPath(beast) {
-    if (!this.collides(beast, beast.dx, beast.dy)) {
+    if (!this.collides(beast, beast.dx, beast.dy, true)) {
       return { x: beast.x + beast.dx, y: beast.y + beast.dy };
     }
     beast.dx *= -1; // reverse direction
     beast.dy *= -1;
-    if (!this.collides(beast, beast.dx, beast.dy)) {
+    if (!this.collides(beast, beast.dx, beast.dy, true)) {
       return { x: beast.x + beast.dx, y: beast.y + beast.dy };
     }
   }
