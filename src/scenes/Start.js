@@ -43,6 +43,7 @@ import ice7 from "/assets/maps/ice7.json";
 import ice8 from "/assets/maps/ice8.json";
 import ice9 from "/assets/maps/ice9.json";
 import ice10 from "/assets/maps/ice10.json";
+import lake1 from "/assets/maps/lake1.json";
 import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
 import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
@@ -162,6 +163,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("ice8", ice8);
     this.load.tilemapTiledJSON("ice9", ice9);
     this.load.tilemapTiledJSON("ice10", ice10);
+    this.load.tilemapTiledJSON("lake1", lake1);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -273,7 +275,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      //this.scene.start("Game");
+      this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
