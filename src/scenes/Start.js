@@ -291,6 +291,7 @@ export default class Start extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     });
+    const localMap = localStorage.getItem("lastMap");
     this.input.once("pointerdown", () => {
       // Uncomment for intro
       //this.scene.start("Game");
@@ -319,7 +320,13 @@ export default class Start extends Phaser.Scene {
                 onComplete: () => {
                   redSam.destroy();
                   this.time.delayedCall(500, () => {
-                    this.scene.start("Game");
+                    if (localMap && localMap !== "desert1") {
+                      this.scene.start("GameOver", {
+                        map: localMap,
+                      });
+                    } else {
+                      this.scene.start("Game");
+                    }
                   });
                 },
               });

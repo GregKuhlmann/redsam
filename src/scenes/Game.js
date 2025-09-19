@@ -671,6 +671,9 @@ export default class Game extends Phaser.Scene {
         this.starting = false;
       }
     });
+
+    localStorage.setItem("lastMap", this.map);
+    // end of create()
   }
 
   update(_time, delta) {

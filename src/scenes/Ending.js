@@ -17,6 +17,7 @@ export default class Ending extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+    localStorage.removeItem("lastMap");
     // fade in camera
     this.cameras.main.fadeIn(2500, 0, 0, 0);
     this.cameras.main.once("camerafadeincomplete", () => {
