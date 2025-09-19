@@ -391,6 +391,14 @@
         },
         "lake8.tmj": {
             "scale": 2.60953125,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "lake9.tmj": {
+            "scale": 2.60953125,
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 159.9904197353452,

@@ -48,7 +48,7 @@ export const MAPS = [
   // "lake5",
   // "lake6",
   // "lake7",
-  // "lake8",
+  "lake8",
   "lake9",
 ];
 
