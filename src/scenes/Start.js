@@ -51,6 +51,7 @@ import lake5 from "/assets/maps/lake5.json";
 import lake6 from "/assets/maps/lake6.json";
 import lake7 from "/assets/maps/lake7.json";
 import lake8 from "/assets/maps/lake8.json";
+import lake9 from "/assets/maps/lake9.json";
 import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
 import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
@@ -178,6 +179,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("lake6", lake6);
     this.load.tilemapTiledJSON("lake7", lake7);
     this.load.tilemapTiledJSON("lake8", lake8);
+    this.load.tilemapTiledJSON("lake9", lake9);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)

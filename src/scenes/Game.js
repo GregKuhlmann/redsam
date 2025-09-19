@@ -48,7 +48,8 @@ export const MAPS = [
   // "lake5",
   // "lake6",
   // "lake7",
-  "lake8",
+  // "lake8",
+  "lake9",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -92,6 +93,7 @@ const TOOLS = {
   ice8: [{ index: HAMMER, crystalsRemaining: 2 }],
   lake4: [{ index: LADDER, crystalsRemaining: 1 }],
   lake8: [{ index: HAMMER, crystalsRemaining: 0 }],
+  lake9: [{ index: HAMMER, crystalsRemaining: 1 }],
 };
 
 function isRock(tile) {
