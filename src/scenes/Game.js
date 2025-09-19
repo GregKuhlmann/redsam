@@ -44,7 +44,8 @@ export const MAPS = [
   // "lake1",
   // "lake2",
   // "lake3",
-  "lake4",
+  // "lake4",
+  "lake5",
 ];
 
 export const MUSIC_VOLUME = 0.5;

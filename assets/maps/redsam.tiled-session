@@ -343,13 +343,29 @@
         },
         "lake2.tmj": {
             "scale": 2.60953125,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 159.9904197353452,
                 "y": 111.89749116819353
             }
         },
         "lake3.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "lake4.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
+        "lake5.tmj": {
             "scale": 2.60953125,
             "selectedLayer": 0,
             "viewCenter": {
