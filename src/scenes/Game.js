@@ -1,55 +1,56 @@
 import * as Phaser from "phaser";
 
 export const MAPS = [
-  // "desert1",
-  // "desert2",
-  // "desert3",
-  // "desert4",
-  // "desert5",
-  // "desert6",
-  // "desert7",
-  // "desert8",
-  // "desert9",
-  // "desert10",
-  // "snow1",
-  // "snow2",
-  // "snow3",
-  // "snow4",
-  // "snow5",
-  // "snow6",
-  // "snow7",
-  // "snow8",
-  // "snow9",
-  // "snow10",
-  // "moon1",
-  // "moon2",
-  // "moon3",
-  // "moon4",
-  // "moon5",
-  // "moon6",
-  // "moon7",
-  // "moon8",
-  // "moon9",
-  // "moon10",
-  // "ice1",
-  // "ice2",
-  // "ice3",
-  // "ice4",
-  // "ice5",
-  // "ice6",
-  // "ice7",
-  // "ice8",
-  // "ice9",
-  // "ice10",
-  // "lake1",
-  // "lake2",
-  // "lake3",
-  // "lake4",
-  // "lake5",
-  // "lake6",
-  // "lake7",
+  "desert1",
+  "desert2",
+  "desert3",
+  "desert4",
+  "desert5",
+  "desert6",
+  "desert7",
+  "desert8",
+  "desert9",
+  "desert10",
+  "snow1",
+  "snow2",
+  "snow3",
+  "snow4",
+  "snow5",
+  "snow6",
+  "snow7",
+  "snow8",
+  "snow9",
+  "snow10",
+  "moon1",
+  "moon2",
+  "moon3",
+  "moon4",
+  "moon5",
+  "moon6",
+  "moon7",
+  "moon8",
+  "moon9",
+  "moon10",
+  "ice1",
+  "ice2",
+  "ice3",
+  "ice4",
+  "ice5",
+  "ice6",
+  "ice7",
+  "ice8",
+  "ice9",
+  "ice10",
+  "lake1",
+  "lake2",
+  "lake3",
+  "lake4",
+  "lake5",
+  "lake6",
+  "lake7",
   "lake8",
   "lake9",
+  "lake10",
 ];
 
 export const MUSIC_VOLUME = 0.5;
@@ -749,9 +750,9 @@ export default class Game extends Phaser.Scene {
         this.tweens.add({
           targets: cyclope.laser,
           displayHeight: 50,
-          duration: 300,
+          duration: 400,
           onComplete: () => {
-            cyclope.laser.setVelocityY(300);
+            cyclope.laser.setVelocityY(180);
           },
         });
       } else if (
@@ -771,9 +772,9 @@ export default class Game extends Phaser.Scene {
         this.tweens.add({
           targets: cyclope.laser,
           displayHeight: 50,
-          duration: 300,
+          duration: 400,
           onComplete: () => {
-            cyclope.laser.setVelocityY(-300);
+            cyclope.laser.setVelocityY(-180);
           },
         });
       } else if (
@@ -793,9 +794,9 @@ export default class Game extends Phaser.Scene {
         this.tweens.add({
           targets: cyclope.laser,
           displayWidth: 50,
-          duration: 300,
+          duration: 400,
           onComplete: () => {
-            cyclope.laser.setVelocityX(300);
+            cyclope.laser.setVelocityX(180);
           },
         });
       } else if (
@@ -815,9 +816,9 @@ export default class Game extends Phaser.Scene {
         this.tweens.add({
           targets: cyclope.laser,
           displayWidth: 50,
-          duration: 300,
+          duration: 400,
           onComplete: () => {
-            cyclope.laser.setVelocityX(-300);
+            cyclope.laser.setVelocityX(-180);
           },
         });
       }

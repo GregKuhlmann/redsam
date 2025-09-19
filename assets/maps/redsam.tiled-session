@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "ice2.tmj",
+    "activeFile": "lake10.tmj",
     "expandedProjectPaths": [
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
@@ -341,6 +341,14 @@
                 "y": 111.89749116819353
             }
         },
+        "lake10.tmj": {
+            "scale": 2.60953125,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 159.9904197353452,
+                "y": 111.89749116819353
+            }
+        },
         "lake2.tmj": {
             "scale": 2.60953125,
             "selectedLayer": 1,
@@ -600,7 +608,7 @@
         },
         "tilesets/TilesetHouse.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1.67,
+            "scaleInDock": 2.5907,
             "scaleInEditor": 1
         },
         "tilesets/TilesetItems.tsx": {
@@ -626,38 +634,31 @@
     "map.tileWidth": 16,
     "map.width": 20,
     "openFiles": [
-        "moon1.tmj",
-        "moon2.tmj",
-        "moon3.tmj",
-        "moon4.tmj",
-        "moon5.tmj",
-        "moon6.tmj",
-        "ice1.tmj",
-        "ice2.tmj",
-        "ice3.tmj",
-        "ice4.tmj",
-        "ice5.tmj",
-        "ice6.tmj",
-        "ice7.tmj",
-        "ice8.tmj",
-        "ice9.tmj",
-        "ice10.tmj",
-        "snow10.tmj"
+        "lake1.tmj",
+        "lake2.tmj",
+        "lake3.tmj",
+        "lake4.tmj",
+        "lake5.tmj",
+        "lake6.tmj",
+        "lake7.tmj",
+        "lake8.tmj",
+        "lake9.tmj",
+        "lake10.tmj"
     ],
     "project": "redsam.tiled-project",
     "recentFiles": [
+        "lake1.tmj",
+        "lake2.tmj",
+        "lake3.tmj",
+        "lake4.tmj",
+        "lake5.tmj",
+        "lake6.tmj",
+        "lake7.tmj",
+        "lake8.tmj",
+        "lake9.tmj",
+        "lake10.tmj",
         "desert6.tmj",
-        "desert5.tmj",
-        "desert4.tmj",
-        "desert3.tmj",
-        "desert2.tmj",
-        "desert1.tmj",
-        "ice8.tmj",
-        "ice7.tmj",
-        "ice6.tmj",
-        "ice5.tmj",
-        "ice4.tmj",
-        "ice3.tmj"
+        "desert5.tmj"
     ],
     "tileset.embedInMap": true,
     "tileset.tileSize": {

@@ -52,6 +52,7 @@ import lake6 from "/assets/maps/lake6.json";
 import lake7 from "/assets/maps/lake7.json";
 import lake8 from "/assets/maps/lake8.json";
 import lake9 from "/assets/maps/lake9.json";
+import lake10 from "/assets/maps/lake10.json";
 import tilesetHouse from "/assets/maps/tilesets/TilesetHouse.png";
 import tilesetNature from "/assets/maps/tilesets/TilesetNature.png";
 import tilesetWater from "/assets/maps/tilesets/TilesetWater.png";
@@ -180,6 +181,7 @@ export default class Start extends Phaser.Scene {
     this.load.tilemapTiledJSON("lake7", lake7);
     this.load.tilemapTiledJSON("lake8", lake8);
     this.load.tilemapTiledJSON("lake9", lake9);
+    this.load.tilemapTiledJSON("lake10", lake10);
     this.game.renderer.pipelines.add(
       "Grayscale",
       new GrayscalePipeline(this.game)
@@ -291,7 +293,7 @@ export default class Start extends Phaser.Scene {
     });
     this.input.once("pointerdown", () => {
       // Uncomment for intro
-      this.scene.start("Game");
+      //this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
