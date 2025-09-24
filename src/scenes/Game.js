@@ -1,57 +1,6 @@
 import * as Phaser from "phaser";
 
-export const MAPS = [
-  "desert1",
-  "desert2",
-  "desert3",
-  "desert4",
-  "desert5",
-  "desert6",
-  "desert7",
-  "desert8",
-  "desert9",
-  "desert10",
-  "snow1",
-  "snow2",
-  "snow3",
-  "snow4",
-  "snow5",
-  "snow6",
-  "snow7",
-  "snow8",
-  "snow9",
-  "snow10",
-  "moon1",
-  "moon2",
-  "moon3",
-  "moon4",
-  "moon5",
-  "moon6",
-  "moon7",
-  "moon8",
-  "moon9",
-  "moon10",
-  "ice1",
-  "ice2",
-  "ice3",
-  "ice4",
-  "ice5",
-  "ice6",
-  "ice7",
-  "ice8",
-  "ice9",
-  "ice10",
-  "lake1",
-  "lake2",
-  "lake3",
-  "lake4",
-  "lake5",
-  "lake6",
-  "lake7",
-  "lake8",
-  "lake9",
-  "lake10",
-];
+import { MAPS, PASSWORDS } from "/src/scenes/Start.js";
 
 export const MUSIC_VOLUME = 0.5;
 
@@ -673,6 +622,10 @@ export default class Game extends Phaser.Scene {
     });
 
     localStorage.setItem("lastMap", this.map);
+    const password = PASSWORDS.indexOf(localStorage.getItem("password")) || 0;
+    if (MAPS.indexOf(this.map) > password) {
+      localStorage.setItem("password", PASSWORDS[MAPS.indexOf(this.map)]);
+    }
     // end of create()
   }
 
@@ -1062,7 +1015,7 @@ export default class Game extends Phaser.Scene {
         this.time.delayedCall(2000, () => {
           this.lives--;
           if (this.lives <= 0) {
-            this.scene.start("GameOver", { map: this.map });
+            this.scene.start("GameOver");
             return;
           }
           this.scene.restart({ map: this.map, lives: this.lives });

@@ -1,6 +1,7 @@
 import * as Phaser from "phaser";
 
 import GrayscalePipeline from "/src/shaders/grayscale.js";
+import DullPipeline from "/src/shaders/dull.js";
 import ShadowPipeline from "/src/shaders/shadow.js";
 
 import desert1 from "/assets/maps/desert1.json";
@@ -104,6 +105,112 @@ import clickToStart from "/assets/images/click-to-start.png";
 import laser from "/assets/images/laser.png";
 import sword from "/assets/images/big-sword.png";
 
+export const MAPS = [
+  "desert1",
+  "desert2",
+  "desert3",
+  "desert4",
+  "desert5",
+  "desert6",
+  "desert7",
+  "desert8",
+  "desert9",
+  "desert10",
+  "snow1",
+  "snow2",
+  "snow3",
+  "snow4",
+  "snow5",
+  "snow6",
+  "snow7",
+  "snow8",
+  "snow9",
+  "snow10",
+  "moon1",
+  "moon2",
+  "moon3",
+  "moon4",
+  "moon5",
+  "moon6",
+  "moon7",
+  "moon8",
+  "moon9",
+  "moon10",
+  "ice1",
+  "ice2",
+  "ice3",
+  "ice4",
+  "ice5",
+  "ice6",
+  "ice7",
+  "ice8",
+  "ice9",
+  "ice10",
+  "lake1",
+  "lake2",
+  "lake3",
+  "lake4",
+  "lake5",
+  "lake6",
+  "lake7",
+  "lake8",
+  "lake9",
+  "lake10",
+];
+
+export const PASSWORDS = [
+  "BBBV",
+  "BCBT",
+  "BDBR",
+  "BGBQ",
+  "BHBP",
+  "BJBM",
+  "BKBL",
+  "BLBK",
+  "BMBJ",
+  "BPBH",
+  "BQBG",
+  "BRBD",
+  "BTBC",
+  "BVBB",
+  "BYZZ",
+  "BZZY",
+  "CBZV",
+  "CCZT",
+  "CDZR",
+  "CGZQ",
+  "CHZP",
+  "CJZM",
+  "CKZL",
+  "CLZK",
+  "CMZJ",
+  "CPZH",
+  "CQZG",
+  "CRZD",
+  "CTZC",
+  "CVZB",
+  "CYYZ",
+  "CZYY",
+  "DBYV",
+  "DCYT",
+  "DDYR",
+  "DGYQ",
+  "DHYP",
+  "DJYM",
+  "DKYL",
+  "DLYK",
+  "DMYJ",
+  "DPYH",
+  "DQYG",
+  "DRYD",
+  "DTYC",
+  "DVYB",
+  "DYVZ",
+  "DZVY",
+  "GBVV",
+  "GCVT",
+];
+
 export default class Start extends Phaser.Scene {
   constructor() {
     super("Start");
@@ -186,6 +293,7 @@ export default class Start extends Phaser.Scene {
       "Grayscale",
       new GrayscalePipeline(this.game)
     );
+    this.game.renderer.pipelines.add("Dull", new DullPipeline(this.game));
     this.game.renderer.pipelines.add("Shadow", new ShadowPipeline(this.game));
     this.load.spritesheet("dragon", spriteSheetDragon, {
       frameWidth: 16,
@@ -291,10 +399,8 @@ export default class Start extends Phaser.Scene {
       yoyo: true,
       repeat: -1,
     });
-    const localMap = localStorage.getItem("lastMap");
+    const password = PASSWORDS.indexOf(localStorage.getItem("password")) || 0;
     this.input.once("pointerdown", () => {
-      // Uncomment for intro
-      //this.scene.start("Game");
       start.destroy();
       this.sound.play("slash");
       var faded = false;
@@ -320,10 +426,8 @@ export default class Start extends Phaser.Scene {
                 onComplete: () => {
                   redSam.destroy();
                   this.time.delayedCall(500, () => {
-                    if (localMap && localMap !== "desert1") {
-                      this.scene.start("GameOver", {
-                        map: localMap,
-                      });
+                    if (password > 0) {
+                      this.scene.start("GameOver");
                     } else {
                       this.scene.start("Game");
                     }
