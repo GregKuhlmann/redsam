@@ -9,8 +9,6 @@ import { MAPS, PASSWORDS } from "/src/scenes/Start.js";
 export default class GameOver extends Phaser.Scene {
   constructor() {
     super("GameOver");
-    this.selected = null;
-    this.chosen = null;
   }
 
   preload() {
@@ -38,6 +36,8 @@ export default class GameOver extends Phaser.Scene {
   }
 
   create() {
+    this.selected = null;
+    this.chosen = null;
     const { width, height } = this.scale;
     let lastMap = MAPS.indexOf(localStorage.getItem("lastMap")) || 0;
     const password = PASSWORDS.indexOf(localStorage.getItem("password")) || 0;
